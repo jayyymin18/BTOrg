@@ -9,6 +9,10 @@
     <aura:attribute name="endPage" type="Integer"/>
     <aura:attribute name="totalRecords" type="Integer"/>
     <aura:attribute name="pageSize" type="Integer" default="10"/>
+	<aura:attribute name="searchKeyword" type="String" default="" />
+    <aura:attribute name="quotId" type="String" />
+    <aura:attribute name="rfqs" type="List" />
+    <aura:attribute name="disableBtn" type="Boolean" default="false" />
     
     <!-- Attribute Declration For Pagination End-->
     
@@ -18,35 +22,12 @@
     <div class="slds-modal__header" style="font-size:17px;">
         Import Master Quotes
     </div>
-	<lightning:layoutItem padding="around-small" class="slds15">
-                <lightning:input autocomplete="off" type="search" placeholder="Search Product Family" variant="label-hidden" value="{!v.searchFamilyFilter}" onclick="{!c.searchProductFamily}" onkeyup="{!c.searchProductFamily}" />
-                <aura:if isTrue="{!v.displayFamilyList}" >
-                    <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox">
-                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                            <aura:iteration items="{!v.ProductFamilyList}" var="result">
-                                <li role="presentation" class="slds-listbox__item" data-value="{!result}" onclick="{!c.clickHandler0}">
-                                    <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" role="option">
-                                        <span class="slds-media__body">
-                                            <span class="slds-truncate" title="All Opportunities">
-                                                <span>{!result}</span>
-                                            </span>
-                                        </span>
-                                    </div>
-                                </li>
-                            </aura:iteration>
-                            <aura:if isTrue="{!empty(v.ProductFamilyList)}">
-                                <span>
-                                    <p class="blank-lst">
-                                        There Are No Product Family With This Name
-                                    </p>
-                                </span>
-                            </aura:if>
-                        </ul>
-                    </div>
-                </aura:if>
-            </lightning:layoutItem>
+	
     <div class="slds-modal__content slds-p-around--large">
         <div class="slds slds-scope">
+			<lightning:layoutItem padding="around-small" size="12">
+				<lightning:input value="{!v.searchKeyword}" placeholder="Search By Quote Name..." name="searchField" onchange="{! c.onSearch }"/>
+			</lightning:layoutItem>
     		<table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
     		    <thead>
     				<tr class="slds-text-title_caps">
@@ -113,11 +94,11 @@
     		</table>
     		<br/>
             <lightning:buttonGroup >
-                <lightning:button label="Previous" disabled="{!v.startPage == 0}"  
+                <lightning:button label="Previous" disabled="{!or(v.startPage == 0, v.disableBtn)}"
                                   onclick="{!c.previous}" variant="brand"
                                   iconName='utility:back'/>
                 &nbsp; &nbsp; &nbsp;
-                <lightning:button label="Next" disabled="{!v.endPage >= v.totalRecords}" 
+                <lightning:button label="Next" disabled="{!or(v.endPage >= v.totalRecords, v.disableBtn)}"
                                   onclick="{!c.next}" variant="brand"
                                   iconName='utility:forward' iconPosition='right'/>
             </lightning:buttonGroup>

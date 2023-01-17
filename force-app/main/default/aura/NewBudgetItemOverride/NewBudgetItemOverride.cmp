@@ -169,7 +169,8 @@
             .slds-modal__container{height:80% !important ;width:70% !important}
         }
     </aura:html>
-    <div class="slds-modal__container">
+    <div class="slds-modal__content " style="width:60%;margin:20px auto;">
+            <div class="slds slds-scope">
         <!-- <div style="height:80%;width:70%"> -->
         <header class="slds-modal__header">
             <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="close" variant="bare-inverse" class="slds-modal__close" />
@@ -177,6 +178,9 @@
             <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">New Budget Line</h2>
             <p></p>
         </header>
+
+
+
         <lightning:recordEditForm aura:id="recordViewForm" objectApiName="buildertek__Budget_Item__c" onsubmit="{!c.handleSubmit}" density="Comfy" >
             <div class="slds-modal__content " id="modal-content-id-1">
                 <div class="slds-scrollable" style="height:33.5rem;">
@@ -272,6 +276,7 @@
             </footer>
         </lightning:recordEditForm>
         <!-- </div> -->
+    </div>
     </div>
     <aura:if isTrue="{!v.isLoading}">
         <div aura:id="spinnerId" class="slds-spinner_container">

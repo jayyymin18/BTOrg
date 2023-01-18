@@ -99,8 +99,6 @@
     doInit: function(component, event, helper) {
 
 
-
-
         var workspaceAPI = component.find("workspace");
         workspaceAPI.getEnclosingTabId().then((response) => {
             let opendTab = response.tabId;
@@ -210,11 +208,11 @@
         helper.getcurr(component, event, helper);
         helper.getmulticur(component, event, helper);
         component.set("v.listofproductfamily", '');
-
+        
         //var bt = component.get("v.Isbtvalues");
         //alert('kkkkkk'+bt);
         var btadminaction = component.get("c.getadminvalues");
-
+        
         //alert("haii");
         btadminaction.setCallback(this, function(response) {
             if (response.getState() === 'SUCCESS') {
@@ -335,16 +333,6 @@
             if (state === "SUCCESS") {
                 helper.fetchPickListVal(component, event, helper);
                 var storeResponse = response.getReturnValue();
-                //add the "--None--" option  in picklist
-                storeResponse.unshift({
-                    productfamilyvalues: "--None--",
-                    Id: ""
-                });
-                //add undefined option in picklist
-                storeResponse.unshift({
-                    productfamilyvalues: undefined,
-                    Id: ""
-                });
                 console.log('storeResponse --> ', storeResponse);
                 // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
                 if (storeResponse.length == 0) {

@@ -304,6 +304,7 @@
             "recordByEvent": product
         });
         compEvent.fire();
+        component.set('v.productfamily', undefined);
         component.set('v.newBudgetLine.Name', '');
         component.set('v.selectedContractor', null);
         component.set('v.newBudgetLine.buildertek__Group__c', null);
@@ -334,6 +335,17 @@
             if (state === "SUCCESS") {
                 helper.fetchPickListVal(component, event, helper);
                 var storeResponse = response.getReturnValue();
+                //add the "--None--" option  in picklist
+                storeResponse.unshift({
+                    productfamilyvalues: "--None--",
+                    Id: ""
+                });
+                //add undefined option in picklist
+                storeResponse.unshift({
+                    productfamilyvalues: undefined,
+                    Id: ""
+                });
+                console.log('storeResponse --> ', storeResponse);
                 // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
                 if (storeResponse.length == 0) {
                     component.set("v.Message", 'No Result Found...');
@@ -345,6 +357,8 @@
                 if (component.get("v.listofproductfamily").length > 0) {
                     component.set("v.productfamily", component.get("v.listofproductfamily")[0].productfamilyvalues);
                 }
+                console.log('productfamily --> ', component.get("v.productfamily"));
+                console.log('listofproductfamily --> ', component.get("v.listofproductfamily"));
             }
 
         });

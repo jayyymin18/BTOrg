@@ -22,6 +22,12 @@
     <div class="slds-modal__header" style="font-size:17px;">
         Import Master Quotes
     </div>
+
+	<aura:html tag="style">
+		.slds-form-element__label{
+			display: none;;
+		}
+	</aura:html>
 	
     <div class="slds-modal__content slds-p-around--large">
         <div class="slds slds-scope">
@@ -31,7 +37,7 @@
     		<table class="slds-table slds-table_bordered slds-table_fixed-layout" role="grid">
     		    <thead>
     				<tr class="slds-text-title_caps">
-    					<th scope="col" style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-left-radius:5px;vertical-align: top;line-height: 2;">
+    					<th scope="col" style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-left-radius:5px;vertical-align: top;line-height: 2; width:30px;">
     				        <ui:inputCheckbox aura:id="checkContractors" change="{!c.selectAll}" />		
     					</th>
     					<th  style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
@@ -83,7 +89,7 @@
             			                <ui:outputText value="{!rec.quoteRecord.buildertek__Type__c}" />  
             			            </td> -->
             			            <td  role="gridcell">
-            						    <ui:outputText value="{!rec.quoteRecord.buildertek__Quote_Amount__c}" />	    
+										<lightning:formattedNumber value="{!rec.quoteRecord.buildertek__Quote_Amount__c}" style="currency" />    
             						</td>    
         						</aura:set>
     			            </aura:if>

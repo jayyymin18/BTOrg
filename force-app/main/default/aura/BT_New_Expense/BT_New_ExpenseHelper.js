@@ -73,7 +73,6 @@
         action.setCallback(this, function(response) {
             component.set('v.isLoading' , false);
             console.log(response.getReturnValue());
-
             if (response.getState() === "SUCCESS") {
                 var response = response.getReturnValue();
                 var lookuprec = response.LookupRec;

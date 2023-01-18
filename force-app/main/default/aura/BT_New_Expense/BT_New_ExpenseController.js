@@ -98,7 +98,7 @@
         console.log(component.get('v.budgetId') + '::::::');
 
         if(component.get('v.parentobjectName') == 'buildertek__Budget__c'){
-            //alert('RecordId'+RecordId);
+            //console.log('RecordId'+RecordId);
             component.find("incidentlookupid").set("v.value", RecordId);
         }
         if(component.get('v.parentobjectName') == 'buildertek__Project__c' && component.get('v.isProjectFieldExist') == true){
@@ -109,7 +109,6 @@
     },
     submitForm :  function(component, event, helper) {
        console.log('Submit form');
-       console.log(document.getElementById('submitForm'));
        document.getElementById('submitForm').click();
        component.set("v.duplicateExp",false); 
 
@@ -117,7 +116,7 @@
     handleSubmit: function (component, event, helper) {
         console.log('handle submit');
         component.set('v.isLoading' , true);
-        event.preventDefault(); // Prevent default submit
+        event.preventDefault(); // stop form submission
         var eventFields = event.getParam("fields");
         var expenseDescription = eventFields["buildertek__Description__c"];
         var expenseType = component.get("v.typevalue");
@@ -128,9 +127,6 @@
             var expenseAmount = null;
         }
         if(component.get("v.duplicateExp") == false){
-
-            component.set('v.isLoading' , false);
-
             var action = component.get("c.duplicateExpense");
             action.setParams({
                 "expenseDescription": expenseDescription,
@@ -140,9 +136,11 @@
             });
             action.setCallback(this, function (response) {
                 if (response.getState() === "SUCCESS") {
+                   component.set('v.isLoading', false);
 
                     var result = response.getReturnValue();
                     if(result == 'DuplicateExpense'){
+                        //component.set("v.isnew", false);
                         component.set("v.duplicateExp",true); 
                         var x= document.querySelector('.maindiv');
                         x.style.visibility='hidden';
@@ -150,29 +148,31 @@
                         if(component.get('v.parentobjectName') == 'buildertek__Project__c'){
                             eventFields["buildertek__Project__c"] = component.get("v.parentRecordId");
                         }
-                        event.preventDefault(); // Prevent default submit
-                        var fields = event.getParam("listOfFields");
-                        component.find('recordViewForm').submit(fields); 
+                        console.log(component.find('recordViewForm') + ':::::');
+                        component.find('recordViewForm').submit(eventFields); // Submit form
                         helper.getbtadminrecord(component,event,helper);
-
                     }
                 }
             });
             $A.enqueueAction(action);
-        }else{
-            console.log('outside loop');
-            if(component.get('v.parentobjectName') == 'buildertek__Project__c'){
+        }
+        else{
+            console.log('inisde if');
+           if(component.get('v.parentobjectName') == 'buildertek__Project__c'){
                 eventFields["buildertek__Project__c"] = component.get("v.parentRecordId");
             }
-            event.preventDefault(); // Prevent default submit
-            var fields = event.getParam("listOfFields");
-            component.find('recordViewForm').submit(fields); 
+            console.log('below');
+            component.set('v.isLoading', true);
+            component.find('recordViewForm').submit(eventFields); // Submit form
             helper.getbtadminrecord(component,event,helper);
-
-        }        
-     },
-
+        } 
+        component.set('v.isLoading' , false);
+        // debugger;
+       
+        
+    },
     onRecordSuccess: function (component, event, helper) {
+        // debugger;
         console.log('on record success');
         var payload = event.getParams().response;
         var expenseId = (payload.id).replace('"','').replace('"',''); 
@@ -298,7 +298,7 @@
         component.set("v.displayuBudgetLine", false);
 
     }, 
-
+    
     // closeSearchOption:function (component, event, helper){
     //     component.set("v.displayuBudgetLine", false);
     // }, 

@@ -82,36 +82,37 @@
         console.log(component.get('v.parentobjectName'));
         component.set('v.typevalue', 'Material');
         var RecordId = component.get("v.parentRecordId");
-        var budgetRecordId= component.get('v.budgetId');
-        if(budgetRecordId){
-            var action = component.get("c.getBudgetline");
-            action.setParams({
-                recordId:component.get('v.budgetId')
-            });
-            action.setCallback(this, function (response) {
-               component.set('v.budgetLineList' , response.getReturnValue());
-               console.log(component.get('v.budgetLineList'));
-            })
-            $A.enqueueAction(action);
-            }
-        console.log({RecordId});
-        console.log(component.get('v.budgetId') + '::::::');
-
         if(component.get('v.parentobjectName') == 'buildertek__Budget__c'){
-            //console.log('RecordId'+RecordId);
             component.find("incidentlookupid").set("v.value", RecordId);
         }
         if(component.get('v.parentobjectName') == 'buildertek__Project__c' && component.get('v.isProjectFieldExist') == true){
-            
             component.find("projectlookupid").set("v.value", RecordId);
         }
-       
     },
     submitForm :  function(component, event, helper) {
        console.log('Submit form');
+       var action = component.get("c.bypassTrigger");
+       action.setCallback(this, function(response){
+            var state = response.getState();
+            if (state = 'SUCCESS') {
+                var result = response.getReturnValue();
+                if (result) {
+                    console.log('bypass');
+                }else{
+                    var temp = response.getReturnValue();
+                    console.log('eror ',{temp});
+                    console.log('erro inside');
+                }
+            }else{
+                console.log('error 1');
+                var temp = response.getReturnValue();
+                console.log('eror ',{temp});
+                console.log('erro outside');
+            }
+        });
+        $A.enqueueAction(action);
        document.getElementById('submitForm').click();
        component.set("v.duplicateExp",false); 
-
     },
     handleSubmit: function (component, event, helper) {
         console.log('handle submit');
@@ -148,28 +149,32 @@
                         if(component.get('v.parentobjectName') == 'buildertek__Project__c'){
                             eventFields["buildertek__Project__c"] = component.get("v.parentRecordId");
                         }
-                        console.log(component.find('recordViewForm') + ':::::');
+
+                        console.log(eventFields["buildertek__Budget__c"]);
+                        eventFields["buildertek__Budget__c"] = component.get("v.selectedBudget");
+                        eventFields["buildertek__Budget_Line__c"] = component.get("v.selectedBudgetLine");
+                        console.log(eventFields["buildertek__Budget_Line__c"]);
                         component.find('recordViewForm').submit(eventFields); // Submit form
                         helper.getbtadminrecord(component,event,helper);
                     }
+                }else{
+                    var temp = response.getError();
+                    debugger
+                    console.log('error msg --> ',{temp});
                 }
             });
             $A.enqueueAction(action);
         }
         else{
-            console.log('inisde if');
            if(component.get('v.parentobjectName') == 'buildertek__Project__c'){
                 eventFields["buildertek__Project__c"] = component.get("v.parentRecordId");
             }
-            console.log('below');
-            component.set('v.isLoading', true);
+            eventFields["buildertek__Budget__c"] = component.get("v.selectedBudget");
+            eventFields["buildertek__Budget_Line__c"] = component.get("v.selectedBudgetLine");
+            console.log(eventFields["buildertek__Budget_Line__c"]);
             component.find('recordViewForm').submit(eventFields); // Submit form
             helper.getbtadminrecord(component,event,helper);
-        } 
-        component.set('v.isLoading' , false);
-        // debugger;
-       
-        
+        }         
     },
     onRecordSuccess: function (component, event, helper) {
         // debugger;
@@ -178,7 +183,10 @@
         var expenseId = (payload.id).replace('"','').replace('"',''); 
         component.set("v.expenseRecordId",payload.id);
         component.set("v.expenseRecordName",payload.Name);
-        console.log(component.get('v.budgetId') + 'budget id::::::');
+        console.log(component.get('v.selectedBudget') + 'budget id::::::');
+        console.log(component.get('v.selectedBudgetLine') + 'selectedLine id::::::');
+
+        
         if(component.get('v.budgetId')){
             var workspaceAPI = component.find("workspace");
             workspaceAPI.getFocusedTabInfo().then(function (response) {
@@ -266,55 +274,53 @@
         $A.get('e.force:refreshView').fire();
 
     },
-    getBudgetValue:function (component, event, helper) {
-        helper.getBudgetValue(component, event, helper);
-        // console.log(event.getSource().get('v.value'));
-        // var getId=event.getSource().get('v.value');
-        // component.set('v.parentBudgetId' , getId[0]);
 
-        // console.log('On option chage');
-        // var action = component.get("c.getBudgetline");
-		// action.setParams({
-        //     recordId:component.get('v.parentBudgetId')
-        // });
-		// action.setCallback(this, function (response) {
-        //    component.set('v.budgetLineList' , response.getReturnValue());
-        //    console.log(component.get('v.budgetLineList'));
-        // })
-        // $A.enqueueAction(action);
-
-
+    getProjectValue:function (component, event, helper) {
+        console.log('jon');
+       helper.getProjectValue(component, event, helper);
     },
 
     displayBudget:function (component, event, helper) {
         component.set("v.displayuBudgetLine", true);
     }, 
+    displayBudgetRelatedProject:function (component, event, helper) {
+        console.log('proj');
+        component.set("v.displayuBudget", true);
+    }, 
 
     clickHandler:function (component, event, helper){
         console.log(event.currentTarget.value);
-        var record = event.currentTarget.dataset.value;
+        // var record = event.currentTarget.dataset.value;
+        var record = event.currentTarget.id;
+        var value=event.currentTarget.dataset.value;
         console.log('record ==> '+record);
-        component.set("v.selectedLine", record);
+        component.set("v.selectedLine", value);
+        component.set("v.selectedBudgetLine", record);
+
         component.set("v.displayuBudgetLine", false);
 
     }, 
-    
-    // closeSearchOption:function (component, event, helper){
-    //     component.set("v.displayuBudgetLine", false);
-    // }, 
-    // onChange:function (component, event, helper) {
-    //     console.log('On option chage');
-    //     var action = component.get("c.getBudgetline");
-	// 	action.setParams({
-    //         recordId:component.get('v.parentBudgetId')
-    //     });
-	// 	action.setCallback(this, function (response) {
-    //        component.set('v.budgetLineId' , response.getReturnValue());
-    //        console.log(component.get('v.budgetLineId'));
-    //     })
-    //     $A.enqueueAction(action);
+    clickHandler0:function (component, event, helper){
+        console.log(event.currentTarget.id);
+        console.log(event.currentTarget.dataset.value);
 
+        var record = event.currentTarget.id;
+        var value=event.currentTarget.dataset.value;
+        console.log('record ==> '+record);
+        component.set("v.budgetId", value);
+        component.set("v.selectedBudget", record);
 
-    // }
+        
+        component.set("v.displayuBudget", false);
+        var action = component.get("c.getBudgetline");
+		action.setParams({
+            recordId:record
+        });
+		action.setCallback(this, function (response) {
+           component.set('v.budgetLineList' , response.getReturnValue());
+           console.log(component.get('v.budgetLineList'));
+        })
+        $A.enqueueAction(action);
 
+    }, 
 })

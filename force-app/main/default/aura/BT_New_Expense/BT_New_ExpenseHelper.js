@@ -10,6 +10,8 @@
 	},
 	getName: function (component, event, helper) {
         // component.set('v.isLoading' , true);
+        console.log('get name');
+        console.log(component.get("v.parentRecordId"));
 		var action = component.get("c.getBudgetNameFromProject");
 		action.setParams({
 			recordId: component.get("v.parentRecordId")
@@ -104,28 +106,7 @@
         });
         $A.enqueueAction(action);
     },
-  /* getMessage : function (component, event, helper) {
-        setTimeout(function () {
-            component.set("v.ismessage",false);
-            var workspaceAPI = component.find("workspace");
-            workspaceAPI.getFocusedTabInfo().then(function (response) {
-                var focusedTabId = response.tabId;
-                workspaceAPI.closeTab({
-                    tabId: focusedTabId
-                });
-            }).catch(function (error) {
-                console.log('Error', JSON.stringify(error));
-            });
-             $A.get("e.force:closeQuickAction").fire();
-            var navEvt = $A.get("e.force:navigateToSObject");
-            navEvt.setParams({
-                "recordId": component.get("v.expenseRecordId"),
-                "slideDevName": "related"
-            });
-            navEvt.fire();
-            
-        }, 2000);
-    },*/
+  
     getMessage : function (component, event, helper) {
         var expenseId;
         component.set('v.isLoading', false);
@@ -171,23 +152,27 @@
             navEvt.fire(); 
         }, 2000);
     },
-    getBudgetValue:function (component, event, helper) {
-        console.log(event.getSource().get('v.value'));
+    getProjectValue:function (component, event, helper) {
+        console.log('inside pro ifd');
         var getId=event.getSource().get('v.value');
-        component.set('v.parentBudgetId' , getId[0]);
-
-        console.log('On option chage');
-        var action = component.get("c.getBudgetline");
+        console.log(getId);
+        component.set('v.projectId' , getId);
+        var action = component.get("c.getBudget");
 		action.setParams({
-            recordId:component.get('v.parentBudgetId')
+            recordId:component.get('v.projectId')
         });
 		action.setCallback(this, function (response) {
-           component.set('v.budgetLineList' , response.getReturnValue());
-           console.log(component.get('v.budgetLineList'));
+            console.log(response.getReturnValue());
+            console.log(response.getState());
+
+            if(response.getState() == 'SUCCESS'){
+                component.set('v.budgetList' , response.getReturnValue());
+                console.log(component.get('v.budgetList'));
+            }
+
         })
         $A.enqueueAction(action);
-
-
     },
+
 
 })

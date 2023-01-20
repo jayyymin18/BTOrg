@@ -18,8 +18,27 @@
 		});
 		action.setCallback(this, function (response) {
 			if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
-				var budgetId = response.getReturnValue();
-				component.set("v.budgetId", budgetId);
+				var budgetList = response.getReturnValue();
+                console.log('budgetList ==> ',{budgetList});
+                if (budgetList.length > 0) {
+                    component.set("v.selectedBudget", budgetList[0].Id);
+                    component.set("v.selectedBudgetName", budgetList[0].Name);
+
+                    var action = component.get("c.getBudgetline");
+                    action.setParams({
+                        recordId:budgetList[0].Id
+                    });
+                    action.setCallback(this, function (response) {
+                       component.set('v.budgetLineList' , response.getReturnValue());
+                       console.log(component.get('v.budgetLineList'));
+                    })
+                    $A.enqueueAction(action);
+
+                    component.set("v.budgetList", budgetList);
+                }
+                // console.log('budget ==> ',{budget});
+
+                // component.set("v.selectedBudget", budget.Id);
 			} else {
 				console.log('Error :::' , response.getReturnValue());
 			}

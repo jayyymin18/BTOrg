@@ -26,7 +26,9 @@
 .THIS .fieldDiv::-webkit-scrollbar{
     display: none;
 }
-
+.THIS .build-budget-div {
+    height: 80px !important;
+}
 .THIS .searchResult{
     position: relative;
 }

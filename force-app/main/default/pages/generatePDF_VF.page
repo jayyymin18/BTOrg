@@ -38,7 +38,7 @@
         }
         </script>
         
-                <style>
+                <style>                
             @media (min-width: 768px) { .container { max-width: 970px; } }
         .user_name{
         font-size:14px;
@@ -55,7 +55,7 @@ overflow:auto;
 font-size:15px;
 }
 .myClass{
-color:red !important;
+color:white !important;
 background:#4c93b1 !important;
 border: 1px solid #36a0fe !important;
 border-bottom-color: #6e9dc7 !important;

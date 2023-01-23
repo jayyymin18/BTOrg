@@ -200,6 +200,10 @@ public with sharing class CreateBudgetLineItemForExpenseAC {
             return;
         }
 
+        if(expenseData.buildertek__Budget__c == null){
+            return;
+        }
+
         buildertek__Budget_Item__c budgetitem = new buildertek__Budget_Item__c();
         budgetitem.buildertek__Budget__c = expenseData.buildertek__Budget__c;
         budgetitem.Name = expenseData.buildertek__Description__c;

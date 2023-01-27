@@ -375,19 +375,11 @@ public with sharing class QuoteDAO{
         }
         // update quoteItemListRec;
         //* old code
-        
-        update quoteItemListRec;
-        for (buildertek__Quote_Item__c quoteLine : quoteItemListRec) {
-            System.debug('quoteLine ==> '+quoteLine);
-            System.debug('quoteLine Markup -> '+quoteLine.buildertek__Markup__c );
-            System.debug('quoteLine Margin -> '+quoteLine.buildertek__Margin__c );
-            System.debug('formula field  -> '+quoteLine.buildertek__Margin_To_Markup__c );
-    
-        }
 
+        update quoteItemListRec;
         if (Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Markup__c.isupdateable() && Schema.sObjectType.buildertek__Quote_Item__c.fields.buildertek__Margin__c.isupdateable()){
             System.debug('<<<<----In If Block---->>>>');
-            update quoteItemListRec;
+            // update quoteItemListRec;
         }
 
         return quoteItemListRec;
@@ -2008,9 +2000,22 @@ public with sharing class QuoteDAO{
             newQline.buildertek__Notes__c = newQline.buildertek__Notes__c;
             newQline.buildertek__Status__c = 'Accept';
             newQline.buildertek__Quote__c = QuoteId;
+            newQline.buildertek__Description__c = qql.buildertek__Description__c;
+
             insertListofQuoteLines.add(newQline); 
         }
+        // for(buildertek__Quote_Item__c q2:insertListofQuoteLines){
+        //     System.debug(q2.buildertek__Description__c);
+        //     System.debug(q2.Name);
+
+        // }
         insert insertListofQuoteLines;
+        System.debug('====> After Insert Quote Line ===>');
+        for(buildertek__Quote_Item__c q:insertListofQuoteLines){
+            System.debug(q.buildertek__Description__c);
+            System.debug(q.Name);
+
+        }
         return insertListofQuoteLines;
     }
     
@@ -2146,9 +2151,19 @@ public with sharing class QuoteDAO{
             System.debug(e.getMessage() + ':' + e.getLineNumber());
             return null;
         }
-        
     }
+    @AuraEnabled
+    public static Boolean getadminvalues(){
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Remove_Single_Quote_Line_Option__c
+                                                                                              from buildertek__Admin_Interface_Node_Configuration__c
+                                                                                              WHERE Name = :'Quote Configuration'];
+        Boolean islien = false;
+        if(adminInterfaceNodeConfigurations.buildertek__Remove_Single_Quote_Line_Option__c == true){
+            islien = true;
+        }
+        return islien;
+    }   
 
-
+    
     
 }

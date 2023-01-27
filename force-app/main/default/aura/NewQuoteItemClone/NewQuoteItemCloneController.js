@@ -91,6 +91,25 @@
 
         }
 
+        var btadminaction = component.get("c.getadminvalues");
+        btadminaction.setCallback(this, function(response) {
+            console.log(response.getState());
+            console.log(response.getReturnValue());
+            console.log('admnvalues');
+
+            if (response.getState() === 'SUCCESS') {
+                var result = response.getReturnValue();
+                if (result == true) {
+                    // document.getElementById('collapseBtn').style.display='none';
+                    component.set('v.removeSingleQuoteLineOption' , true);
+                }else{
+                    component.set('v.removeSingleQuoteLineOption' , false);
+                }
+            }
+
+        });
+        $A.enqueueAction(btadminaction);
+
     },
 
     onClickChangeGroupName: function(component, event, helper) {
@@ -387,7 +406,7 @@
 
     },
     changefamily: function(component, event, helper) {
-
+        console.log('changefamily');
         var product = component.get('v.selectedLookUpRecord');
         var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
         compEvent.setParams({
@@ -437,6 +456,7 @@
             if (state === "SUCCESS") {
                 helper.fetchPickListVal(component, event, helper);
                 var storeResponse = response.getReturnValue();
+                console.log({storeResponse});
                 // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
                 if (storeResponse.length == 0) {
                     component.set("v.Message", 'No Result Found...');
@@ -445,11 +465,17 @@
                 }
                 // set searchResult list with return value from server.
                 component.set("v.listofproductfamily", storeResponse);
-
+                // if(component.get("v.listofproductfamily").length ===1 && component.get("v.listofproductfamily")[0].productfamilyvalues=='None'){
+                //     component.set("v.productfamily", 'None');
+                //     document.getElementById('noneValue').style.display='None';
+                // }else 
                 if (component.get("v.listofproductfamily").length > 0) {
-                    component.set("v.productfamily", component.get("v.listofproductfamily")[0].productfamilyvalues);
+                    component.set("v.productfamily", '--None--');
+                    // component.set("v.productfamily", component.get("v.listofproductfamily")[0].productfamilyvalues);
+
+                    
                 } else {
-                    component.set("v.productfamily", null)
+                    component.set("v.productfamily", 'None');
                 }
 
             }
@@ -1775,7 +1801,7 @@
         actionLines.setParams({
             "quoteRec": component.get("v.QuoteRec").Id,
             markupvalue: markupvalue,
-            marginvalue:marginvalue
+            marginvalue: marginvalue
         });
         console.log('actionLines-->>>',{actionLines});
         actionLines.setCallback(this, function(response) {
@@ -2167,7 +2193,9 @@ component.set("v.StoreIdsOfDatatable2",'') */
                                     'buildertek__Unit_Cost__c': row1.PricebookEntries[0].buildertek__Unit_Cost__c ? row1.PricebookEntries[0].buildertek__Unit_Cost__c : row1.PricebookEntries[0].UnitPrice,
                                     'buildertek__Markup__c': row1.PricebookEntries[0].buildertek__Markup__c ? row1.PricebookEntries[0].buildertek__Markup__c : 0,
                                     'buildertek__Product__c': row1.Id,
-                                    'buildertek__Size__c': row1.PricebookEntries[0].Pricebook2.Name
+                                    'buildertek__Size__c': row1.PricebookEntries[0].Pricebook2.Name,
+                                    'buildertek__Description__c': row1.Name
+
                                 })
                             } else {
                                 xyz.push({
@@ -2180,7 +2208,8 @@ component.set("v.StoreIdsOfDatatable2",'') */
                                     'buildertek__Unit_Cost__c': row1.PricebookEntries[0].buildertek__Unit_Cost__c ? row1.PricebookEntries[0].buildertek__Unit_Cost__c : row1.PricebookEntries[0].UnitPrice,
                                     'buildertek__Markup__c': row1.PricebookEntries[0].buildertek__Markup__c ? row1.PricebookEntries[0].buildertek__Markup__c : 0,
                                     'buildertek__Product__c': row1.Id,
-                                    'buildertek__Size__c': row1.PricebookEntries[0].Pricebook2.Name
+                                    'buildertek__Size__c': row1.PricebookEntries[0].Pricebook2.Name,
+                                    'buildertek__Description__c': row1.Name
                                 })
                             }
                         }
@@ -2345,6 +2374,7 @@ return other.Id == current.Id
         });
 
         action10.setCallback(this, function(response) {
+            console.log(response.getReturnValue());
             component.set("v.openQuoteLineBox", false);
             $A.get("e.force:refreshView").fire();
             component.set("v.Spinner", false);

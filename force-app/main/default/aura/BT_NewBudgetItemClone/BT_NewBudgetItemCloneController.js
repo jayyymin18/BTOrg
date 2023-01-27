@@ -203,10 +203,10 @@
         //   helper.getBudgetGroups(component, event, helper, page); //, start, output);
         helper.fetchPickListVal(component, event, helper);
         helper.fetchpricebooks(component, event, helper);
-        helper.fetchCORecordType(component, event, helper);
-        helper.fetchInvoiceRecordType(component, event, helper);
+        //helper.fetchCORecordType(component, event, helper);
+        //helper.fetchInvoiceRecordType(component, event, helper);
         helper.getcurr(component, event, helper);
-        helper.getmulticur(component, event, helper);
+        //helper.getmulticur(component, event, helper);
         component.set("v.listofproductfamily", '');
         
         //var bt = component.get("v.Isbtvalues");
@@ -305,7 +305,7 @@
         component.set('v.productfamily', undefined);
         component.set('v.newBudgetLine.Name', '');
         component.set('v.selectedContractor', null);
-        component.set('v.newBudgetLine.buildertek__Group__c', null);
+        component.set('v.newBudgetLine.buildertek__Group__c', '');
         component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
         component.set('v.options', '');
         component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
@@ -918,6 +918,7 @@
         component.set("v.disableAddCO", true);
         var selectedRecs = component.get('v.selectedRecs');
         console.log('selectedRecs ==> ',{selectedRecs});
+        helper.fetchCORecordType(component, event, helper);
         if (selectedRecs.length > 0) {
             var rowData;
             var newCOItems = [];
@@ -1297,6 +1298,7 @@
 
     newInvoice: function(component, event, helper) {
         var selectedRecs = component.get('v.selectedRecs');
+        helper.fetchInvoiceRecordType(component, event, helper);
         if (selectedRecs.length > 0) {
             var rowData;
             var newInvoiceItems = [];
@@ -1728,8 +1730,8 @@ helper.getProductDetails(component,event,helper);
                 var result = respo.getReturnValue();
                 var group = component.find('costCodeId');
                 group.set("v._text_value", '');
-                //var costCode = component.find('costCodeId');
-                //costCode.set("v._text_value", '');
+                var costCode = component.find('groupId');
+                costCode.set("v._text_value", '');
                 var product = component.get('v.selectedLookUpRecord');
                 var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
                 compEvent.setParams({
@@ -1739,7 +1741,7 @@ helper.getProductDetails(component,event,helper);
                 component.set('v.newBudgetLine.Name', '');
                 //component.set('v.selectedContractor', null);
                 component.set('v.selectedContractor', null);
-                component.set('v.newBudgetLine.buildertek__Group__c', null);
+                component.set('v.newBudgetLine.buildertek__Group__c', '');
                 component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
                 component.set('v.newBudgetLine.buildertek__UOM__c', '');
                 component.set('v.newBudgetLine.buildertek__Notes__c', '');

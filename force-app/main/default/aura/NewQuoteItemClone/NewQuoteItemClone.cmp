@@ -199,18 +199,18 @@
         </div>
 
     <div style="margin: -8px 0px;">  
-        <div class="slds-grid slds wrap">
-            <div id='collapseBtn' class="slds-float_left" style="padding: 0.5rem; margin-top: -5px;display:contents">
-                <span style="display:none;" class="{!'expandAllBtn_'+v.quoteId}" data-iconattr="{!'expandAllBtn_'+v.quoteId}" data-iconname="Expand All" onclick="{!c.expandCollapeAll}">
+        <div style="display:block">
+            <div id='collapseBtn' class="slds-float_left" style="margin-top: 5px;">
+                <span style="display:none;margin-left:1.6rem" class="{!'expandAllBtn_'+v.quoteId}" data-iconattr="{!'expandAllBtn_'+v.quoteId}" data-iconname="Expand All" onclick="{!c.expandCollapeAll}">
                     <lightning:buttonIcon aura:id="expandCollapeseAllBtn" iconName="utility:add" variant="border-filled"
                         iconClass="dark" alternativeText="Expand All" title="Expand All" />
                 </span>
-                <span style="display:inline-block;" class="{!'CollapeseAllBtn_'+v.quoteId}" data-iconattr="{!'CollapeseAllBtn_'+v.quoteId}" data-iconname="Collapse All" onclick="{!c.expandCollapeAll}">
+                <span style="display:inline-block;margin-left:1.6rem" class="{!'CollapeseAllBtn_'+v.quoteId}" data-iconattr="{!'CollapeseAllBtn_'+v.quoteId}" data-iconname="Collapse All" onclick="{!c.expandCollapeAll}">
                     <lightning:buttonIcon aura:id="expandCollapeseAllBtn2" iconName="utility:dash"
                         variant="border-filled" iconClass="dark" alternativeText="Collapse All" title="Collapse All" />
                 </span>
             </div>
-            <div id='btnDiv' style="display:flex; justify-content: right; margin-top: 40px;" class="slds-m-top_medium slds-m-bottom_medium slds-m-right_small">
+            <div id='btnDiv' style="display:flex; justify-content: right; margin-top: 30px;" class="slds-m-top_medium slds-m-right_small">
                 <lightning:buttonGroup>
 
 
@@ -508,7 +508,7 @@
                 <aura:if isTrue="{!!v.removeSingleQuoteLineOption}" >
                     <div id='Tablebox' style="padding:10px;margin-top: -5px;">
                         <br />
-                        <div  aura:id="inlineEditQuote" style="margin-top:25px; margin-bottom:25px;">
+                        <div  aura:id="inlineEditQuote" style="margin-bottom:18px;">
                             <table class="slds-table slds-table_bordered slds-table_cell-buffer" style="border:1px solid grey;border-radius: 5px;">
                                 <thead style="border:1px solid rgb(216, 237, 255);">
                                     <tr class="slds-text-title_caps">

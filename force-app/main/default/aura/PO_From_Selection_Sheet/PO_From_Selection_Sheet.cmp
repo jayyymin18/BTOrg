@@ -54,6 +54,9 @@
 
                                     <tr class="slds-text-heading--label slds-scrollable" style="line-height:20px">
                                         <th class="subHeader" style="width: 40px;"> </th>
+                                        <th class="subHeader subData"> Selection Sheet </th>
+                                        <th class="subHeader subData"> Selection Category </th>
+                                        <th class="subHeader subData"> Selection Type </th>
                                         <th class="subHeader subData"> Option Name </th>
                                         <th class="subHeader subData"> Product </th>
                                         <th class="subHeader subData"> Quantity </th>
@@ -65,7 +68,7 @@
                                             <th scope="col" class="tableData">
                                                 <lightning:input type="checkbox" aura:id="checkContractors" onchange="{!c.selectCheck}" checked="{!optionWp.selected}" />
                                             </th>
-                                            <td class="vendorData" colspan="4">
+                                            <td class="vendorData" colspan="7">
                                                 {!optionWp.VendorData.Name}
                                             </td>
                                         </tr>
@@ -73,6 +76,17 @@
                                             <tr>
                                                 <td class="tableData">
                                                     <lightning:input type="checkbox" aura:id="checkContractor" variant="label-hidden" checked="{!option.selected}" />
+                                                </td>
+
+                                                <td>
+                                                    {!v.buildertek__Selection__c.Name}
+                                                </td>
+                                                <td class="tableData" role="gridcell" title="{!option.option.buildertek__Section__r.Name}">
+                                                    <ui:outputURL value="{!'/one/one.app?#/sObject/'+ option.option.buildertek__Section__r.Id + '/view'}" target="_blank" label="{!option.option.buildertek__Section__r.Name}" />
+                                                </td>
+                                                
+                                                <td class="tableData" role="gridcell" title="{!option.option.buildertek__Question_Group__r.Name}">
+                                                    <ui:outputURL value="{!'/one/one.app?#/sObject/'+ option.option.buildertek__Question_Group__r.Id + '/view'}" target="_blank" label="{!option.option.buildertek__Question_Group__r.Name}" />
                                                 </td>
 
                                                 <td class="tableData" role="gridcell" title="{!option.option.Name}">

@@ -2,7 +2,9 @@
     getQuoteDataHelper : function(component, event, helper) {
         try {
             console.log('*** getQuoteDataHelper ***');
+            var page = component.get("v.page") || 1
             var action = component.get("c.getQuoteData");
+            var groupFieldList = component.get("v.groupFieldList");
             action.setStorable({
                 ignoreExisting: true
             });
@@ -10,7 +12,7 @@
                 quoteId: component.get("v.recordId"),
                 pageNumber: page,
                 recordToDisply: 50,
-                status: 'Accept'
+                groupingList: groupFieldList
             });
             action.setCallback(this, function(response) {
                 var state = response.getState();

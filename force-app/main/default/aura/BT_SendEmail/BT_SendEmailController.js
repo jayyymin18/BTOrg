@@ -69,6 +69,9 @@
         }
 	},
 	uploadFileAdd : function(component, event, helper) {
+        console.log(component.get("v.selectedFiles"));
+        console.log(component.get("v.objectAPI"));
+
 		$A.createComponents(
             [
                 ["aura:html", {

@@ -152,7 +152,7 @@
     },
 	
 	send:function(component, event, helper) {
-        debugger;
+        // debugger;
 		var to, cc, toIds = [], ccIds = [], files, fileIds = [], subject, body, recordId, templateId, pdfFileName;
 		
         body = '';
@@ -178,6 +178,9 @@
 		//alert('body -------> '+body);
 		//alert('body -------> '+fileIds);
 
+        // component.set("v.pdfFileName" , 'sakina');
+        alert(component.get("v.recordId"));
+
         console.log('fileIds ==>',{fileIds});
 
 		subject = component.get("v.subject"); 
@@ -186,7 +189,7 @@
 		recordId = component.get("v.recordId");
 		pdfFileName = component.get("v.pdfFileName");
 		var dbAction = component.get("c.SendEmail");
-        //alert('Hiiii');
+        alert('pdfFileName' + pdfFileName);
         dbAction.setParams({
             to:toIds,
             cc: ccIds,
@@ -199,7 +202,7 @@
             emailIds: emailIds,
         });
         dbAction.setCallback(this, function (response) {
-           debugger;
+        //    debugger;
             var state = response.getState();
             if (state === "SUCCESS") {
                 if(response.getReturnValue() == 'Success'){

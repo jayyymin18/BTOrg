@@ -2,7 +2,7 @@ public with sharing class PO_From_Selection_Sheet {
     /*Description:- This method is used to create purchase order when user click on "create PO" button from Selection sheet*/
     @AuraEnabled
     public static void createPO(String recordId , List<buildertek__Question__c> selectedRowList){
-        List<buildertek__Question__c> optionList = [SELECT Id, Name, buildertek__Selected__c, buildertek__Product__c, buildertek__Product__r.Name , buildertek__Manufacturer__c, buildertek__Manufacturer__r.Name, buildertek__Quantity__c, buildertek__Cost__c, buildertek__Purchase_Order__c, buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__r.buildertek__Project__c FROM buildertek__Question__c WHERE buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__c =: recordId AND buildertek__Selected__c = true AND buildertek__Manufacturer__c != null AND buildertek__Product__c != null AND buildertek__Purchase_Order__c = null];
+        List<buildertek__Question__c> optionList = [SELECT Id, Name, buildertek__Selected__c, buildertek__Product__c, buildertek__Section__c, buildertek__Question_Group__c, buildertek__Product__r.Name , buildertek__Manufacturer__c, buildertek__Manufacturer__r.Name, buildertek__Quantity__c, buildertek__Cost__c, buildertek__Purchase_Order__c, buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__r.buildertek__Project__c FROM buildertek__Question__c WHERE buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__c =: recordId AND buildertek__Selected__c = true AND buildertek__Manufacturer__c != null AND buildertek__Product__c != null AND buildertek__Purchase_Order__c = null];
         Integer maxSize = 80;
 
         List<String> manufacturerIds = new List<String>();
@@ -70,7 +70,7 @@ public with sharing class PO_From_Selection_Sheet {
         // wp.getOptionList= new  List<buildertek__Question__c>();
         List<buildertek__Question__c> optionList = [SELECT Id, Name, buildertek__Selected__c, buildertek__Product__c, buildertek__Product__r.Name , 
                                                     buildertek__Manufacturer__c, buildertek__Manufacturer__r.Name, buildertek__Quantity__c, buildertek__Cost__c, 
-                                                    buildertek__Purchase_Order__c, buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__r.buildertek__Project__c 
+                                                    buildertek__Purchase_Order__c,buildertek__Section__r.Name, buildertek__Question_Group__r.Name, buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__r.buildertek__Project__c 
                                                     FROM buildertek__Question__c WHERE buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__c =: recordId AND 
                                                     buildertek__Selected__c = true AND buildertek__Manufacturer__c != null AND buildertek__Product__c != null AND buildertek__Purchase_Order__c = null
                                                     ORDER BY buildertek__Manufacturer__c];

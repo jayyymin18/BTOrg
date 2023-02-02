@@ -19,6 +19,7 @@
     border-color: #e5e5e5;
 }
 
-/* .THIS .slds-modal__container{
-    min-width: 80rem;
+/* .THIS .slds-modal__container {
+    width: 70% !important;
+    min-width: 80rem !important;
 } */

@@ -2576,7 +2576,8 @@ return other.Id == current.Id
             evt.setParams({
                 componentDef: "c:BOM_Line_Grouping_On_Quote",
                 componentAttributes: {
-                    recordId: component.get("v.recordId")
+                    recordId: component.get("v.recordId"),
+                    groupFieldList: selectedFieldList
                 }
             });
             evt.fire();

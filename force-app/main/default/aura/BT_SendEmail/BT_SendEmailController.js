@@ -24,8 +24,9 @@
                 helper.getbodyTemplate(component, event, helper);
             }
             helper.getTemplate(component, event, helper);
-           // helper.getFiles(component, event, helper);    
         }
+        helper.getProjectName(component, event, helper);    
+
        
 	},
     emailTemplate : function(component, event, helper) {

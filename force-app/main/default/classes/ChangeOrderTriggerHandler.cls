@@ -99,8 +99,17 @@ public with sharing class ChangeOrderTriggerHandler {
                 buildertek__Budget_Item__c budgetLine = new buildertek__Budget_Item__c();
                 budgetLine.Name = newCO.Name + ' budget line';
                 budgetLine.buildertek__Budget__c = newCO.buildertek__Budget__c;
+                budgetLine.buildertek__CO_Total__c = newCO.buildertek__Total_Amount_Tax__c;
                 budgetLine.buildertek__Group__c = budgetLineGroupId;
                 budgetLineMap.put(newCO.Id, budgetLine);
+                // insert budgetLine;
+                
+                // buildertek__CO_Item_To_Budget_Item_Link__c linkObj = new buildertek__CO_Item_To_Budget_Item_Link__c();
+                // linkObj.buildertek__CO_Item__c = newCO.Id;
+                // linkObj.buildertek__Budget_Item__c = budgetLine.Id;
+                // linkObj.buildertek__Auto_Roll_Up__c = true;
+                // insert linkObj;
+
             } 
         }
 
@@ -114,15 +123,53 @@ public with sharing class ChangeOrderTriggerHandler {
             }
         }
 
+        //will delete automatically created budget line if unlinked from the change order on update
+        for(buildertek__Change_Order__c changeOrder : oldChangeOrder){
+            for(buildertek__Change_Order__c changeOrder2 : updatedChangeOrder){
+                if(changeOrder.Id == changeOrder2.Id){
+                    if(changeOrder.buildertek__Budget_Line__c != changeOrder2.buildertek__Budget_Line__c && changeOrder.buildertek__Budget_Line__c != null) 
+                    {
+                        string Name  = changeOrder.Name + ' budget line';
+                        buildertek__Budget_Item__c  oldBudgetLine = [SELECT Id, buildertek__Item_Name__c, Name FROM buildertek__Budget_Item__c WHERE ID =: changeOrder.buildertek__Budget_Line__c];
+                        if(oldBudgetLine.Name == Name){
+                            delete oldBudgetLine;
+                        }
+                    }
+                }
+            }
+        }
+
+
+        for(buildertek__Change_Order__c changeOrder : updatedChangeOrder){
+            for(buildertek__Change_Order__c changeOrder2 : oldChangeOrder){
+                if(changeOrder.Id == changeOrder2.Id){
+                    if(changeOrder.buildertek__Total_Amount_Tax__c != changeOrder2.buildertek__Total_Amount_Tax__c){
+                        //check if the budget line is same as the old budget line
+                        if(changeOrder.buildertek__Budget_Line__c == changeOrder2.buildertek__Budget_Line__c){
+                            //check if the name if the budget line is same as the name of the change order + ' budget line'
+                            string Name  = changeOrder.Name + ' budget line';
+                            buildertek__Budget_Item__c  oldBudgetLine = [SELECT Id, buildertek__Item_Name__c, Name FROM buildertek__Budget_Item__c WHERE ID =: changeOrder.buildertek__Budget_Line__c];
+                            if(oldBudgetLine.Name == Name){
+                                oldBudgetLine.buildertek__CO_Total__c = changeOrder.buildertek__Total_Amount_Tax__c;
+                                update oldBudgetLine;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        
+
+
     }
     
     public void OnBeforeDelete(buildertek__Change_Order__c[] ChangeOrderToDelete, Map<ID, buildertek__Change_Order__c> ChangeOrderMap){
         system.debug('ChangeOrderToDelete------->'+ChangeOrderToDelete);
         for(buildertek__Change_Order__c changeOrder : ChangeOrderToDelete) {
             if(changeOrder.buildertek__Status__c != null){
-                
-                if(changeOrder.buildertek__Status__c.equalsIgnoreCase('Approved') || changeOrder.buildertek__Status__c.equalsIgnoreCase('Paid') 
-                   || changeOrder.buildertek__Status__c.equalsIgnoreCase('Partially Paid') || changeOrder.buildertek__Status__c.equalsIgnoreCase('Customer Approved')) {
+                //* whole condition breakDown {changeOrder.buildertek__Status__c.equalsIgnoreCase('Approved') || changeOrder.buildertek__Status__c.equalsIgnoreCase('Paid')|| changeOrder.buildertek__Status__c.equalsIgnoreCase('Partially Paid') || changeOrder.buildertek__Status__c.equalsIgnoreCase('Customer Approved')}
+                if(changeOrder.buildertek__Status__c.equalsIgnoreCase('Customer Approved')) {
                        changeOrder.addError('You cannot delete this Change Order because it has already been '+changeOrder.buildertek__Status__c);
                    }
             }
@@ -902,6 +949,47 @@ public with sharing class ChangeOrderTriggerHandler {
             }
         }
     }
+
+    public void ManageBudgetLineOnInsert(List<buildertek__Change_Order__c> coList){       
+        if(!coList.isEmpty()){
+            for(buildertek__Change_Order__c co : coList){
+                //get all the CO Items along with the budget item as well as the budet on that budget item
+                List<buildertek__Change_Order_Item__c> coItemList = [SELECT Id, Name, buildertek__Budget_Item__c, buildertek__Budget_Item__r.buildertek__Budget__c FROM buildertek__Change_Order_Item__c WHERE buildertek__Change_Order__c =: co.Id];
+                //loop through the CO Items and check if the budget item is not null
+                for(buildertek__Change_Order_Item__c coItem : coItemList){
+                    if(coItem.buildertek__Budget_Item__c != null){
+                        //check if the budget on that budget item is same as the budget on the CO
+                        if(coItem.buildertek__Budget_Item__r.buildertek__Budget__c != co.buildertek__Budget_Line__c){
+                            //update the budget item with the budget on the CO
+                            coItem.buildertek__Budget_Item__r.buildertek__Budget__c = co.buildertek__Budget_Line__c;
+                        }
+                        //create a new CO Item to Budget Item Link
+                        buildertek__CO_Item_To_Budget_Item_Link__c COItemToBudgetItemLink = new buildertek__CO_Item_To_Budget_Item_Link__c();
+                        COItemToBudgetItemLink.CO_Item__c = coItem.Id;
+                        COItemToBudgetItemLink.Budget_Item__c = co.buildertek__Budget_Line__c;
+                        //COItemToBudgetItemLink.buildertek__Auto_Roll_Up__c = true;
+                        insert COItemToBudgetItemLink;
+                    }else{
+                        //create a new budget item
+                        buildertek__Budget_Item__c budgetItem = new buildertek__Budget_Item__c();
+                        budgetItem.buildertek__Budget__c = co.buildertek__Budget__c;
+                        budgetItem.Name = coItem.Name;
+                        budgetItem.buildertek__Group__c = 'a0g1K00000JngPyQAJ';
+                        insert budgetItem;
+                        //create a new CO Item to Budget Item Link
+                        buildertek__CO_Item_To_Budget_Item_Link__c COItemToBudgetItemLink = new buildertek__CO_Item_To_Budget_Item_Link__c();
+                        COItemToBudgetItemLink.CO_Item__c = coItem.Id;
+                        COItemToBudgetItemLink.Budget_Item__c = budgetItem.Id;
+                        COItemToBudgetItemLink.buildertek__Auto_Roll_Up__c = true;
+                        insert COItemToBudgetItemLink;
+                    }
+                }
+                
+            }
+        }
+
+    }
+
     
     
     

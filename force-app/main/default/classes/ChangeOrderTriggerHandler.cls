@@ -102,14 +102,6 @@ public with sharing class ChangeOrderTriggerHandler {
                 budgetLine.buildertek__CO_Total__c = newCO.buildertek__Total_Amount_Tax__c;
                 budgetLine.buildertek__Group__c = budgetLineGroupId;
                 budgetLineMap.put(newCO.Id, budgetLine);
-                // insert budgetLine;
-                
-                // buildertek__CO_Item_To_Budget_Item_Link__c linkObj = new buildertek__CO_Item_To_Budget_Item_Link__c();
-                // linkObj.buildertek__CO_Item__c = newCO.Id;
-                // linkObj.buildertek__Budget_Item__c = budgetLine.Id;
-                // linkObj.buildertek__Auto_Roll_Up__c = true;
-                // insert linkObj;
-
             } 
         }
 

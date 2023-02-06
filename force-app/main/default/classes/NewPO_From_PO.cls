@@ -23,9 +23,16 @@ public with sharing class NewPO_From_PO {
         List<buildertek__Purchase_Order_Item__c> newPolineList = new List<buildertek__Purchase_Order_Item__c>();
 
         for (buildertek__Purchase_Order_Item__c POLine : POLineList) {
-            
             if (POLineMap.get(POLine.Id).buildertek__Quantity__c == POLine.buildertek__Quantity__c) {
                 deletePolineList.add(POLine);
+            } else if (POLineMap.get(POLine.Id).buildertek__Quantity__c > POLine.buildertek__Quantity__c) {
+                buildertek__Purchase_Order_Item__c oldPoLine =POLineMap.get(POLine.Id);
+                oldPoLine.buildertek__Quantity__c = POLineMap.get(POLine.Id).buildertek__Quantity__c - POLine.buildertek__Quantity__c;
+                updatePolineList.add(oldPoLine);
+            } else if(POLineMap.get(POLine.Id).buildertek__Quantity__c < POLine.buildertek__Quantity__c){
+                buildertek__Purchase_Order_Item__c oldPoLine = POLineMap.get(POLine.Id);
+                oldPoLine.buildertek__Quantity__c = POLine.buildertek__Quantity__c;
+                updatePolineList.add(oldPoLine);
             }
             buildertek__Purchase_Order_Item__c newPoLine = new buildertek__Purchase_Order_Item__c();
             newPoLine.Name = POLine.Name;
@@ -42,9 +49,12 @@ public with sharing class NewPO_From_PO {
 
         if (deletePolineList.size()>0) {
             delete deletePolineList;
+            System.debug('Deleted Successfully');
         }
-
+        if (updatePolineList.size()>0){
+            update updatePolineList;
+            System.debug('Updated sucessfully');
+        }
         return newPO.Id;
-        
     }
 }

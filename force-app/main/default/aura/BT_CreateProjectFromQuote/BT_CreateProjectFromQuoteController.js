@@ -20,6 +20,7 @@
         });
         action1.setCallback(this, function (response) {
             var result = response.getReturnValue();
+            console.log({result});
             var recordName = '';
             result.forEach(element => {
                 if (element.Id == recordId) {

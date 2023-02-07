@@ -89,7 +89,7 @@
                                         <lightning:input type="currency" value="{!poline.buildertek__Unit_Price__c}"></lightning:input>
                                     </td>
                                     <td>
-                                        <lightning:input type="number" value="{!poline.buildertek__Tax__c}"></lightning:input>
+                                        <lightning:input type="number" value="{!poline.buildertek__Tax__c}" format="#0%"></lightning:input>
                                     </td>
                                 </tr>
                             </aura:iteration>

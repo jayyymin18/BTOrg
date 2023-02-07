@@ -19,6 +19,10 @@
 				console.log('===SUCCESS===');
 				var result = response.getReturnValue();
                 console.log('Result => ',{result});
+				console.log(result.buildertek__RFQs__r[0]);
+				console.log(result.buildertek__RFQs__r[0].Id);
+
+				// component.set('v.rfqRecordId')
 			}
             component.set("v.displayNameList", false);
 		});

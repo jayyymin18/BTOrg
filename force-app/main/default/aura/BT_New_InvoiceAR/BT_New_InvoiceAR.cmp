@@ -1,10 +1,10 @@
-<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="InvoiceDAO"
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="InvoiceAR"
 	access="global">
 	<ltng:require styles="{!$Resource.ModalPreviewWidth100}" />
 	<aura:attribute name="budgetlineid" type="string" />
     <aura:attribute name="budgetId" type="string" />
     <aura:attribute name="invoiceDescription" type="string" />
-	<aura:attribute name="newCO" type="Account_Payable_Clone__c" default="{ 'sobjectType': 'Account_Payable_Clone__c'}"
+	<aura:attribute name="newCO" type="Billings__c" default="{ 'sobjectType': 'Billings__c'}"
 		access="public" />
 	<aura:attribute name="newCOItems" type="Billable_Lines__c[]" access="public" />
 	<aura:attribute name="newInvoiceItem" type="Billable_Lines__c"
@@ -86,7 +86,7 @@
 							<td>
 								<div class="slds-truncate" >
 									<lightning:recordEditForm aura:id="recordViewForm"
-										objectApiName="buildertek__Account_Payable_Item_Clone__c">
+										objectApiName="buildertek__Billable_Lines__c">
 										<lightning:messages />
 										<lightning:inputField onchange="{!c.updateProductInfo}" aura:id="{!index}"
 											fieldName="buildertek__Product__c"
@@ -144,7 +144,7 @@
 					<div class="slds-spinner__dot-a"></div>
 					<div class="slds-spinner__dot-b"></div>
                      <div class="custom-loading-text">
-                           <b>Processing, Please Wait</b>
+                           <!-- <b>Processing, Please Wait</b> -->
                        </div>
 				</div>
 			</div>

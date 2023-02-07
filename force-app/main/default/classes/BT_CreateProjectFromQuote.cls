@@ -2,7 +2,10 @@ public with sharing class BT_CreateProjectFromQuote {
     @AuraEnabled
     public static buildertek__Quote__c getQuote(String recordId,String searchNameValue){
         buildertek__Quote__c opp;
-        opp = [SELECT Id, Name from buildertek__Quote__c where Id =: recordId]; 
+        // opp = [SELECT Id, Name from buildertek__Quote__c where Id =: recordId]; 
+        opp = [SELECT Id, Name ,(SELECT Id, Name , buildertek__Project__c ,buildertek__Quote__c FROM buildertek__RFQs__r),
+        (SELECT Id, Name , buildertek__Project__c , buildertek__Quote__c FROM buildertek__RFQs1__r) FROM buildertek__Quote__c where Id =: recordId]; 
+
         List<buildertek__Quote__c> productList = new List<buildertek__Quote__c>();
         String queryList = 'SELECT Id, Name FROM buildertek__Quote__c';
         if (searchNameValue != null && searchNameValue != '') {
@@ -21,6 +24,9 @@ public with sharing class BT_CreateProjectFromQuote {
     public static List<buildertek__Quote__c> getQuoteName1(String searchNameValue){
         List<buildertek__Quote__c> QuoteList = new List<buildertek__Quote__c>();
         List<buildertek__Quote__c> QtList = [SELECT Id, Name FROM buildertek__Quote__c ORDER BY name ASC];
+        // List<buildertek__Quote__c> QtList = [SELECT Id, Name ,(SELECT Id, Name , buildertek__Quote__c FROM buildertek__RFQs__r),
+        //  (SELECT Id, Name , buildertek__Quote__c FROM buildertek__RFQs1__r) FROM buildertek__Quote__c ORDER BY name ASC];
+
 
         if(!String.isBlank(searchNameValue)){
             for (buildertek__Quote__c quote : QtList) {
@@ -33,6 +39,7 @@ public with sharing class BT_CreateProjectFromQuote {
                 QuoteList.add(quote);
             }
         }
+
         return QuoteList;
     }
     

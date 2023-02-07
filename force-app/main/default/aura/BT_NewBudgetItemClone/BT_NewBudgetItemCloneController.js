@@ -1317,7 +1317,6 @@
                         var budgetline = '';
                         //run a loop on the result and append the name from the result to the budgetline variable
                         for (var i = 0; i < result.length; i++) {
-                            console.log(result[i].Name);
                             budgetline += result[i].Name + ', ';
                         }
                         budgetline = budgetline.slice(0, -2);
@@ -1345,6 +1344,9 @@
                             if (component.isValid() && response.getState() === "SUCCESS") {
                                 for (var i = 0; i < response.getReturnValue().length; i++) {
                                     rowData = response.getReturnValue()[i];
+                                    // if (rowData.buildertek__Unit_Price__c == null) {
+                                    //     rowData.buildertek__Unit_Price__c = 0;
+                                    // }
                                     var newInvoiceItem = new Object();
                                     newInvoiceItem.Name = rowData.Name;
                                     newInvoiceItem.buildertek__Item_Title__c = rowData.Name;
@@ -1365,7 +1367,7 @@
                                 $A.get("e.c:BT_SpinnerEvent").setParams({
                                     "action": "HIDE"
                                 }).fire();
-                                
+
                                 $A.createComponents([
                                         ["c:BT_New_Invoice", {
                                             "aura:id": "btNewco",
@@ -1424,23 +1426,29 @@
         // helper.fetchInvoiceRecordType(component, event, helper);
         console.log('selectedRecs--->>>',{selectedRecs});
         if (selectedRecs.length > 0 ) {
-            var action = component.get("c.checkforBidgetItem");
+            var action = component.get("c.checkforBidgetItemAR");
             action.setParams({
                 "BudgetIds": selectedRecs
             });
             action.setCallback(this, function(response) {
                 if (response.getState() === "SUCCESS") {
-                    console.log('---Success---');
                     var result = response.getReturnValue();
-                    for (var i = 0; i < result.length; i++) {
-                        console.log(result[i]);
-                    }
                     if (result.length > 0) {
-                        console.log({result});
+                        console.log("result__>",{result});
+                        var budgetline = '';
+                        //run a loop on the result and append the name from the result to the budgetline variable
+                        for (var i = 0; i < result.length; i++) {
+                            budgetline += result[i].Name + ', ';
+                        }
+                        budgetline = budgetline.slice(0, -2);
+                        console.log(budgetline);
+                        $A.get("e.c:BT_SpinnerEvent").setParams({
+                            "action": "HIDE"
+                        }).fire();
                         component.find('notifLib').showNotice({
                             "variant": "error",
-                            "header": "Selected Budget Line already has Invoice",
-                            "message": "Please Select at least Budget Line without Invoice.",
+                            "header": "Selected Budget Line already has Invoice (AR)",
+                            "message": "Budeget Line " + budgetline + " already has Invoice.",
                             closeCallback: function() {}
                         });
                     }
@@ -1460,6 +1468,9 @@
                                 console.log('IF--->>>');
                                 for (var i = 0; i < response.getReturnValue().length; i++) {
                                     rowData = response.getReturnValue()[i];
+                                    // if (rowData.buildertek__Sales_Price__c == null) {
+                                    //     rowData.buildertek__Sales_Price__c = 0;
+                                    // }
                                     var newInvoiceItem = new Object();
                                     newInvoiceItem.Name = rowData.Name;
                                     newInvoiceItem.buildertek__Item_Title__c = rowData.Name;
@@ -1467,7 +1478,7 @@
                                     newInvoiceItem.buildertek__Budget_Line__c = rowData.Id;
                                     newInvoiceItem.buildertek__Description__c = rowData.Name;
                                     newInvoiceItem.buildertek__Quantity__c = rowData.buildertek__Quantity__c;
-                                    newInvoiceItem.buildertek__Unit_Price__c = rowData.buildertek__Unit_Price__c;
+                                    newInvoiceItem.buildertek__Unit_Price__c = rowData.buildertek__Sales_Price__c;
                                     newInvoiceItems.push(newInvoiceItem);
                                 }
                                 var Invoice = component.get("v.newInvoiceAR");
@@ -1515,7 +1526,7 @@
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Select Budget Line",
-                "message": "Please Select at least One Budget Line to Create Invoice.",
+                "message": "Please Select at least One Budget Line to Create Invoice (AR).",
                 closeCallback: function() {}
             });
         }

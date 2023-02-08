@@ -77,6 +77,9 @@
             account : accountId,
             projectManager : projectManagerId,
             contractDate : contractDateId,
+            quoteRFQId:component.get('v.quoteRFQ'),
+            addedQuoteRFQId:component.get('v.addedQuoteRFQ'),
+
         });
         action.setCallback(this, function(response){
             var state = response.getState();

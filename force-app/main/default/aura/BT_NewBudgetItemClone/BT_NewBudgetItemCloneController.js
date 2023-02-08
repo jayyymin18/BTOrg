@@ -1326,8 +1326,8 @@
                         }).fire();
                         component.find('notifLib').showNotice({
                             "variant": "error",
-                            "header": "Selected Budget Line already has Invoice",
-                            "message": "Budeget Line " + budgetline + " already has Invoice.",
+                            "header": "The selected Budget Line(s) already has Invoice. Please choose another Budget Line(s).",
+                            "message": "Budget Line: " + budgetline ,
                             closeCallback: function() {}
                         });
                     }
@@ -1344,9 +1344,9 @@
                             if (component.isValid() && response.getState() === "SUCCESS") {
                                 for (var i = 0; i < response.getReturnValue().length; i++) {
                                     rowData = response.getReturnValue()[i];
-                                    // if (rowData.buildertek__Unit_Price__c == null) {
-                                    //     rowData.buildertek__Unit_Price__c = 0;
-                                    // }
+                                    if (rowData.buildertek__Unit_Price__c == null) {
+                                        rowData.buildertek__Unit_Price__c = 0;
+                                    }
                                     var newInvoiceItem = new Object();
                                     newInvoiceItem.Name = rowData.Name;
                                     newInvoiceItem.buildertek__Item_Title__c = rowData.Name;
@@ -1412,7 +1412,7 @@
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Select Budget Line",
-                "message": "Please Select at least One Budget Line to Create Invoice.",
+                "message": "In order to create an Invoice you need to select at least one Budget line.",
                 //"header": "No Budget Lines",
                 //"message": "No Budget Lines Records.",
                 closeCallback: function() {}
@@ -1421,6 +1421,9 @@
     },
 
     newInvoiceAR: function(component, event, helper) {
+        $A.get("e.c:BT_SpinnerEvent").setParams({
+            "action": "SHOW"
+        }).fire();
         console.log('In AR');
         var selectedRecs = component.get('v.selectedRecs');
         // helper.fetchInvoiceRecordType(component, event, helper);
@@ -1447,8 +1450,8 @@
                         }).fire();
                         component.find('notifLib').showNotice({
                             "variant": "error",
-                            "header": "Selected Budget Line already has Invoice (AR)",
-                            "message": "Budeget Line " + budgetline + " already has Invoice.",
+                            "header": "The selected Budget Line(s) already has Invoice. Please select another Budget Line(s).",
+                            "message": "Budeget Lines : " + budgetline ,
                             closeCallback: function() {}
                         });
                     }
@@ -1468,9 +1471,9 @@
                                 console.log('IF--->>>');
                                 for (var i = 0; i < response.getReturnValue().length; i++) {
                                     rowData = response.getReturnValue()[i];
-                                    // if (rowData.buildertek__Sales_Price__c == null) {
-                                    //     rowData.buildertek__Sales_Price__c = 0;
-                                    // }
+                                    if (rowData.buildertek__Sales_Price__c == null) {
+                                        rowData.buildertek__Sales_Price__c = 0;
+                                    }
                                     var newInvoiceItem = new Object();
                                     newInvoiceItem.Name = rowData.Name;
                                     newInvoiceItem.buildertek__Item_Title__c = rowData.Name;
@@ -1486,6 +1489,9 @@
                                 Invoice.buildertek__Project__c = component.get("v.sampleNewRecord").buildertek__Project__c;
                                 var overlayLib;
                                 console.log('=====');
+                                $A.get("e.c:BT_SpinnerEvent").setParams({
+                                    "action": "HIDE"
+                                }).fire();
                                 $A.createComponents([
                                         ["c:BT_New_InvoiceAR", {
                                             "aura:id": "btNewco",
@@ -1523,10 +1529,13 @@
             });
             $A.enqueueAction(action);
         } else {
+            $A.get("e.c:BT_SpinnerEvent").setParams({
+                "action": "HIDE"
+            }).fire();
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Select Budget Line",
-                "message": "Please Select at least One Budget Line to Create Invoice (AR).",
+                "message": "In order to create Invoice, you need to select at least one Budget Line.",
                 closeCallback: function() {}
             });
         }
@@ -1847,7 +1856,6 @@ helper.getProductDetails(component,event,helper);
         } */
         console.log('=============================================================');
         console.log('Sub Group::', JSON.stringify(budgetLineObject));
-        debugger;
         var selectedContractor = component.get("v.selectedContractor");
         if (selectedContractor != undefined) {
             contractor = selectedContractor.Id;
@@ -2393,7 +2401,6 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     updateQuoteData: function(component, event, helper) {
-        debugger;
         if (!component.get("v.enableMassUpdate")) {
             var recordId = component.get("v.quoteItemId");
             var quoteList = component.get("v.datalist");
@@ -2721,7 +2728,6 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
     onClickMassUpdate: function(component, event, helper) {
         component.set("v.isExpandGrp", false);
-        debugger;
 
         component.set("v.enableMassUpdate", component.get("v.enableMassUpdate") == true ? false : true);
         // component.set("v.isExpandGrp",false);

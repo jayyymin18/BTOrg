@@ -19,13 +19,30 @@
 				console.log('===SUCCESS===');
 				var result = response.getReturnValue();
                 console.log('Result => ',{result});
-				console.log(result.buildertek__RFQs__r[0]);
-				console.log(result.buildertek__RFQs__r[0].Id);
+				var appQuoteRFQIdList=[];
+				var addedQuoteRFQIdList=[];
 
-				// component.set('v.rfqRecordId')
+				if(result.buildertek__RFQs__r != null){
+					result.buildertek__RFQs__r.forEach(function(element , index){
+						appQuoteRFQIdList.push(element.Id);
+					});
+					component.set('v.quoteRFQ' , appQuoteRFQIdList);
+
+				}
+
+				if(result.buildertek__RFQs1__r !=null){
+					result.buildertek__RFQs1__r.forEach(function(element , index){
+						addedQuoteRFQIdList.push(element.Id);
+
+					});
+					component.set('v.addedQuoteRFQ' , addedQuoteRFQIdList);
+
+					
+				}
 			}
             component.set("v.displayNameList", false);
 		});
 	$A.enqueueAction(action); 
-	}
+	},
+
 })

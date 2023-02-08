@@ -195,6 +195,26 @@
         Option.buildertek__Upgrade__c = checkValue;
         component.set("v.Option", Option);
     },
+    onBudgetChanged:function(component, event, helper) {
+        var getValue = event.getSource().get("v.value");
+        console.log(getValue[0]);
+        var action = component.get("c.getBudgetLine");
+        action.setParams({
+            budgetId: getValue[0]
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            console.log({state});
+            var result= response.getReturnValue();
+            if (state === "SUCCESS") {
+                console.log({result});
+            }
+        });
+        $A.enqueueAction(action);
+
+
+        
+    }
 
 
 })

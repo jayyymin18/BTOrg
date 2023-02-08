@@ -2,6 +2,8 @@
 	<aura:attribute name="Spinner" type="Boolean" default="false"/>
 	<aura:attribute name="Option" type="Question__c" default="{ 'sobjectType': 'Question__c'}" />
 	<aura:attribute name="Product" type="Product2" default="{ 'sobjectType': 'Product2'}" />
+	<aura:attribute name="selectedLookupValue" type="sObject" default="{}"/>
+
 
     <aura:attribute name="recordId" type="Id"/>
 
@@ -36,6 +38,7 @@
 								<lightning:inputField fieldName="buildertek__Cost__c" value="{!v.Option.buildertek__Cost__c}" />
 								<lightning:inputField fieldName="buildertek__Markup__c" value="{!v.Option.buildertek__Markup__c}" />
 								<lightning:inputField fieldName="buildertek__Upgrade_Costs__c" value="{!v.Option.buildertek__Upgrade_Costs__c}" />
+								
 							</div>
 
 							<div class="slds-col slds-size_1-of-2">
@@ -47,6 +50,22 @@
 								<!-- <lightning:inputField fieldName="buildertek__Default_Option__c" value="{!v.Option.buildertek__Default_Option__c}" />	 -->
 								<h1 class="checkboxLabel">Default Option</h1>
 								<lightning:input type="checkbox" aura:id="optionCheck" checked="{!v.Option.buildertek__Default_Option__c}" onchange="{!c.onOptionChanged}"/>
+
+								<lightning:inputField fieldName="buildertek__Budget__c" value="{!v.Option.buildertek__Budget__c}"  onchange="{!c.onBudgetChanged}"/>
+								<!-- <lightning:inputField fieldName="buildertek__Budget_Line__c" value="None" /> -->
+								<!-- <aura:if isTrue="{!field.name == 'buildertek__Budget_Line__c'}"> -->
+								<c:BT_LightningLookup objectAPIName="buildertek__Budget_Line__c" IconName="utility:search" selectedRecord="{!v.selectedLookupValue}" />
+
+								<!-- <label>Budget Line</label>
+								<ui:inputSelect value="{!v.budgetLineName}">
+									<option value="">None</option>
+									<aura:iteration var="option" items="{!v.budgetLineList}">
+										<option value="{!option.Id}" selected="{!option.Id == v.budgetLineName}">{!option.Name}</option>
+									</aura:iteration>
+								</ui:inputSelect> -->
+                                <!-- </aura:if> -->
+
+
 
 							</div>
 

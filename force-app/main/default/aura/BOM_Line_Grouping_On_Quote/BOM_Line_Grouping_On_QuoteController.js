@@ -34,6 +34,35 @@
     },
 
     expandCollapeGroup: function(component, event, helper){
+        var iconName = event.currentTarget.dataset.iconname;
+        var spanId = event.target.id;
+        console.log('spanId ==> '+spanId);
+
+        var spanGroupId;
+    
+        if (iconName == 'Expand Group') {
+            spanGroupId = spanId.replace('expandGroupBtn_','');
+        } else if (iconName == 'Collapse Group') {
+            spanGroupId = spanId.replace('collapeseGroupBtn_','');
+        }
+        console.log('spanGroupId => ' + spanGroupId);
+
+        var recordDiv = 'record_'+spanGroupId;
+        for(let i = 0; i < recordDiv.length; i++) {
+            recordDiv[i].style.display = 'none';
+        }
+
+        // if (component.get("v.forthGrouping")) {
+            
+        // } else if (component.get("v.thirdGrouping")) {
+
+        // } else if (component.get("v.secondGrouping")) {
+
+        // } else if(component.get("v.firstGrouping")){
+         
+        // }
+
+        
 
     }
 })

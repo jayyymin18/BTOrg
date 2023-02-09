@@ -836,8 +836,273 @@ public with sharing class BT_AdminConfigurationController{
         BTOpportunityConfiguration.Description__c = 'Configure Opportunity Process for your organization.';
         firstLevelNodes.add(BTOpportunityConfiguration);
 
+        //=========== With Parent record ========
+        Admin_Interface_Node_Configuration__c BudgetConfiguration = new Admin_Interface_Node_Configuration__c();
+        BudgetConfiguration.Name = 'Budget Configuration';
+        BudgetConfiguration.Disable__c = false;
+        BudgetConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        BudgetConfiguration.Open_New_Tab__c = false;
+        BudgetConfiguration.Tab_Name__c = 'Budget Configuration';
+        BudgetConfiguration.Page_URL__c = '/apex/BT_CreateBudgetConfiguration';
+        BudgetConfiguration.buildertek__Create_Budget_on_Quote_Acceptance__c = true;
+        BudgetConfiguration.buildertek__Automatically_add_Expense_to_Budget__c = true;
+        BudgetConfiguration.buildertek__Automatically_add_Time_Card_to_Budget__c = true;
+        firstLevelNodes.add(BudgetConfiguration);
+
+        Admin_Interface_Node_Configuration__c CreateContractonQuoteAcceptance = new Admin_Interface_Node_Configuration__c();
+        CreateContractonQuoteAcceptance.Name = 'Create Contract on Quote Acceptance';
+        CreateContractonQuoteAcceptance.Disable__c = false;
+        CreateContractonQuoteAcceptance.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        CreateContractonQuoteAcceptance.Open_New_Tab__c = false;
+        CreateContractonQuoteAcceptance.Tab_Name__c = 'Create Contract on Quote Acceptance';
+        CreateContractonQuoteAcceptance.Page_URL__c = '/apex/BT_CreateContractOnQuoteAcceptance';
+        CreateContractonQuoteAcceptance.buildertek__Change_Order_Configuration__c = true;
+        firstLevelNodes.add(CreateContractonQuoteAcceptance);
+
+        Admin_Interface_Node_Configuration__c TurnoffCostOptionAllowanceCheck = new Admin_Interface_Node_Configuration__c();
+        TurnoffCostOptionAllowanceCheck.Name = 'Turn off Cost Option Allowance Check';
+        TurnoffCostOptionAllowanceCheck.Disable__c = false;
+        TurnoffCostOptionAllowanceCheck.Index__c = 0;
+        TurnoffCostOptionAllowanceCheck.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        TurnoffCostOptionAllowanceCheck.Open_New_Tab__c = false;
+        TurnoffCostOptionAllowanceCheck.Tab_Name__c = 'Turn off Cost Option Allowance Check';
+        TurnoffCostOptionAllowanceCheck.Page_URL__c = '/apex/BT_CreateContractOnQuoteAcceptance';
+        firstLevelNodes.add(TurnoffCostOptionAllowanceCheck);
+
+        Admin_Interface_Node_Configuration__c MSAConfiguration1 = new Admin_Interface_Node_Configuration__c();
+        MSAConfiguration1.Name = 'MSA Configuration';
+        MSAConfiguration1.Disable__c = false;
+        MSAConfiguration1.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        MSAConfiguration1.Open_New_Tab__c = false;
+        MSAConfiguration1.Tab_Name__c = 'MSA Configuration';
+        MSAConfiguration1.Page_URL__c = '/apex/BT_MSA_Settings';
+        firstLevelNodes.add(MSAConfiguration1);
+
+        Admin_Interface_Node_Configuration__c PaymentApplicationConfiguration = new Admin_Interface_Node_Configuration__c();
+        PaymentApplicationConfiguration.Name = 'Payment Application Configuration';
+        PaymentApplicationConfiguration.Disable__c = false;
+        PaymentApplicationConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        PaymentApplicationConfiguration.Open_New_Tab__c = false;
+        PaymentApplicationConfiguration.Tab_Name__c = 'Payment Application Configuration';
+        PaymentApplicationConfiguration.Page_URL__c = '/apex/BT_CreatePaymentApplicationConfiguration';
+        PaymentApplicationConfiguration.buildertek__Default_Account_for_PA__c = '0011K00002PFYi5QAH';
+        PaymentApplicationConfiguration.buildertek__Get_Lines_From_CO__c = true;
+        PaymentApplicationConfiguration.buildertek__User_SOV_Sharing__c = true;
+        firstLevelNodes.add(PaymentApplicationConfiguration);
+
+        Admin_Interface_Node_Configuration__c PreQualificationConfiguration = new Admin_Interface_Node_Configuration__c();
+        PreQualificationConfiguration.Name = 'Pre Qualification Configuration';
+        PreQualificationConfiguration.Disable__c = false;
+        PreQualificationConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        PreQualificationConfiguration.Open_New_Tab__c = false;
+        PreQualificationConfiguration.Tab_Name__c = 'Pre Qualification Configuration';
+        PreQualificationConfiguration.Page_URL__c = '/apex/BT_PreQualificationConfiguration';
+        PreQualificationConfiguration.buildertek__Selected_Templates__c = 'Pre_QualProcess_VF,Standard_PreQual_VF';
+        firstLevelNodes.add(PreQualificationConfiguration);
+
+        Admin_Interface_Node_Configuration__c FileUploadPageConfiguration = new Admin_Interface_Node_Configuration__c();
+        FileUploadPageConfiguration.Name = 'File Upload Page Configuration';
+        FileUploadPageConfiguration.Disable__c = false;
+        FileUploadPageConfiguration.Index__c = 3;
+        FileUploadPageConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        FileUploadPageConfiguration.Open_New_Tab__c = false;
+        FileUploadPageConfiguration.Tab_Name__c = 'File Upload Page Configuration';
+        FileUploadPageConfiguration.Page_URL__c = '/apex/BT_FileUploadPageConfiguration';
+        BTOpportunityConfiguration.Description__c = 'Configure default values for new file.';
+        firstLevelNodes.add(FileUploadPageConfiguration);
+
+        Admin_Interface_Node_Configuration__c SystemConfiguration = new Admin_Interface_Node_Configuration__c();
+        SystemConfiguration.Name = 'System Configuration';
+        SystemConfiguration.Disable__c = false;
+        SystemConfiguration.Index__c = 1;
+        SystemConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        SystemConfiguration.Open_New_Tab__c = false;
+        SystemConfiguration.Tab_Name__c = 'System Configuration';
+        SystemConfiguration.Page_URL__c = '/apex/BT_ApplicationConfiguration';
+        SystemConfiguration.Description__c = 'Provide AWS Access Key Id, Secret Key and other values needed to configure application for your organization.';
+        firstLevelNodes.add(SystemConfiguration);
+
+        Admin_Interface_Node_Configuration__c FileExplorerPageConfiguration = new Admin_Interface_Node_Configuration__c();
+        FileExplorerPageConfiguration.Name = 'File Explorer Page Configuration';
+        FileExplorerPageConfiguration.Disable__c = false;
+        FileExplorerPageConfiguration.Index__c = 2;
+        FileExplorerPageConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        FileExplorerPageConfiguration.Open_New_Tab__c = false;
+        FileExplorerPageConfiguration.Tab_Name__c = 'File Explorer Page Configuration';
+        FileExplorerPageConfiguration.Page_URL__c = '/apex/BT_FileExplorerPageConfiguration';
+        FileExplorerPageConfiguration.Description__c = 'Configure File Explorer Interface for your organization.';
+        firstLevelNodes.add(FileExplorerPageConfiguration);
+
+        Admin_Interface_Node_Configuration__c ProjectConfiguration = new Admin_Interface_Node_Configuration__c();
+        ProjectConfiguration.Name = 'Project Configuration';
+        ProjectConfiguration.Disable__c = false;
+        ProjectConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        ProjectConfiguration.Open_New_Tab__c = false;
+        ProjectConfiguration.Tab_Name__c = 'Project Configuration';
+        ProjectConfiguration.Page_URL__c = '/apex/BT_CreateProjectConfiguration';
+        ProjectConfiguration.buildertek__Retreive_Aerial_Photo_of_project__c = true;
+        ProjectConfiguration.buildertek__Google_Map_API_Key__c = 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo';
+        firstLevelNodes.add(ProjectConfiguration);
+
+        Admin_Interface_Node_Configuration__c BoxSettings1 = new Admin_Interface_Node_Configuration__c();
+        BoxSettings1.Name = 'Box Settings';
+        BoxSettings1.Disable__c = false;
+        BoxSettings1.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        BoxSettings1.Open_New_Tab__c = false;
+        BoxSettings1.Tab_Name__c = 'Box Settings';
+        BoxSettings1.Page_URL__c = '/apex/BT_BOX_Settings';
+        firstLevelNodes.add(BoxSettings1);
+
+        Admin_Interface_Node_Configuration__c SOVConfiguration = new Admin_Interface_Node_Configuration__c();
+        SOVConfiguration.Name = 'SOV Configuration';
+        SOVConfiguration.Disable__c = false;
+        SOVConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        SOVConfiguration.Open_New_Tab__c = false;
+        SOVConfiguration.Tab_Name__c = 'SOV Configuration';
+        SOVConfiguration.Page_URL__c = '/apex/BT_BOX_Settings';
+        SOVConfiguration.buildertek__Default_Account_for_SOV__c = '0011K00002PFYi5QAH';
+        firstLevelNodes.add(SOVConfiguration);
+
+        Admin_Interface_Node_Configuration__c RFQConfiguration1 = new Admin_Interface_Node_Configuration__c();
+        RFQConfiguration1.Name = 'RFQ Configuration';
+        RFQConfiguration1.Disable__c = false;
+        RFQConfiguration1.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        RFQConfiguration1.Open_New_Tab__c = false;
+        RFQConfiguration1.Tab_Name__c = 'RFQ Configuration';
+        RFQConfiguration1.Page_URL__c = '/apex/BT_CreateRFQConfiguration';
+        RFQConfiguration1.buildertek__Email_Subject__c = 'BuilderTek RFQ';
+        RFQConfiguration1.buildertek__Retreive_Aerial_Photo_of_project__c = true;
+        RFQConfiguration1.buildertek__Google_Map_API_Key__c = 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo';
+        RFQConfiguration1.buildertek__Community_URL__c = 'https://buildertekcom-developer-edition.na75.force.com/vendor';
+        firstLevelNodes.add(RFQConfiguration1);
+
+        Admin_Interface_Node_Configuration__c PurchaseOrderConfiguration1 = new Admin_Interface_Node_Configuration__c();
+        PurchaseOrderConfiguration1.Name = 'Purchase Order Configuration';
+        PurchaseOrderConfiguration1.Disable__c = false;
+        PurchaseOrderConfiguration1.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        PurchaseOrderConfiguration1.Open_New_Tab__c = false;
+        PurchaseOrderConfiguration1.Tab_Name__c = 'Purchase Order Configuration';
+        PurchaseOrderConfiguration1.Page_URL__c = '/apex/BT_CreatePurchaseOrderConfiguration';
+        PurchaseOrderConfiguration1.Description__c = 'Use to send email on PO Approved';
+        PurchaseOrderConfiguration1.buildertek__Email_Subject__c = 'PurchaseOrder';
+        PurchaseOrderConfiguration1.buildertek__Send_PO_On_Approval__c = true;
+        PurchaseOrderConfiguration1.buildertek__Create_Invoice_on_Approval__c = true;
+        firstLevelNodes.add(PurchaseOrderConfiguration1);
+
+        Admin_Interface_Node_Configuration__c ChangeOrderConfiguration = new Admin_Interface_Node_Configuration__c();
+        ChangeOrderConfiguration.Name = 'Change Order Configuration';
+        ChangeOrderConfiguration.Disable__c = false;
+        ChangeOrderConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        ChangeOrderConfiguration.Open_New_Tab__c = false;
+        ChangeOrderConfiguration.Tab_Name__c = 'Change Order Configuration';
+        ChangeOrderConfiguration.Page_URL__c = '/apex/BT_Change_Order_On_Overage';
+        ChangeOrderConfiguration.buildertek__Change_Order_Configuration__c = true;
+        firstLevelNodes.add(ChangeOrderConfiguration);
+
+        Admin_Interface_Node_Configuration__c CreatinganewUser = new Admin_Interface_Node_Configuration__c();
+        CreatinganewUser.Name = 'Creating a new User';
+        CreatinganewUser.Disable__c = false;
+        CreatinganewUser.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        CreatinganewUser.Open_New_Tab__c = false;
+        CreatinganewUser.Tab_Name__c = 'Creating a new User';
+        CreatinganewUser.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTfhUAG';
+        CreatinganewUser.Description__c = 'Configure creating new users';
+        firstLevelNodes.add(CreatinganewUser);
+
+        Admin_Interface_Node_Configuration__c CreatingAccountsandContacts = new Admin_Interface_Node_Configuration__c();
+        CreatingAccountsandContacts.Name = 'Creating Accounts and Contacts';
+        CreatingAccountsandContacts.Disable__c = false;
+        CreatingAccountsandContacts.Index__c = 13;
+        CreatingAccountsandContacts.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        CreatingAccountsandContacts.Open_New_Tab__c = false;
+        CreatingAccountsandContacts.Tab_Name__c = 'Creating Accounts and Contacts';
+        CreatingAccountsandContacts.Description__c = 'Configure Accounts and Contacts';
+        firstLevelNodes.add(CreatingAccountsandContacts);
+
+        Admin_Interface_Node_Configuration__c CreateAccount = new Admin_Interface_Node_Configuration__c();
+        CreateAccount.Name = 'Create Account';
+        CreateAccount.Disable__c = false;
+        CreateAccount.Index__c = 13;
+        CreateAccount.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        CreateAccount.Open_New_Tab__c = false;
+        CreateAccount.Tab_Name__c = 'Create Account';
+        CreateAccount.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTm4UAG';
+        CreateAccount.Description__c = 'Configure Accounts';
+        firstLevelNodes.add(CreateAccount);
+
+        Admin_Interface_Node_Configuration__c CreateContact = new Admin_Interface_Node_Configuration__c();
+        CreateContact.Name = 'Create Contact';
+        CreateContact.Disable__c = false;
+        CreateContact.Index__c = 13;
+        CreateContact.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        CreateContact.Open_New_Tab__c = false;
+        CreateContact.Tab_Name__c = 'Create Contact';
+        CreateContact.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTm9UAG';
+        CreateContact.Description__c = 'Configure Contacts';
+        CreateContact.buildertek__Header_Text__c = 'Create Contact';
+        firstLevelNodes.add(CreateContact);
+
+        Admin_Interface_Node_Configuration__c OpportunityConfiguration = new Admin_Interface_Node_Configuration__c();
+        OpportunityConfiguration.Name = 'Opportunity Configuration';
+        OpportunityConfiguration.Disable__c = false;
+        OpportunityConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        OpportunityConfiguration.Open_New_Tab__c = false;
+        OpportunityConfiguration.Tab_Name__c = 'Opportunity Configuration';
+        OpportunityConfiguration.Page_URL__c = '/apex/BT_CreateOpportunityConfiguration';
+        OpportunityConfiguration.buildertek__Assign_to_Existing_Project_on_Closed_Won__c = true;
+        firstLevelNodes.add(OpportunityConfiguration);
+
+        Admin_Interface_Node_Configuration__c QuoteConfiguration = new Admin_Interface_Node_Configuration__c();
+        QuoteConfiguration.Name = 'Quote Configuration';
+        QuoteConfiguration.Disable__c = false;
+        QuoteConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
+        QuoteConfiguration.Open_New_Tab__c = false;
+        QuoteConfiguration.Tab_Name__c = 'Quote Configuration';
+        QuoteConfiguration.Page_URL__c = '/apex/CreateProjectfromQuoteAcceptanceonOpp';
+        QuoteConfiguration.buildertek__Create_Project_from_Opportunity__c = true;
+        QuoteConfiguration.buildertek__Quote_Configuration__c = true;
+        QuoteConfiguration.buildertek__Update_the_Opp_Amount__c = true;
+        QuoteConfiguration.buildertek__Default_Project_Owner__c = '00541000000QRY5AAO';
+        QuoteConfiguration.buildertek__Org_Base_URL__c = 'https://btservice360-dev-ed--buildertek.na75.visual.force.com';
+        firstLevelNodes.add(QuoteConfiguration);
+
         try {
             DMLManager.insertAsUser(firstLevelNodes);
+            Map<String, Admin_Interface_Node_Configuration__c> nodeMap = new Map<String, Admin_Interface_Node_Configuration__c>();
+            for (Admin_Interface_Node_Configuration__c node : firstLevelNodes) {
+                nodeMap.put(node.Name, node);
+            }
+
+            Map<String, String> nameMap = new Map<String, String>();
+            nameMap.put('Budget Configuration', 'BT Budget Configuration');
+            nameMap.put('Create Contract on Quote Acceptance', 'BT Contract Configuration');
+            nameMap.put('Turn off Cost Option Allowance Check', 'BT Change Order Configuration');
+            nameMap.put('MSA Configuration', 'MSA Configuration');
+            nameMap.put('Payment Application Configuration', 'BT Payment Application Configuration');
+            nameMap.put('Pre Qualification Configuration', 'BT Pre Qualification Configuration');
+            nameMap.put('File Upload Page Configuration', 'Pre Qualification Configuration');
+            nameMap.put('System Configuration', 'BT Document Configuration');
+            nameMap.put('File Explorer Page Configuration', 'BT Document Configuration');
+            nameMap.put('Project Configuration', 'BT Project Configuration');
+            nameMap.put('Box Settings', 'Box Settings');
+            nameMap.put('SOV Configuration', 'BT SOV Configuration');
+            nameMap.put('RFQ Configuration', 'BT RFQ Configuration');
+            nameMap.put('Purchase Order Configuration', 'BT Purchase Order Configuration');
+            nameMap.put('Change Order Configuration', 'BT Change Order Configuration');
+            nameMap.put('Creating a new User', 'BT Training');
+            nameMap.put('Creating Accounts and Contacts', 'BT Training');
+            nameMap.put('Create Account', 'Creating Accounts and Contacts');
+            nameMap.put('Create Contact', 'Creating Accounts and Contacts');
+            nameMap.put('Opportunity Configuration', 'BT Opportunity Configuration');
+            nameMap.put('Quote Configuration', 'BT Quote Configuration');
+            List<Admin_Interface_Node_Configuration__c> newNodeList = new List<Admin_Interface_Node_Configuration__c>();
+            for(String key: nameMap.keySet()){
+                Admin_Interface_Node_Configuration__c node = nodeMap.get(key);
+                node.buildertek__Parent_Node__c = nodeMap.get(nameMap.get(key)).Id;
+                newNodeList.add(node);
+            }
+            System.debug('newNodeList==>'+newNodeList);
+            DMLManager.updateAsUser(newNodeList);
         } catch(Exception ex){
             ApexPages.Message errorMsg = new ApexPages.Message(ApexPages.Severity.FATAL, ex.getMessage());
             ApexPages.addMessage(errorMsg);

@@ -1,7 +1,9 @@
 ({
-    doInitHelper : function(component, event, helper) {
-        console.log('*** doInitHelper Method ***');
-        component.set("v.Spinner", true);
+    renderCmpHelper : function(component, event, helper) {
+        console.log('*** renderCmpHelper Method ***');
+        $A.get("e.c:BT_SpinnerEvent").setParams({
+            "action": "SHOW"
+        }).fire();
         var page = component.get("v.page") || 1
         var groupFieldList = component.get("v.groupFieldList");
         if (groupFieldList[3] != undefined) {
@@ -27,6 +29,7 @@
                 var quoteLineList = quoteLineWrapper.quoteLineList;
                 component.set("v.totalColumn", quoteLineWrapper.columns.length);
                 if (quoteLineList.length > 0) {
+                    component.set("v.TotalRecordCount", quoteLineList.length);
                     var columns = quoteLineWrapper.columns;
                     quoteLineList.forEach(element => {
                         var quoteLineFieldData = []
@@ -78,18 +81,31 @@
                             quoteLines1 = [];
                             group1Value = element[groupFieldList[0]];
                             quoteLines1.push(element);
+
+                            if (quoteLineList.length == index+1) {
+                                if (groupFieldList[1] != undefined) {
+                                    quoteLines1 = helper.addSecondGrouping(component, helper, quoteLines1, groupFieldList, columns);
+                                }
+                                totalObj = helper.createTotalWrapper(component, helper, totalObj, columns);
+                                var wrapperData = {groupIndex: group1Wrapper.length+1, groupName : group1Value, quoteLineList: quoteLines1, fieldTotals: totalObj};
+                                group1Wrapper.push(wrapperData);
+                            }
                         }
                     });
                     quoteLineWrapper.groupWrapper = group1Wrapper;
                     console.log('*** Quote Wrapper Data ***');
                     console.log('Quote Wrapper Data => ',{ quoteLineWrapper });
                     component.set("v.QuoteLineWrapper", quoteLineWrapper);
-                    component.set("v.Spinner", false);
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
                 }
             } else{
                 var error = response.getError();
                 console.log('Error => ',{error});
-                component.set("v.Spinner", false);
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
             }                
         });
         $A.enqueueAction(action);
@@ -133,6 +149,15 @@
                     quoteLines2 = [];
                     group2Value = element[groupFieldList[1]];
                     quoteLines2.push(element);
+
+                    if (quoteLines1.length == index+1){
+                        if (groupFieldList[2] != undefined) {
+                            quoteLines2 = helper.addThirdGrouping(component, helper, quoteLines2, groupFieldList, columns);
+                        }
+                        totalObj = helper.createTotalWrapper(component, helper, totalObj, columns);
+                        var wrapperData = {groupIndex: group2Wrapper.length+1, groupName : group2Value, quoteLineList: quoteLines2, fieldTotals: totalObj};
+                        group2Wrapper.push(wrapperData);
+                    }
                 }
             });
             return group2Wrapper;
@@ -177,6 +202,15 @@
                     quoteLines3 = [];
                     group3Value = element[groupFieldList[2]]
                     quoteLines3.push(element);
+
+                    if (quoteLines2.length == index+1){
+                        if (groupFieldList[3] != undefined) {
+                            quoteLines3 = helper.addFourthGrouping(component, helper, quoteLines3, groupFieldList, columns);
+                        }
+                        totalObj = helper.createTotalWrapper(component, helper, totalObj, columns);
+                        var wrapperData = {groupIndex: group3Wrapper.length+1, groupName : group3Value, quoteLineList: quoteLines3, fieldTotals: totalObj};
+                        group3Wrapper.push(wrapperData);
+                    }
                 }
             });
             return group3Wrapper;
@@ -215,6 +249,12 @@
                     quoteLines4 = [];
                     group4Value = element[groupFieldList[3]];
                     quoteLines4.push(element);
+
+                    if (quoteLines3.length == index+1){
+                        totalObj = helper.createTotalWrapper(component, helper, totalObj, columns);
+                        var wrapperData = {groupIndex: group4Wrapper.length+1, groupName : group4Value, quoteLineList: quoteLines4, fieldTotals: totalObj};
+                        group4Wrapper.push(wrapperData);
+                    }
                 }
             });
             return group4Wrapper;
@@ -246,4 +286,28 @@
         totalObj['fieldTotalList'] = quoteLineTotalData;
         return totalObj;
     }, 
+
+    expandRecordsHelper : function(component, event, helper, spanGroupId){
+        let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+        let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
+        let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
+
+        collapeallIcon.style.display = 'block';
+        expandallIcon.style.display = 'none';
+        for(let index = 0; index < recordDivList.length; index++) {
+            recordDivList[index].style.display = 'table-row';
+        }
+    }, 
+
+    collapeRecordsHelper : function(component, event, helper, spanGroupId){
+        let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+        let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
+        let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
+        
+        collapeallIcon.style.display = 'none';
+        expandallIcon.style.display = 'block';
+        for(let index = 0; index < recordDivList.length; index++) {
+            recordDivList[index].style.display = 'none';
+        }
+    }
 })

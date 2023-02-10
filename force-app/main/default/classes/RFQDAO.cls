@@ -1882,6 +1882,7 @@ Throws [Exceptions]:
             if (quote.buildertek__Project__c != null) {
                 projectId = quote.buildertek__Project__c;
             }
+            //append that id of rfq should not be in rfqIds
             String rfqItemrecords = 'Select Id, Name, buildertek__RFQ_Details__c, buildertek__Status__c, buildertek__Vendor__r.Name, buildertek__Vendor_Quote__c,CurrencyIsoCode, buildertek__Project__c, buildertek__Project__r.Name from buildertek__RFQ__c'+
                 ' where buildertek__project__c =\'' + projectId +'\' and buildertek__status__c =\'' +status+'\' and Id NOT IN :rfqIds ORDER BY Name';
             system.debug('rfqItemrecords'+rfqItemrecords);

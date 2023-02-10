@@ -1326,7 +1326,7 @@
                         }).fire();
                         component.find('notifLib').showNotice({
                             "variant": "error",
-                            "header": "The selected Budget Line(s) already has Invoice. Please choose another Budget Line(s).",
+                            "header": "The selected Budget Line(s) have already been invoiced. Please select another Budget Line(s).",
                             "message": "Budget Line: " + budgetline ,
                             closeCallback: function() {}
                         });
@@ -1412,7 +1412,7 @@
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Select Budget Line",
-                "message": "In order to create an Invoice you need to select at least one Budget line.",
+                "message": "In order to create Invoice, you need to select at least one Budget Line.",
                 //"header": "No Budget Lines",
                 //"message": "No Budget Lines Records.",
                 closeCallback: function() {}
@@ -1450,7 +1450,7 @@
                         }).fire();
                         component.find('notifLib').showNotice({
                             "variant": "error",
-                            "header": "The selected Budget Line(s) already has Invoice. Please select another Budget Line(s).",
+                            "header": "The selected Budget Line(s) have already been invoiced. Please select another Budget Line(s).",
                             "message": "Budeget Lines : " + budgetline ,
                             closeCallback: function() {}
                         });

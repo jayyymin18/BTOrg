@@ -177,7 +177,7 @@
 
 /* *** BOM Grouping *** */
 
-.THIS.mainBomDiv{
+.THIS .mainBomDiv{
     overflow: auto;
 }
 

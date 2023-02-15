@@ -987,7 +987,7 @@
                                                 </td>
                                                 <td>
                                                 </td>
-                                                <!-- <td></td>-->
+                                                <td></td>
                                             </tr>
                                             <tr class="slds-text-heading--label"
                                                 style="line-height: 2;font-size: 12px;">
@@ -1318,7 +1318,6 @@
                                                     <aura:if
                                                         isTrue="{!group.Name == rec.groupName &amp;&amp; rec.fieldType == 'false'}">
                                                         <td style="text-align:right">
-                                                            test
                                                         </td>
                                                     </aura:if>
                                                     <!-- </aura:if> -->

@@ -99,6 +99,11 @@
 
             if (response.getState() === 'SUCCESS') {
                 var result = response.getReturnValue();
+                console.log({result});
+                console.log(response.getState());
+                console.log(response.getError());
+
+
                 if (response.getState() === 'SUCCESS') {
                     var result = response.getReturnValue();
                     // if (result[0] == true || result[1] == true) {
@@ -545,7 +550,6 @@
 
     getsetparams: function(component, event, helper) {
         var showresultvalue = event.getParam("selectedRows");
-        console.log({showresultvalue});
         component.set("v.selectedRows", showresultvalue);
     },
 
@@ -887,6 +891,10 @@
     closeModel: function(component, event, helper) {
         // for Hide/Close Model,set the "isOpen" attribute to "Fasle"
         component.set("v.isOpen", false);
+        component.set("v.isBOMmodalOpen", false);
+
+
+        
     },
 
     closeQuotelineModel: function(component, event, helper) {
@@ -2164,6 +2172,8 @@ console.log(document.getElementsByClassName(className)[0]);
 
     openQuoteLine: function(component, event, helper) {
         component.set("v.Spinner", true);
+        //clear searchbo1
+        component.set("v.searchKey2", "");
         var listid = component.get("v.listOfSelectedIds");
         console.log("List of selected Id when click next : ", listid)
             /*    console.log(listid);
@@ -2288,6 +2298,7 @@ component.set("v.StoreIdsOfDatatable2",'') */
         }
     },
     closeBox: function(component, event, helper) {
+        component.set("v.searchKey2", "");
         component.set("v.data1", []) //1
         component.set("v.selectedRows", "");
         //   component.set("v.listOfSelectedIds",null);
@@ -2323,11 +2334,37 @@ component.set("v.StoreIdsOfDatatable2",'') */
     },
 
     updateSelectedText: function(component, event, helper) {
-        console.log('--------ON ROW SELECTION----------');
-        console.log(component.get("v.selectedRows") + '======Selected Rows =========');
-
         var selectedRows = event.getParam('selectedRows');
-        console.log({selectedRows});
+        console.log(component.get("v.pricebookName1"))
+            /*   if(!component.get("v.checkFunctionCall")){
+var oldData = component.get("v.oldData");
+
+if(oldData != undefined){
+if(oldData.length == 0){
+component.set("v.oldData", selectedRows);
+}else if(selectedRows.length < oldData.length){
+
+var onlyInOld = selectedRows.filter(comparer(oldData));
+var onlyInNew = oldData.filter(comparer(selectedRows));
+
+//List of all unselected objects from dataTable
+var unselectedData = onlyInOld.concat(onlyInNew);
+console.log("your unselected data", unselectedData);
+component.set("v.StoreIdsOfDatatable2",unselectedData)
+}else if(selectedRows.length > oldData.length){
+component.set("v.oldData", selectedRows);
+}
+}
+
+//helper comparer function
+function comparer(otherArray){
+return function(current){
+return otherArray.filter(function(other){
+return other.Id == current.Id
+}).length == 0;
+}
+}
+} */
 
         console.log("1 st -- " + component.get("v.listOfSelectedIds"));
         component.set("v.StoreIdsOfDatatable", component.get("v.listOfSelectedIds"));
@@ -2340,13 +2377,28 @@ component.set("v.StoreIdsOfDatatable2",'') */
 
             } else {
                 console.log("yes")
+                    /*   if(selectedRowList){
+                       for( var j = 0; j < selectedRowList.length; j++){
+
+                           if ( selectedRowList[j] === selectedRows[i].Id) {
+                               console.log("yes")
+                               selectedRowList.splice(j, 1);
+                           }
+
+                       }
+                       } */
             }
             NewselectedRows.push(selectedRows[i].Id);
         }
-
-            // NewselectedRows.push(oldSelectedRows);
-        
-        console.log("Final List :------------------> " + NewselectedRows);
+        /*     if(unselectedData != undefined && !component.get("v.checkFunctionCall")){
+                                        for(var i = 0; i< unselectedData.length;i++){
+                                            if(selectedRowList.indexOf(unselectedData[i].Id) >= 0){
+                                              //  selectedRowList.pop(unselectedData[i].Id);
+                                            delete  selectedRowList[i];
+                                            }
+                                        }
+                                        } */
+        console.log("Final List :------------------> " + NewselectedRows)
         component.set("v.listOfSelectedIds", NewselectedRows)
         component.set("v.selectedRows", NewselectedRows);
     },
@@ -2415,10 +2467,6 @@ component.set("v.StoreIdsOfDatatable2",'') */
     },
 
     searchTable: function(component, event, helper) {
-        console.log(component.get("v.listOfSelectedIds") + '==FIRST==');
-        console.log(component.get("v.selectedRows"));
-
-
         var allRecords = component.get("v.filteredData");
         // var allRecords = cmp.get("v.data1");
         var searchFilter = event.getSource().get("v.value").toUpperCase()
@@ -2433,8 +2481,6 @@ component.set("v.StoreIdsOfDatatable2",'') */
         console.log("Temp array : ", tempArray);
         component.set("v.data1", tempArray);
         helper.sortData(component, component.get("v.sortedBy"), component.get("v.sortedDirection"));
-        console.log(component.get("v.listOfSelectedIds") + '===LAST===');
-
 
     },
 
@@ -2551,9 +2597,9 @@ component.set("v.StoreIdsOfDatatable2",'') */
         component.set("v.GroupingOptions", opts);
     },
 
-    closeModel: function(component, event, helper) { 
-        component.set("v.isBOMmodalOpen", false);
-     },
+    // closeModel: function(component, event, helper) { 
+    //     component.set("v.isBOMmodalOpen", false);
+    //  },
     
      submitDetails: function(component, event, helper) {
         var valueofField1 = component.get("v.valueofField1")

@@ -692,6 +692,9 @@
             });
             action.setCallback(this, function(response) {
                 var state = response.getState();
+                console.log({state});
+                console.log(response.getError());
+
                 if (state === "SUCCESS") {
                     var result = response.getReturnValue();
                     console.log(response.groups);
@@ -1434,6 +1437,17 @@
         for(let index = 0; index < recordDivList.length; index++) {
             recordDivList[index].style.display = 'none';
         }
-    }
+    },
+    updateSelectedRecords: function(component, event, helper) {
+        var tempSelected = JSON.parse(JSON.stringify(component.get('v.selectedRows')));
+        component.get('v.data1').forEach(function(row) {
+            if (tempSelected[row.Id]) {
+                tempSelected[row.Id] = true;
+            }
+        });
+        component.set('v.selectedRows', tempSelected);
+
+        console.log(component.get('v.selectedRows') + '>>>>>>>');
+    },
 
 })

@@ -36,7 +36,7 @@
                         <div class="inner-box">
                             <div class="slds-grid slds-gutters slds-scrollable" style="padding:5px;  ">
                                 <aura:iteration items="{!v.selectedVendor}" var="vlist">
-                                    <div class="{!v.dynamicClass}" style="{!v.dynamicStyle}" >
+                                    <!-- <div class="{!v.dynamicClass}" style="{!v.dynamicStyle}" > -->
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr style="background: #3a8ed8;color: #fff;width:50%">
@@ -121,7 +121,7 @@
                                             </tbody>
                                         </table>
                                        
-                                    </div>
+                                    <!-- </div> -->
 
                                 </aura:iteration>
                             </div>

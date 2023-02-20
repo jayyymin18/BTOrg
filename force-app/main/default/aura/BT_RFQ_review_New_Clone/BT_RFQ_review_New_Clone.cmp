@@ -174,11 +174,11 @@
                             <lightning:button iconName="utility:close" iconPosition="left" variant="bare"
                                               onclick="{!c.cancelRFQ}" label="Cancel RFQ" class="iconWithoutBorder" />
                         </li>
-                        <li
+                        <!-- <li
                             style="display: inline-block;vertical-align: middle;border-right: 1px solid #ccc;">
                             <lightning:button iconName="utility:close" iconPosition="left" variant="bare"
                                               onclick="{!c.cancelvoidRFQ}" label="Void RFQ" class="iconWithoutBorder" />
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
             </header>
@@ -194,7 +194,7 @@
                                                                  width:100%;">
                                         <div class="checkbox check-btn"
                                              style="display: inline-block; vertical-align: middle;margin: 0 auto;">
-                                            <aura:if isTrue="{!vlist.buildertek__Status__c!='Rejected'}">
+                                            <aura:if isTrue="{!and(vlist.buildertek__Status__c!='Rejected', vlist.buildertek__Status__c!='Email Sent')}">
                                                 <label class="custom-radio-check">
                                                     <lightning:input aura:id="vendorselection" type="checkbox"
                                                                      variant="lable-hidden"

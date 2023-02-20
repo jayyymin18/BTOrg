@@ -160,6 +160,7 @@
     },
     
 	handleFilesChange: function(component, event, helper) {
+        console.log('handleFilesChange');
             var fileName = 'No File Selected..';                
                 //alert(event.getSource().get("v.files").length);
             if (event.getSource().get("v.files").length > 0) {
@@ -192,8 +193,10 @@
         }
         component.set("v.fileName", files);            
         component.set("v.selectedfilesFill",mapData);
-        //alert(typeof event.getSource().get("v.files"));        
-        //component.set("v.fileName", fileName);
+
+        console.log(component.get("v.fileName"));
+        console.log(component.get("v.selectedfilesFill"));
+
     }, 
                 
                 

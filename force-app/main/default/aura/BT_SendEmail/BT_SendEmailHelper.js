@@ -177,6 +177,7 @@
 		pdfFileName = component.get("v.pdfFileName");
 		var dbAction = component.get("c.SendEmail");
         console.log('pdfFileName' + component.get("v.pdfFileName"));
+        // debugger;
         dbAction.setParams({
             to:toIds,
             cc: ccIds,
@@ -300,7 +301,7 @@
         // get the selected files using aura:id [return array of files]
         //var fileInput = component.find("fuploader").get("v.files");
         var fileInput = component.get("v.selectedfileslist");
-        console.log('fileInput ==> '+fileInput);
+        console.log('fileInput ==> ',fileInput);
         //alert('fileInput--->'+fileInput);
         this.fileInputLenght = fileInput.length; 
         //alert('uploadHelper--->'+recid);
@@ -421,8 +422,13 @@
                 // check if the start postion is still less then end postion 
                 // then call again 'uploadInChunk' method , 
                 // else, diaply alert msg and hide the loading spinner
+                console.log(startPosition < endPosition);
+                console.log({startPosition});
+                console.log({endPosition});
+
                 if (startPosition < endPosition) {
                     this.uploadInChunk(component, file, fileContents, startPosition, endPosition, attachId,recid,helper);
+                    // debugger;
                 } else {
                     //this.showMessage('File(s) uploaded successfully',true);
                    /* var navEvt = $A.get("e.force:navigateToSObject");

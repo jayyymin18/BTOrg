@@ -197,6 +197,25 @@
             component.set('v.isGroupDescriptionOpen', false);
         }
     },
+    // customCheckbox: function(component, cellValue, helper) {
+    //     console.log('customCheckbox');
+    //     var isSelected = cellValue;
+    //     var label = component.get('v.columns').find(function(column) {
+    //         return column.fieldName === 'isSelected';
+    //     }).typeAttributes.label;
+    //     return [
+    //         {
+    //             label: label,
+    //             type: 'checkbox',
+    //             class: 'slds-checkbox--faux',
+    //             checked: isSelected,
+    //             disabled: true
+    //         }
+    //     ];
+    //     console.log('end customCheckbox');
+
+    // },
+
     addProductFromGroup: function(component, event, helper) {
         if (!component.get('v.isAddProductFromGroup')){
             console.log(component.get('v.runFirstTime'));
@@ -222,6 +241,7 @@
 
 
             component.set('v.columns1', [
+                // { label: '', type: 'customCheckbox', fieldName: 'isSelected', typeAttributes: { isChecked: { fieldName: 'isSelected' }, label: '' } },
                 { label: 'Product Family', fieldName: 'Family', type: 'text' },
                 { label: 'Product Name', fieldName: 'Name', type: 'text' },
                 { label: 'Product Description', fieldName: 'Description', type: 'text' },
@@ -786,23 +806,31 @@
     },
 
     deleteSelectedQuoteItem: function(component, event, helper) {
-        if (component.find("checkQuoteItem") != undefined) {
-            $A.get("e.c:BT_SpinnerEvent").setParams({
+        console.log('---In Delete Method---');
+         $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "SHOW"
             }).fire();
+        if (component.find("checkQuoteItem") != undefined) {
+            // $A.get("e.c:BT_SpinnerEvent").setParams({
+            //     "action": "SHOW"
+            // }).fire();
             var QuoteIds = [];
             var rowData;
             var newRFQItems = [];
             var delId = [];
             var getAllId = component.find("checkQuoteItem");
+            console.log('getAllId--->>',{getAllId});
             if (!Array.isArray(getAllId)) {
                 if (getAllId.get("v.value") == true) {
                     QuoteIds.push(getAllId.get("v.text"));
                 }
             } else {
                 for (var i = 0; i < getAllId.length; i++) {
+                    console.log(getAllId[i].get("v.value")  , 'getAllId[i].get("v.value") ');
                     if (getAllId[i].get("v.value") == true) {
+                        console.log('inside if');
                         QuoteIds.push(getAllId[i].get("v.text"));
+                        console.log({QuoteIds});
                     }
                 }
             }
@@ -1000,6 +1028,7 @@
         }
     },
     deleteSelectedQuoteItemlines: function(component, event, helper) {
+        console.log('on delete quote');
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
@@ -1027,6 +1056,8 @@
             });
             action.setCallback(this, function(response) {
                 var state = response.getState();
+                console.log({state});
+                console.log(response.getError());
                 if (state === "SUCCESS") {
                     component.set("v.isQuotelinedelete", false);
                     $A.get("e.force:refreshView").fire();
@@ -2193,20 +2224,8 @@ console.log(document.getElementsByClassName(className)[0]);
         //clear searchbo1
         component.set("v.searchKey2", "");
         var listid = component.get("v.listOfSelectedIds");
-        console.log("List of selected Id when click next : ", listid)
-            /*    console.log(listid);
-var unselectedData = component.get("v.StoreIdsOfDatatable2")
-console.log("unchecked : ",unselectedData);
-if(unselectedData != undefined){
-for(var i = 0; i< unselectedData.length;i++){
-if(listid.indexOf(unselectedData[i].Id) >= 0){
-//  listid.pop(unselectedData[i].Id);
-console.log(listid[listid.indexOf(unselectedData[i].Id)])
-delete listid[listid.indexOf(unselectedData[i].Id)];
-}
-}
-}
-component.set("v.StoreIdsOfDatatable2",'') */
+        console.log("List of selected Id when click next : ", listid);
+
         if (listid.length > 0 && listid != undefined && listid != "") {
             // debugger;
             component.set("v.openProductBox", false);
@@ -2228,6 +2247,17 @@ component.set("v.StoreIdsOfDatatable2",'') */
                     console.log("Products : ", listProduct)
                     var xyz = [];
                     var Quotelist = component.get("v.QuoteLineList");
+                    // var action = component.get("c.getQuoteLineGroup");
+                    // action.setParams({
+                    //     "productList": listProduct
+                    // });
+                    // action.setCallback(this, function(response) {
+                    //     if (response.getState() == "SUCCESS") {
+                    //         var result = response.getReturnValue();
+                    //         console.log("Quote Line Groups : ", result);
+                    //     }
+                    // });
+                    // $A.enqueueAction(action);                    
                     for (var i = 0; i < listProduct.length; i++) {
 
                         /*   xyz.push({
@@ -2245,7 +2275,18 @@ component.set("v.StoreIdsOfDatatable2",'') */
                         var row1 = listProduct[i];
                         console.log("Row1 PricebookEntries : ", row1.PricebookEntries)
                         console.log("Row1 => ", { row1 });
-                        console.log(row1.buildertek__Quote_Group__c);
+                        var action = component.get("c.createQuoteLineGroup");
+                        action.setParams({
+                            "productFamilyName": row1.Family
+                        });
+                        action.setCallback(this, function(response) {
+                            if (response.getState() == "SUCCESS") {
+                                var result = response.getReturnValue();
+                                console.log("Quote Line Groups : ", result);
+                            }
+                        });
+                        $A.enqueueAction(action);
+                        console.log('group => '+row1.buildertek__Quote_Group__c);
                         if (row1.PricebookEntries != undefined) {
                             if (row1.buildertek__Quote_Group__c != undefined) {
                                 xyz.push({
@@ -2279,7 +2320,6 @@ component.set("v.StoreIdsOfDatatable2",'') */
                             }
                         }
                     }
-
                     component.set("v.data2", xyz);
                     console.log("data 2 : ", xyz);
                     //  var action11 = component.get("c.getQuoteLineGroupRecords");
@@ -2354,36 +2394,6 @@ component.set("v.StoreIdsOfDatatable2",'') */
     updateSelectedText: function(component, event, helper) {
         var selectedRows = event.getParam('selectedRows');
         console.log(component.get("v.pricebookName1"))
-            /*   if(!component.get("v.checkFunctionCall")){
-var oldData = component.get("v.oldData");
-
-if(oldData != undefined){
-if(oldData.length == 0){
-component.set("v.oldData", selectedRows);
-}else if(selectedRows.length < oldData.length){
-
-var onlyInOld = selectedRows.filter(comparer(oldData));
-var onlyInNew = oldData.filter(comparer(selectedRows));
-
-//List of all unselected objects from dataTable
-var unselectedData = onlyInOld.concat(onlyInNew);
-console.log("your unselected data", unselectedData);
-component.set("v.StoreIdsOfDatatable2",unselectedData)
-}else if(selectedRows.length > oldData.length){
-component.set("v.oldData", selectedRows);
-}
-}
-
-//helper comparer function
-function comparer(otherArray){
-return function(current){
-return otherArray.filter(function(other){
-return other.Id == current.Id
-}).length == 0;
-}
-}
-} */
-
         console.log("1 st -- " + component.get("v.listOfSelectedIds"));
         component.set("v.StoreIdsOfDatatable", component.get("v.listOfSelectedIds"));
         var y = [];
@@ -2395,30 +2405,13 @@ return other.Id == current.Id
 
             } else {
                 console.log("yes")
-                    /*   if(selectedRowList){
-                       for( var j = 0; j < selectedRowList.length; j++){
-
-                           if ( selectedRowList[j] === selectedRows[i].Id) {
-                               console.log("yes")
-                               selectedRowList.splice(j, 1);
-                           }
-
-                       }
-                       } */
             }
             NewselectedRows.push(selectedRows[i].Id);
         }
-        /*     if(unselectedData != undefined && !component.get("v.checkFunctionCall")){
-                                        for(var i = 0; i< unselectedData.length;i++){
-                                            if(selectedRowList.indexOf(unselectedData[i].Id) >= 0){
-                                              //  selectedRowList.pop(unselectedData[i].Id);
-                                            delete  selectedRowList[i];
-                                            }
-                                        }
-                                        } */
         console.log("Final List :------------------> " + NewselectedRows)
         component.set("v.listOfSelectedIds", NewselectedRows)
         component.set("v.selectedRows", NewselectedRows);
+
     },
 
     cancelBox: function(component, event, helper) {
@@ -2485,8 +2478,19 @@ return other.Id == current.Id
     },
 
     searchTable: function(component, event, helper) {
+        // helper.customCheckbox(component, cellValue, helper);
+        console.log("searchTable List :------------------> " + component.get("v.listOfSelectedIds"));
+        // var data = component.get('v.data1');
+        // for (var i = 0; i < data.length; i++) {
+        //     console.log(data[i].isSelected);
+        //     console.log(data[i]);
+     
+
+        // }
+    
+
+
         var allRecords = component.get("v.filteredData");
-        // var allRecords = cmp.get("v.data1");
         var searchFilter = event.getSource().get("v.value").toUpperCase()
         var tempArray = [];
         var i;
@@ -2498,6 +2502,7 @@ return other.Id == current.Id
         }
         console.log("Temp array : ", tempArray);
         component.set("v.data1", tempArray);
+        console.log("Temp array : AFTER");
         helper.sortData(component, component.get("v.sortedBy"), component.get("v.sortedDirection"));
 
     },
@@ -2507,6 +2512,8 @@ return other.Id == current.Id
         component.set("v.Spinner2", true);
         console.log('inside change event 1');
         component.set("v.data1", []);
+        component.set("v.listOfSelectedIds", []);
+
         var x = component.find("getPriceBookId").get("v.value");
 
         if (x == '') {
@@ -2806,7 +2813,22 @@ return other.Id == current.Id
             expandallIcon.style.display = 'none';
         }
 
-    }
+    },
+    handleSelectAllProduct: function(component, event, helper) {
+        var getID = component.get("v.data1");
+        var checkvalue = component.find("selectAll").get("v.value");        
+        var checkProduct = component.find("checkProduct"); 
+        if(checkvalue == true){
+            for(var i=0; i<checkProduct.length; i++){
+                checkProduct[i].set("v.value",true);
+            }
+        }
+        else{ 
+            for(var i=0; i<checkProduct.length; i++){
+                checkProduct[i].set("v.value",false);
+            }
+        }
+    },
 
 
 })

@@ -777,6 +777,8 @@ public with sharing class QuoteDAO{
         wrap.wrapperList = wrapperList;
         wrap.columns = Detail.columns;
         wrap.totalColumns = Detail.columns.size() / 2;
+        wrap.Totalcols = Detail.columns.size()+3;
+
         wrap.groups = Detail.groups;
         wrap.pageSize = pageSize;
         wrap.page = (Integer)pageNumber;
@@ -1903,6 +1905,10 @@ public with sharing class QuoteDAO{
 
         @AuraEnabled
         public String status{get;set;}
+
+        @AuraEnabled
+        public Integer Totalcols{ get; set; }
+
     }
 
     public class productfamilyClass{

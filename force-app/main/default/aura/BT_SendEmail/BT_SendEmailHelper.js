@@ -321,6 +321,8 @@
             if(filenameexists){
                 var file = fileInput[i];
                 var self = this;
+
+                console.log(file.size , '=======file.size=========');
                 //alert(file);
                 // check the selected file size, if select file size greter then MAX_FILE_SIZE,
                 // then show a alert msg to user,hide the loading spinner and return from function 
@@ -499,23 +501,8 @@
             }
         });
         $A.enqueueAction(action);
-    }
+    },
            
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     
 })

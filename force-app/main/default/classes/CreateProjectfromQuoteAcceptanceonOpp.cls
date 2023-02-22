@@ -7,6 +7,9 @@ public class CreateProjectfromQuoteAcceptanceonOpp {
  public Boolean isRemovesingleQuoteLineOption{get;set;}
  public Boolean hideGlobalMargin{get;set;}
  public Boolean hideGlobalMarkup{get;set;}
+//  public Boolean Margin{get;set;}
+//  public Boolean Markup{get;set;}
+
  public string  isBaseUrl {get;set;} 
  public buildertek__Admin_Interface_Node_Configuration__c admininterface {get;set;} 
  public string  emailsubject {get;set;} 
@@ -47,6 +50,9 @@ public class CreateProjectfromQuoteAcceptanceonOpp {
         adminInterfaceNodeConfigurations.buildertek__Remove_Single_Quote_Line_Option__c = isRemovesingleQuoteLineOption;
         adminInterfaceNodeConfigurations.buildertek__Hide_Global_Margin__c = hideGlobalMargin;
         adminInterfaceNodeConfigurations.buildertek__Hide_Global_Markup__c = hideGlobalMarkup;
+
+
+
         system.debug('isBaseUrl'+isBaseUrl);
         System.debug(adminInterfaceNodeConfigurations.buildertek__Remove_Single_Quote_Line_Option__c);
         admininterface.buildertek__Org_Base_URL__c = isBaseUrl;

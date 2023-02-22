@@ -161,14 +161,17 @@
     
 	handleFilesChange: function(component, event, helper) {
         console.log('handleFilesChange');
-            var fileName = 'No File Selected..';                
-                //alert(event.getSource().get("v.files").length);
-            if (event.getSource().get("v.files").length > 0) {
-               // fileName = event.getSource().get("v.files")[0]['name'];
-            }
-            component.set("v.selectedfileslist",event.getSource().get("v.files"));
 
-                    var fileCount=event.getSource().get("v.files").length;
+
+
+        var fileName = 'No File Selected..';                
+            //alert(event.getSource().get("v.files").length);
+        if (event.getSource().get("v.files").length > 0) {
+            // fileName = event.getSource().get("v.files")[0]['name'];
+        }
+        component.set("v.selectedfileslist",event.getSource().get("v.files"));
+
+        var fileCount=event.getSource().get("v.files").length;
 
         
         var files='';
@@ -212,7 +215,8 @@
             }  
         }
     },                
-                
+
+              
                 
                 
                 

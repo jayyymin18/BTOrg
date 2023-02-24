@@ -174,16 +174,16 @@
                                     <div class="slds-truncate" title="Quantity">Quantity</div>
                                 </th>
                                 <th class="" scope="col">
-                                    <div class="slds-truncate" title="Markup %">Markup %</div>
-                                </th>
-                                <th class="" scope="col">
-                                    <div class="slds-truncate" title="Discount %">Discount %</div>
-                                </th>
-                                <th class="" scope="col">
                                     <div class="slds-truncate" title="Unit Cost">Unit Cost</div>
                                 </th>
                                 <th class="" scope="col">
                                     <div class="slds-truncate" title="List Price">List Price</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Markup %">Markup %</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Discount %">Discount %</div>
                                 </th>
                             </tr>
                         </thead>
@@ -210,16 +210,16 @@
                                         <lightning:input name="input4" label="" value="{!item.buildertek__Quantity__c}" />
                                     </td>
                                     <td>
-                                        <lightning:input name="input7" label="" value="{!item.buildertek__Markup__c}" />
-                                    </td>
-                                    <td>
-                                        <lightning:input name="input5" label="" value="{!item.buildertek__Additional_Discount__c}" />
-                                    </td>
-                                    <td>
                                         <lightning:input name="input6" label="" value="{!item.buildertek__Unit_Cost__c}" formatter="currency" type="number" maximumFractionDigits="5" step="0.01" />
                                     </td>
                                     <td>
                                         <lightning:input name="input2" label="" value="{!item.buildertek__Unit_Price__c}" formatter="currency" type="number" maximumFractionDigits="5" step="0.01" />
+                                    </td>
+                                    <td>
+                                        <lightning:input name="input7" label="" value="{!item.buildertek__Markup__c}" />
+                                    </td>
+                                    <td>
+                                        <lightning:input name="input5" label="" value="{!item.buildertek__Additional_Discount__c}" />
                                     </td>
                                 </tr>
                             </aura:iteration>

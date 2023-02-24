@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>56.0</apiVersion>
+    <assignments>
+        <name>assinged_new_total</name>
+        <label>assinged new total</label>
+        <locationX>264</locationX>
+        <locationY>575</locationY>
+        <assignmentItems>
+            <assignToReference>assigned_total_to_transaction.Amount__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Total__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>assigned_total_to_transaction</targetReference>
+        </connector>
+    </assignments>
+    <environments>Default</environments>
+    <interviewLabel>Finance Transaction Update Total {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Finance Transaction Update Total</label>
+    <loops>
+        <name>assigned_total_to_transaction</name>
+        <label>assigned total to transaction</label>
+        <locationX>176</locationX>
+        <locationY>455</locationY>
+        <collectionReference>get_finance_transactio</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>assinged_new_total</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>update_all_transaction</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>get_finance_transactio</name>
+        <label>get finance transactio</label>
+        <locationX>176</locationX>
+        <locationY>335</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>assigned_total_to_transaction</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Sales_Invoice_AR__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Billings__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Finance_Transaction__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>update_all_transaction</name>
+        <label>update all transaction</label>
+        <locationX>176</locationX>
+        <locationY>791</locationY>
+        <inputReference>assigned_total_to_transaction</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>get_finance_transactio</targetReference>
+        </connector>
+        <object>Billable_Lines__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Obsolete</status>
+</Flow>

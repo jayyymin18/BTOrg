@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>56.0</apiVersion>
+    <decisions>
+        <description>Checks which field gets updated either margin or markup</description>
+        <name>Check_Update_field</name>
+        <label>Check Update field</label>
+        <locationX>314</locationX>
+        <locationY>335</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>On_MarkUp_Change</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.buildertek__Markup__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record__Prior.Markup__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_the_Margin_Based_on_the_Markup_Entered</targetReference>
+            </connector>
+            <label>On MarkUp Change</label>
+        </rules>
+        <rules>
+            <name>On_Margin_Update</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.buildertek__Margin__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record__Prior.Margin__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_the_Markup_Based_on_the_Margin_Entered</targetReference>
+            </connector>
+            <label>On Margin Update</label>
+        </rules>
+    </decisions>
+    <description>Added condition for Markup to margin value update</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula to update the value of margin from the input value of markup</description>
+        <name>Formula_To_Update_Margin_From_Value_of_Markup</name>
+        <dataType>Number</dataType>
+        <expression>({!$Record.buildertek__Markup__c}/(100+{!$Record.buildertek__Markup__c}))*100</expression>
+        <scale>4</scale>
+    </formulas>
+    <interviewLabel>Margin to Markup Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Margin to Markup Flow</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the value of Margin based on the changing value of markup</description>
+        <name>Update_the_Margin_Based_on_the_Markup_Entered</name>
+        <label>Update the Margin Based on the Markup Entered</label>
+        <locationX>50</locationX>
+        <locationY>455</locationY>
+        <inputAssignments>
+            <field>Margin__c</field>
+            <value>
+                <elementReference>Formula_To_Update_Margin_From_Value_of_Markup</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_the_Markup_Based_on_the_Margin_Entered</name>
+        <label>Update the Markup Based on the Margin Entered</label>
+        <locationX>314</locationX>
+        <locationY>455</locationY>
+        <inputAssignments>
+            <field>Markup__c</field>
+            <value>
+                <elementReference>$Record.Margin_To_Markup__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>188</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Update_field</targetReference>
+        </connector>
+        <filterLogic>or</filterLogic>
+        <filters>
+            <field>Margin__c</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Markup__c</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Markup__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Quote_Item__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Obsolete</status>
+</Flow>

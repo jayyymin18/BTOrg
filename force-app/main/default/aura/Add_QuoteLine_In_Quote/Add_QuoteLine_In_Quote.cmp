@@ -9,7 +9,7 @@
     <aura:attribute name="selecteProducts" type="Boolean" default="true" />
     <aura:attribute name="Spinner" type="Boolean" default="false" />
     <aura:attribute name="pricebookoptions" type="List" />
-    <aura:attribute name="selectedPricebookId" type="String" />
+    <aura:attribute name="selectedPricebookId" type="String" default="" />
     <aura:attribute name="sProductFamily" type="String" />
     <aura:attribute name="sProductName" type="String" />
     <aura:attribute name="productFamilyOptions" type="List" />
@@ -137,8 +137,12 @@
                     </table>
                     <aura:if isTrue="{!v.selectedPricebookId == ''}">
                         <center class="elseMsg">Please Select PriceBook!!!</center>
+                        <aura:set attribute="else" >
+                            <aura:if isTrue="{!v.tableDataList.length == 0}">
+                                <center class="elseMsg">No Products Found!!!</center>
+                            </aura:if>
+                        </aura:set>
                     </aura:if> 
-
                 </div>
             </div>
     

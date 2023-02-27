@@ -9,7 +9,7 @@
         <lightning:treeGrid
             columns="{! v.gridColumns }"
             data="{! v.gridData }"
-            keyField="Id"
+            keyField="Name"
             hideCheckboxColumn="true"
             onrowaction="{!c.handleURLClick}"
         />

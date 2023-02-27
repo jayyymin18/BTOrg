@@ -501,18 +501,6 @@ public with sharing class BT_AdminConfigurationController{
         fileExplorerPageConfigurationNode.Description__c = System.Label.File_Explorer_Page_Configuration_Description;
         firstLevelNodes.add(fileExplorerPageConfigurationNode);
         
-        /*
-        Admin_Interface_Node_Configuration__c fileManagementConfig = new Admin_Interface_Node_Configuration__c();
-        fileManagementConfig.Name = System.Label.File_Management_Configuration;
-        fileManagementConfig.Disable__c = false;
-        fileManagementConfig.Index__c = 3;
-        fileManagementConfig.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
-        fileManagementConfig.Page_URL__c = '/apex/BT_FileManagementConfiguration';
-        fileManagementConfig.Tab_Name__c = System.Label.File_Management_Configuration;
-        fileManagementConfig.Description__c = System.Label.File_Management_Configuration_Description;
-        firstLevelNodes.add(fileManagementConfig);
-        */
-        
         Admin_Interface_Node_Configuration__c fileUploadConfig = new Admin_Interface_Node_Configuration__c();
         fileUploadConfig.Name = System.Label.File_Upload_Page_Configuration;
         fileUploadConfig.Disable__c = false;
@@ -594,7 +582,6 @@ public with sharing class BT_AdminConfigurationController{
         BTPaymentApplicationConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTPaymentApplicationConfiguration.Open_New_Tab__c = false;
         BTPaymentApplicationConfiguration.Tab_Name__c = 'BT Payment Application Configuration';
-        BTPaymentApplicationConfiguration.Page_URL__c = '';
         BTPaymentApplicationConfiguration.Description__c = 'Configure payment Application  Process for your organization.';
         firstLevelNodes.add(BTPaymentApplicationConfiguration);
 
@@ -616,7 +603,6 @@ public with sharing class BT_AdminConfigurationController{
         MSAConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         MSAConfiguration.Open_New_Tab__c = false;
         MSAConfiguration.Tab_Name__c = 'MSA Configuration';
-        MSAConfiguration.Page_URL__c = '';
         MSAConfiguration.Description__c = 'Configure MSA Process for your organization.';
         firstLevelNodes.add(MSAConfiguration);
 
@@ -627,7 +613,6 @@ public with sharing class BT_AdminConfigurationController{
         RFQConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         RFQConfiguration.Open_New_Tab__c = false;
         RFQConfiguration.Tab_Name__c = 'BT RFQ Configuration';
-        RFQConfiguration.Page_URL__c = '';
         RFQConfiguration.Description__c = 'Configure RFQ Process for your organization.';
         firstLevelNodes.add(RFQConfiguration);
 
@@ -673,7 +658,6 @@ public with sharing class BT_AdminConfigurationController{
         BTPreQualificationConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTPreQualificationConfiguration.Open_New_Tab__c = false;
         BTPreQualificationConfiguration.Tab_Name__c = 'BT Pre Qualification Configuration';
-        BTPreQualificationConfiguration.Page_URL__c = '';
         BTPreQualificationConfiguration.Description__c = 'Configure Pre Qualification Process for your organization.';
         firstLevelNodes.add(BTPreQualificationConfiguration);
 
@@ -684,7 +668,6 @@ public with sharing class BT_AdminConfigurationController{
         BTDocumentConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTDocumentConfiguration.Open_New_Tab__c = false;
         BTDocumentConfiguration.Tab_Name__c = 'BT Document Configuration';
-        BTDocumentConfiguration.Page_URL__c = '';
         BTDocumentConfiguration.Description__c = 'Configure Document Interface for your organization.';
         firstLevelNodes.add(BTDocumentConfiguration);
 
@@ -695,7 +678,6 @@ public with sharing class BT_AdminConfigurationController{
         BTProjectConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTProjectConfiguration.Open_New_Tab__c = false;
         BTProjectConfiguration.Tab_Name__c = 'BT Project Configuration';
-        BTProjectConfiguration.Page_URL__c = '';
         BTProjectConfiguration.Description__c = 'Configure Project Process for your organization.';
         firstLevelNodes.add(BTProjectConfiguration);
 
@@ -706,7 +688,6 @@ public with sharing class BT_AdminConfigurationController{
         BTAccountPayableConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTAccountPayableConfiguration.Open_New_Tab__c = false;
         BTAccountPayableConfiguration.Tab_Name__c = 'BT Account Payable Configuration';
-        BTAccountPayableConfiguration.Page_URL__c = '';
         BTAccountPayableConfiguration.Description__c = 'Configure Account Payable Process for your organization.';
         firstLevelNodes.add(BTAccountPayableConfiguration);
 
@@ -717,7 +698,6 @@ public with sharing class BT_AdminConfigurationController{
         BTQuoteConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTQuoteConfiguration.Open_New_Tab__c = false;
         BTQuoteConfiguration.Tab_Name__c = 'BT Quote Configuration';
-        BTQuoteConfiguration.Page_URL__c = '';
         BTQuoteConfiguration.Description__c = 'Configure Quote Process for your organization.';
         firstLevelNodes.add(BTQuoteConfiguration);
 
@@ -728,7 +708,6 @@ public with sharing class BT_AdminConfigurationController{
         BTContractConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTContractConfiguration.Open_New_Tab__c = false;
         BTContractConfiguration.Tab_Name__c = 'BT Contract Configuration';
-        BTContractConfiguration.Page_URL__c = '';
         BTContractConfiguration.Description__c = 'Configure Contract Process for your organization.';
         firstLevelNodes.add(BTContractConfiguration);
 
@@ -739,7 +718,6 @@ public with sharing class BT_AdminConfigurationController{
         BTBudgetConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTBudgetConfiguration.Open_New_Tab__c = false;
         BTBudgetConfiguration.Tab_Name__c = 'BT Budget Configuration';
-        BTBudgetConfiguration.Page_URL__c = '';
         BTBudgetConfiguration.Description__c = 'Configure Budget Process for your organization.';
         firstLevelNodes.add(BTBudgetConfiguration);
 
@@ -750,7 +728,6 @@ public with sharing class BT_AdminConfigurationController{
         BTChangeOrderConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTChangeOrderConfiguration.Open_New_Tab__c = false;
         BTChangeOrderConfiguration.Tab_Name__c = 'BT Change Order Configuration';
-        BTChangeOrderConfiguration.Page_URL__c = '';
         BTChangeOrderConfiguration.Description__c = 'Configure Change Order Process for your organization.';
         firstLevelNodes.add(BTChangeOrderConfiguration);
 
@@ -761,7 +738,6 @@ public with sharing class BT_AdminConfigurationController{
         BoxSettings.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BoxSettings.Open_New_Tab__c = false;
         BoxSettings.Tab_Name__c = 'Box Settings';
-        BoxSettings.Page_URL__c = '';
         BoxSettings.Description__c = 'Configure Box Process for your organization.';
         firstLevelNodes.add(BoxSettings);
 
@@ -783,7 +759,6 @@ public with sharing class BT_AdminConfigurationController{
         BTSOVConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTSOVConfiguration.Open_New_Tab__c = false;
         BTSOVConfiguration.Tab_Name__c = 'BT SOV Configuration';
-        BTSOVConfiguration.Page_URL__c = '';
         BTSOVConfiguration.Description__c = 'Configure SOV Process for your organization.';
         firstLevelNodes.add(BTSOVConfiguration);
 
@@ -794,7 +769,6 @@ public with sharing class BT_AdminConfigurationController{
         BTPurchaseOrderConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTPurchaseOrderConfiguration.Open_New_Tab__c = false;
         BTPurchaseOrderConfiguration.Tab_Name__c = 'BT Purchase Order Configuration';
-        BTPurchaseOrderConfiguration.Page_URL__c = '';
         BTPurchaseOrderConfiguration.Description__c = 'Configure Purchase Order Process for your organization.';
         firstLevelNodes.add(BTPurchaseOrderConfiguration);
 
@@ -831,7 +805,6 @@ public with sharing class BT_AdminConfigurationController{
         BTOpportunityConfiguration.Description__c = 'Configure Opportunity Process for your organization.';
         firstLevelNodes.add(BTOpportunityConfiguration);
 
-        //=========== With Parent record ========
         Admin_Interface_Node_Configuration__c BudgetConfiguration = new Admin_Interface_Node_Configuration__c();
         BudgetConfiguration.Name = 'Budget Configuration';
         BudgetConfiguration.Disable__c = false;
@@ -941,8 +914,6 @@ public with sharing class BT_AdminConfigurationController{
         RFQConfiguration1.Page_URL__c = '/apex/BT_CreateRFQConfiguration';
         RFQConfiguration1.buildertek__Email_Subject__c = 'BuilderTek RFQ';
         RFQConfiguration1.buildertek__Retreive_Aerial_Photo_of_project__c = true;
-        // RFQConfiguration1.buildertek__Google_Map_API_Key__c = 'AIzaSyA3kg7YWugGl1lTXmAmaBGPNhDW9pEh5bo';
-        // RFQConfiguration1.buildertek__Community_URL__c = 'https://buildertekcom-developer-edition.na75.force.com/vendor';
         firstLevelNodes.add(RFQConfiguration1);
 
         Admin_Interface_Node_Configuration__c PurchaseOrderConfiguration1 = new Admin_Interface_Node_Configuration__c();
@@ -977,7 +948,6 @@ public with sharing class BT_AdminConfigurationController{
         CreatinganewUser.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         CreatinganewUser.Open_New_Tab__c = false;
         CreatinganewUser.Tab_Name__c = 'Creating a new User';
-        // CreatinganewUser.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTfhUAG';
         CreatinganewUser.Description__c = 'Configure creating new users';
         firstLevelNodes.add(CreatinganewUser);
 
@@ -998,7 +968,6 @@ public with sharing class BT_AdminConfigurationController{
         CreateAccount.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         CreateAccount.Open_New_Tab__c = false;
         CreateAccount.Tab_Name__c = 'Create Account';
-        // CreateAccount.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTm4UAG';
         CreateAccount.Description__c = 'Configure Accounts';
         firstLevelNodes.add(CreateAccount);
 
@@ -1009,7 +978,6 @@ public with sharing class BT_AdminConfigurationController{
         CreateContact.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         CreateContact.Open_New_Tab__c = false;
         CreateContact.Tab_Name__c = 'Create Contact';
-        // CreateContact.Page_URL__c = '/apex/DisplayContents?id=a0H1K00000aWTm9UAG';
         CreateContact.Description__c = 'Configure Contacts';
         CreateContact.buildertek__Header_Text__c = 'Create Contact';
         firstLevelNodes.add(CreateContact);
@@ -1036,7 +1004,6 @@ public with sharing class BT_AdminConfigurationController{
         QuoteConfiguration.buildertek__Create_Project_from_Opportunity__c = true;
         QuoteConfiguration.buildertek__Quote_Configuration__c = true;
         QuoteConfiguration.buildertek__Update_the_Opp_Amount__c = true;
-        // QuoteConfiguration.buildertek__Org_Base_URL__c = 'https://btservice360-dev-ed--buildertek.na75.visual.force.com';
         firstLevelNodes.add(QuoteConfiguration);
 
         try {

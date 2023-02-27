@@ -445,9 +445,11 @@ does not add deprecated condition.
                                             BT_SoqlCondition whereCondition;
                                             if (queryFieldNameValue != null) {
                                                 Set<String> queryFields = queryFieldNameValue.keySet(); 
+                                                system.debug('queryFields' +  queryFields);
                                                 if (queryFields != null && !queryFields.isEmpty()) {
                                                     //Create the condition for the soql
                                                     if (conditionType == 'or') {
+                                                        System.debug('Ist If condition');
                                                         BT_SoqlOrCondition orC = new BT_SoqlOrCondition();
                                                         
                                                         //Loop through the list of fields to validate and add them to the condition
@@ -496,10 +498,13 @@ does not add deprecated condition.
                                                                 orC.add(getFieldCondition(ftype, s, value));
                                                             }
                                                         }
-                                                        
+                                                        System.debug('1 Above where condition =======>>>' +  orC);                                                        
                                                         //Add the where clause
                                                         whereCondition = orC;
+                                                        System.debug('1 where condition =======>>>' +  whereCondition);
                                                     } else {
+                                                        System.debug('2nd  If condition');
+
                                                         BT_SoqlAndCondition andC = new BT_SoqlAndCondition();
                                                         //Loop through the list of fields to validate and add them to the condition
                                                         for (String s : queryFields) {
@@ -521,21 +526,31 @@ does not add deprecated condition.
                                                             
                                                             String value = queryFieldNameValue.get(s);
                                                             if(value != null){
+                                                                System.debug(':::::::value==========================' + value);
                                                                 value = value.unescapeHtml4();
+                                                                System.debug(':::::::value==========================' + value);
+
                                                             }
                                                             List<String> andMultiValues = new List<String>();
                                                             List<String> orMultiValues = new List<String>();
                                                             if(value != null){
                                                                 andMultiValues = BT_Utils.tokenizeStringWithSeparator(value,',');
                                                                 orMultiValues = BT_Utils.tokenizeStringWithSeparator(value,';');
+                                                                System.debug(' orMultiValues ' + orMultiValues);
+                                                                System.debug(' andMultiValues ' + andMultiValues);
+
+
                                                             }
                                                             if(orMultiValues.size() > 1){
+                                                                System.debug('[[[[[[ orMultiValues ]]]]]' + orMultiValues);
                                                                 BT_SoqlOrCondition nestedOrC = new BT_SoqlOrCondition();
                                                                 for (String v : orMultiValues) {
                                                                     nestedOrC.add(getFieldCondition(ftype, s, v));
                                                                 }
                                                                 andC.add(nestedOrC);
                                                             } else if(andMultiValues.size() > 1){
+                                                                System.debug('[[[[[[ andMultiValues ]]]]]' + andMultiValues);
+
                                                                 BT_SoqlAndCondition nestedAndC = new BT_SoqlAndCondition();
                                                                 for (String v : andMultiValues) {
                                                                     nestedAndC.add(getFieldCondition(ftype, s, v));
@@ -543,10 +558,18 @@ does not add deprecated condition.
                                                                 andC.add(nestedAndC);
                                                             } else {
                                                                 andC.add(getFieldCondition(ftype, s, value));
+                                                                System.debug('2  ftype =======>>>' +  ftype);
+                                                                System.debug('2 S =======>>>' +  s);
+
+
                                                             }
                                                         }
+                                                        System.debug('2 where condition =======>>>' +  andC);
+
                                                         //Add the where clause
                                                         whereCondition = andC;
+                                                        System.debug('2 where condition =======>>>' +  whereCondition);
+
                                                     }
                                                 }
                                             }
@@ -568,6 +591,8 @@ does not add deprecated condition.
                                                 updatedWhereCondition.add(otherCondition);
                                                 soqlB.wherex(updatedWhereCondition);
                                             } else if(whereCondition != null){
+                                                System.debug('3 where condition =======>>>' +  whereCondition);
+
                                                 soqlB.wherex(whereCondition);
                                             } else if(otherCondition != null){
                                                 soqlB.wherex(otherCondition);
@@ -575,7 +600,9 @@ does not add deprecated condition.
                                             
                                             String soql = soqlB.toSoql(new BT_SoqlOptions().wildcardStringsInLikeOperators());
                                             List<sObject> L = new List<sObject>();
+                                            System.debug('<<<<<<==================soql :: above soql =============>>>>>>>');
                                             System.debug('soql :: '+soql);
+
                                             try {
                                                 if(!Test.isRunningTest()){ 
                                                 L = Database.query(soql);

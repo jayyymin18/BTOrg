@@ -589,13 +589,17 @@ does not add deprecated condition.
                                                 BT_SoqlAndCondition updatedWhereCondition = new BT_SoqlAndCondition();
                                                 updatedWhereCondition.add(whereCondition);
                                                 updatedWhereCondition.add(otherCondition);
+                                                System.debug('updatedWhereCondition' + updatedWhereCondition);
                                                 soqlB.wherex(updatedWhereCondition);
                                             } else if(whereCondition != null){
                                                 System.debug('3 where condition =======>>>' +  whereCondition);
-
                                                 soqlB.wherex(whereCondition);
+                                                System.debug('soqlB'+ soqlB);
+
                                             } else if(otherCondition != null){
                                                 soqlB.wherex(otherCondition);
+                                                System.debug(' soqlB other condition != nulll' +soqlB );
+
                                             }
                                             
                                             String soql = soqlB.toSoql(new BT_SoqlOptions().wildcardStringsInLikeOperators());
@@ -609,6 +613,8 @@ does not add deprecated condition.
                                                 }
                                             }
                                             catch (QueryException e) {
+                                                System.debug(e.getLineNumber());
+
                                                 try{
                                                     
                                                     if(!Test.isRunningTest()){ 
@@ -616,6 +622,7 @@ does not add deprecated condition.
                                                     }
                                                     
                                                 }catch(QueryException queryException){
+                                                    System.debug(queryException.getLineNumber());
                                                      throw queryException;
                                                   //  return null;
                                                 }

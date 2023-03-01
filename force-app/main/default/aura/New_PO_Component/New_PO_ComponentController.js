@@ -15,7 +15,7 @@
             if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
                 component.set("v.Spinner", false);
                 var listOfFields0 = JSON.parse(response.getReturnValue());
-                console.log({listOfFields0});
+                console.log('listOfFields0-->>',{listOfFields0});
                 component.set("v.listOfFields0", listOfFields0);
             }
         });

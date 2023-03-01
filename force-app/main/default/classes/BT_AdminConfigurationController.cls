@@ -1019,14 +1019,14 @@ public with sharing class BT_AdminConfigurationController{
              indexMap2.put(32,23);
              indexMap2.put(33,22);
              indexMap2.put(34,24);
-             indexMap2.put(12,35);
+             indexMap2.put(35,12);
              indexMap2.put(36,10);
              indexMap2.put(37,17);
              indexMap2.put(3,18);
              indexMap2.put(1,18);
              indexMap2.put(2,18);
              indexMap2.put(38,19);
-             indexMap2.put(25,39);
+             indexMap2.put(39,25);
              indexMap2.put(40,27);
              indexMap2.put(41,13);
              indexMap2.put(42,28);
@@ -1035,7 +1035,7 @@ public with sharing class BT_AdminConfigurationController{
              indexMap2.put(45,30);
              indexMap2.put(46,45);
              indexMap2.put(47,45);
-             indexMap2.put(48,31);
+             indexMap2.put(31,48);
              indexMap2.put(49,21);
  
              List<Admin_Interface_Node_Configuration__c> newNodeList = new List<Admin_Interface_Node_Configuration__c>();

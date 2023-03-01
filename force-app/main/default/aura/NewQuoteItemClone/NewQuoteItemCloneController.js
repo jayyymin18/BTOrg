@@ -654,7 +654,17 @@
             "action": "SHOW"
         }).fire();
         var quoteObject = component.get("v.newQuote");
-        console.log({quoteObject});
+        quoteObject.buildertek__Product_Family__c = component.get("v.productfamily");
+
+
+        var jsonString =JSON.stringify(quoteObject);
+
+
+        console.log('*************************');
+
+        console.log(jsonString);
+        console.log(component.get("v.productfamily"));
+
         console.log(component.get("v.newQuote"));
         console.log(' Quote Data ==> ' + JSON.stringify(quoteObject));
 
@@ -666,6 +676,8 @@
         // markup = markup * 100;
         component.set("v.newQuote.buildertek__Margin__c", margin);
         component.set("v.newQuote.buildertek__Markup__c", markup);
+
+
         var action = component.get("c.saveQuoteLineItem");
         action.setParams({
             "quoteLineRecord": JSON.stringify(quoteObject)
@@ -2618,7 +2630,9 @@ console.log(document.getElementsByClassName(className)[0]);
             {label: "Location (PL)", value:"buildertek__Location_Picklist__c"},
             {label: "Location Detailed Area", value:"buildertek__Location_Detailed_Area__c"},
             {label: "Location Detail Reference 1", value:"buildertek__Location_Detail_Reference_1__c"},
-            {label: "Service Category", value:"buildertek__BL_SERVICE_CATEGORY__c"}
+            {label: "Service Category", value:"buildertek__BL_SERVICE_CATEGORY__c"},
+            {label: "Product Family", value:"buildertek__Product_Family__c"},
+            {label: "Sub Group", value:"buildertek__Sub_Group__c"}
         ]
         component.set("v.GroupingOptions", opts);
     },

@@ -1562,7 +1562,7 @@ public with sharing class ManagePOlinesController {
             bom = [SELECT ID, Name,buildertek__BT_Quote__c,buildertek__Tax_Rate_1__c, 
                     (SELECT Id,Name,buildertek__Quantity__c, buildertek__BL_LIST_PRICE__c, buildertek__Upgrade_Price__c, buildertek__Build_Phase__c, 
                     buildertek__Build_Reference_1__c, buildertek__Base_Location__c, buildertek__Location_Picklist__c, buildertek__Location_Detailed_Area__c, 
-                    buildertek__Location_Detail_Reference_1__c, buildertek__BL_SERVICE_CATEGORY__c FROM buildertek__Selection_Sheet_Takeoff_Lines__r) 
+                    buildertek__Location_Detail_Reference_1__c,buildertek__BL_UNIT_COST__c, buildertek__BL_SERVICE_CATEGORY__c FROM buildertek__Selection_Sheet_Takeoff_Lines__r) 
                     FROM buildertek__Project_Selection_Sheet_Takeoff__c WHERE Id =:recordId];
             
             buildPhaseList = [SELECT Id, Name FROM buildertek__Build_Phase__c];
@@ -1617,8 +1617,12 @@ public with sharing class ManagePOlinesController {
                         qtLine.buildertek__Quantity__c = bomLine.buildertek__Quantity__c;
                         if (bomLine.buildertek__Upgrade_Price__c != null) {
                             qtLine.buildertek__Unit_Cost__c = bomLine.buildertek__Upgrade_Price__c;
-                        } else{
+                        } else if(bomLine.buildertek__BL_LIST_PRICE__c != null && bomLine.buildertek__BL_LIST_PRICE__c != 0 ){
                             qtLine.buildertek__Unit_Cost__c = bomLine.buildertek__BL_LIST_PRICE__c;
+                        }
+                        else{
+                            //add total cost
+                            qtLine.buildertek__Unit_Cost__c = decimal.valueOf(myMap.get(bomLine.Id)[3]);                            
                         }
                         qtLine.buildertek__Quote__c = quote.Id;
                         qtLine.buildertek__Markup__c = markUp;

@@ -169,7 +169,6 @@ public with sharing class ChangeOrderTriggerHandler {
     }
     
     public void OnAfterInsert(buildertek__Change_Order__c[] newChangeOrder, Map<ID, buildertek__Change_Order__c> newChangeOrderMap){ 
-        
         //----------------------------------------------------------------------------
         
         //  Code for giving permission to master sov for community
@@ -310,9 +309,7 @@ public with sharing class ChangeOrderTriggerHandler {
         if(contractToUpdateList.size() > 0){
             update contractToUpdateList; 
             
-            SET<Id> contractIdSet = new SET<Id>();
-            //Map<String, String> ContractGroupMap = new Map<String, String>();
-            
+            SET<Id> contractIdSet = new SET<Id>();            
             for(buildertek__Contract__c cont: contractToUpdateList){
                 contractIdSet.add(cont.Id);    
             } 
@@ -324,39 +321,28 @@ public with sharing class ChangeOrderTriggerHandler {
                         WHERE Name = 'Change Order'];
             
             if(groupList.size() > 0){
-                //for(buildertek__Quote_Line_Group__c groups : groupList){
-                //ContractGroupMap.put(groups.buildertek__Contract__c, groups.Id);
                 system.debug(Schema.sObjectType.buildertek__Quote_Line_Group__c.fields.Id.isUpdateable());    
-                
-                
                 newContractGroup.Id = groupList[0].Id;
                 newContractGroup.Name = 'Change Order';
-                //newContractGroup.buildertek__Contract__c = groups.buildertek__Contract__c;
-                //newContractGroupList.add(newContractGroup);      
-                
-                
-                //}
                 update newContractGroup;
             }else{
-                
-                
                 newContractGroup.Name = 'Change Order';
-                //newContractGroup.buildertek__Contract__c = contractToUpdateList[0].Id;
-                //newContractGroupList.add(newContractGroup); 
-                insert newContractGroup;
-                
-                
-                
+                insert newContractGroup; 
             }
-            /*for(buildertek__Quote_Line_Group__c grp : newContractGroupList){
-            groupNameMap.put(grp.buildertek__Contract__c, grp.Id);        
-            }*/
         } 
 
 
         List<buildertek__Change_Order__c> newCOList = new List<buildertek__Change_Order__c>();
+        System.debug('newChangeOrder' + newChangeOrder);
         for(buildertek__Change_Order__c changeOrder : newChangeOrder){
             for (Id key : budgetLineMap.keySet()) {
+                // System.debug(budgetLineMap.get(changeOrder.Id));
+                // System.debug('key' + key);
+                // System.debug(changeOrder.Id == key);
+                // System.debug(budgetLineMap.get(changeOrder.Id).Id);
+                // System.debug(budgetLineMap.keySet());
+
+                System.debug('*****************************************');
                 if (changeOrder.Id == key) {
                     changeOrder.buildertek__Budget_Line__c = budgetLineMap.get(changeOrder.Id).Id;
                     newCOList.add(changeOrder);
@@ -366,44 +352,6 @@ public with sharing class ChangeOrderTriggerHandler {
         if (newCOList.size() > 0) {
             update newCOList;
         }
-        
-        
-        
-        
-        
-        /*  List<buildertek__Change_Order_Item__c> COItemList = new List<buildertek__Change_Order_Item__c>();
-
-            COItemList= [SELECT Id,
-            buildertek__Cost_Code__c,
-            Name,
-            buildertek__Quantity__c,
-            buildertek__Unit_Price__c,
-            buildertek__Total__c,
-            buildertek__Unit_Sales_Price__c,
-            buildertek__Change_Order__c,
-            buildertek__Change_Order__r.buildertek__Contract__c
-            FROM buildertek__Change_Order_Item__c
-            WHERE buildertek__Change_Order__c IN: changeOrderIdSet];
-
-            if(COItemList.size() > 0){
-            for(buildertek__Change_Order_Item__c coItem : COItemList){
-
-
-            buildertek__Contract_Item__c contractItem = new buildertek__Contract_Item__c();
-            contractItem.Name = coItem.Name;
-            contractItem.buildertek__Contract__c = coItem.buildertek__Change_Order__r.buildertek__Contract__c;
-            contractItem.buildertek__Quantity__c = coItem.buildertek__Quantity__c;
-            contractItem.buildertek__Unit_Price__c = coItem.buildertek__Unit_Sales_Price__c;
-            contractItem.buildertek__Contract_Item_Group__c = newContractGroup.Id;
-            contractItemsToInsert.add(contractItem);
-
-
-            } 
-            if(contractItemsToInsert.size() > 0){
-            // insert contractItemsToInsert;    
-            }
-            }      */                                                      
-        
     }
     
     public void OnAfterUpdate(buildertek__Change_Order__c[] oldChangeOrder, buildertek__Change_Order__c[] updatedChangeOrder, Map<ID, buildertek__Change_Order__c> ChangeOrderMap, Map<Id, buildertek__Change_Order__c> oldChangeOrderMap){

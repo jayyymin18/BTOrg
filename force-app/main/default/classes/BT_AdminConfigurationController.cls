@@ -790,7 +790,7 @@ public with sharing class BT_AdminConfigurationController{
         BTTraining.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTTraining.Open_New_Tab__c = false;
         BTTraining.Tab_Name__c = 'BT Training';
-        BTTraining.Page_URL__c = '/apex/BTStripeSettings';
+        // BTTraining.Page_URL__c = '/apex/BTStripeSettings';
         BTTraining.Description__c = 'Configure Training.';
         firstLevelNodes.add(BTTraining);
 
@@ -801,7 +801,6 @@ public with sharing class BT_AdminConfigurationController{
         BTOpportunityConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         BTOpportunityConfiguration.Open_New_Tab__c = false;
         BTOpportunityConfiguration.Tab_Name__c = 'BT Opportunity Configuration';
-        BTOpportunityConfiguration.Page_URL__c = '/apex/BTStripeSettings';
         BTOpportunityConfiguration.Description__c = 'Configure Opportunity Process for your organization.';
         firstLevelNodes.add(BTOpportunityConfiguration);
 
@@ -948,6 +947,7 @@ public with sharing class BT_AdminConfigurationController{
         CreatinganewUser.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         CreatinganewUser.Open_New_Tab__c = false;
         CreatinganewUser.Tab_Name__c = 'Creating a new User';
+        CreatinganewUser.Page_URL__c = '/apex/DisplayContents';
         CreatinganewUser.Description__c = 'Configure creating new users';
         firstLevelNodes.add(CreatinganewUser);
 
@@ -969,6 +969,7 @@ public with sharing class BT_AdminConfigurationController{
         CreateAccount.Open_New_Tab__c = false;
         CreateAccount.Tab_Name__c = 'Create Account';
         CreateAccount.Description__c = 'Configure Accounts';
+        CreateAccount.Page_URL__c = '/apex/DisplayContents';
         firstLevelNodes.add(CreateAccount);
 
         Admin_Interface_Node_Configuration__c CreateContact = new Admin_Interface_Node_Configuration__c();
@@ -980,6 +981,7 @@ public with sharing class BT_AdminConfigurationController{
         CreateContact.Tab_Name__c = 'Create Contact';
         CreateContact.Description__c = 'Configure Contacts';
         CreateContact.buildertek__Header_Text__c = 'Create Contact';
+        CreateContact.Page_URL__c = '/apex/DisplayContents';
         firstLevelNodes.add(CreateContact);
 
         Admin_Interface_Node_Configuration__c OpportunityConfiguration = new Admin_Interface_Node_Configuration__c();
@@ -989,8 +991,8 @@ public with sharing class BT_AdminConfigurationController{
         OpportunityConfiguration.Icon_URL__c = '/resource/'+nameSpacePrefix+'SLDS/assets/icons/utility/settings_60.png';
         OpportunityConfiguration.Open_New_Tab__c = false;
         OpportunityConfiguration.Tab_Name__c = 'Opportunity Configuration';
-        OpportunityConfiguration.Page_URL__c = '/apex/BT_CreateOpportunityConfiguration';
         OpportunityConfiguration.buildertek__Assign_to_Existing_Project_on_Closed_Won__c = true;
+        OpportunityConfiguration.Page_URL__c = '/apex/BT_CreateOpportunityConfiguration';
         firstLevelNodes.add(OpportunityConfiguration);
 
         Admin_Interface_Node_Configuration__c QuoteConfiguration = new Admin_Interface_Node_Configuration__c();
@@ -1035,7 +1037,7 @@ public with sharing class BT_AdminConfigurationController{
              indexMap2.put(45,30);
              indexMap2.put(46,45);
              indexMap2.put(47,45);
-             indexMap2.put(31,48);
+             indexMap2.put(48,31);
              indexMap2.put(49,21);
  
              List<Admin_Interface_Node_Configuration__c> newNodeList = new List<Admin_Interface_Node_Configuration__c>();

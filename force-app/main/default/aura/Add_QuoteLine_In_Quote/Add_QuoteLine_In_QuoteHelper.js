@@ -151,13 +151,14 @@
                     'buildertek__Markup__c': element.MarkUp ? element.MarkUp : 0,
                     'buildertek__Product__c': element.Id,
                     'buildertek__Size__c': element.Size,
-                    'buildertek__Description__c': element.Description ? element.Description : element.Name,
-                    'buildertek__Product_Family__c': element.Family ? element.Family : 'No Grouping'
+                    'buildertek__Product_Family__c': element.Family ? element.Family : 'No Grouping',
+                    'buildertek__Description__c': element.Description ? element.Description.substring(0, 75) : element.Name.substring(0, 75),
                 })
             }
         });
         console.log('selectedProducts => ',{selectedProducts});
         component.set("v.selectedProducts", selectedProducts);
+        console.log('selectedProducts 1 => ',component.get("v.selectedProducts"));
         if (selectedProducts.length > 0) {
             component.set("v.selecteProducts", false);
         }else{

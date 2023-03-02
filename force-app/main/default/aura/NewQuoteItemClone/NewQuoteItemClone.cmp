@@ -1028,7 +1028,7 @@
                                                         </div>
                                                     </div>
                                                 </th>
-                                                <th></th>
+                                                <th style="width: 80px !important;"></th>
                                                 <aura:iteration items="{!v.columns}" var="col">
                                                     <aura:if
                                                         isTrue="{!and(col.fieldName!='Name',and(col.fieldName!='buildertek__Notes__c',col.fieldType!='reference'))}">

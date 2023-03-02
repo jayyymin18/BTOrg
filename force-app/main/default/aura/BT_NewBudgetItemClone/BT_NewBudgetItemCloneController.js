@@ -2016,9 +2016,9 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         var selectedRecs = component.get('v.selectedRecs');
         console.log('selected:id', selectedRecs);
         if (component.get('v.selectedRecs') != undefined) {
-            $A.get("e.c:BT_SpinnerEvent").setParams({
-                "action": "SHOW"
-            }).fire();
+            // $A.get("e.c:BT_SpinnerEvent").setParams({
+            //     "action": "SHOW"
+            // }).fire();
             var BudgetIds = component.get('v.selectedRecs');
             var rowData;
             var newRFQItems = [];
@@ -2356,25 +2356,24 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                     if (state === "SUCCESS") {
                         component.set("v.isBudgetlinedelete", false);
                         $A.get("e.force:refreshView").fire();
-                        window.setTimeout(
-                            $A.getCallback(function() {
-                                var toastEvent = $A.get("e.force:showToast");
-                                toastEvent.setParams({
-                                    mode: 'sticky',
-                                    message: 'Selected Budget Lines was deleted',
-                                    type: 'success',
-                                    duration: '10000',
-                                    mode: 'dismissible'
-                                });
-                                toastEvent.fire();
-                            }), 3000
-                        );
+
                         component.refreshData();
                         var noRecord = [];
                         component.set('v.selectedRecs', noRecord);
                         var page = component.get("v.page") || 1
                         component.set("v.TotalRecords", {});
-                        helper.getBudgetGroups(component, event, helper, page);
+                        helper.getBudgetGroups(component, event, helper, page ,function(response) {
+                            // Callback function to execute after the helper method has finished
+                            var toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams({
+                              mode: 'sticky',
+                              message: 'Selected Budget Lines were deleted',
+                              type: 'success',
+                              duration: '10000',
+                              mode: 'dismissible'
+                            });
+                            toastEvent.fire();
+                          });
                     }
                 });
                 $A.enqueueAction(action);

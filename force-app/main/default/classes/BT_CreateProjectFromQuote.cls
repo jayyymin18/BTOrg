@@ -142,6 +142,7 @@ public with sharing class BT_CreateProjectFromQuote {
             contract.buildertek__Notes__c = quoteList[0].buildertek__Notes__c;
             contract.buildertek__Status__c = 'Approved';
             contract.buildertek__Project__c = project.Id;
+            contract.buildertek__Markup__c=quoteList[0].buildertek__Markup__c;
             insert contract;
             
             List<buildertek__Contract_Item__c> contractItemList = new List<buildertek__Contract_Item__c>();

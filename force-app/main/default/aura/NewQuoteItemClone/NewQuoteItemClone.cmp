@@ -222,6 +222,7 @@
     <c:BT_Spinner />
 
 
+
     <div style="background: white;border-radius: 5px;height: 100%;" class="slds">
 
 
@@ -920,6 +921,8 @@
                     </aura:if>
 
                     <aura:if isTrue="{!!v.displayGrouping}">
+
+
                         <!-- <div class="slds mainTablediv"> -->
                         <div class="slds-scrollable">
                             <div>
@@ -1114,7 +1117,7 @@
                                                                     change="{!c.updateQuoteData}" blur="{!c.onblur}" />
                                                                 <aura:set attribute="else">
                                                                     <div class="slds-truncate"
-                                                                        title="{!tar.recordName}">
+                                                                        title="{!tar.recordName}" style="white-space: normal; word-wrap: break-word;">
                                                                         <a href="javascript:void(0);" role="menuitem"
                                                                             tabindex="-1" data-record="{!tar.recordId}"
                                                                             onclick="{!c.doView}">
@@ -1151,8 +1154,7 @@
                                                                 ),value.fieldName == 'buildertek__Markup__c'
                                                                 ),value.fieldName == 'buildertek__Margin__c'
                                                                 ),value.fieldName=='buildertek__Notes__c'
-                                                                ))
-                                                                }">
+                                                                ),value.fieldName=='buildertek__Tax__c')}">
                                                                     <aura:if isTrue="{!value.fieldType != 'picklist'}">
                                                                         <aura:if
                                                                             isTrue="{!value.fieldType == 'reference'}">

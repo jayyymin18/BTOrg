@@ -24,7 +24,7 @@
             }
         }
         var toggleVal = component.get("v.groupBytoggle");
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page ,function(){});
     },
 
     checkToogle1: function(component, event, helper) {
@@ -56,7 +56,7 @@
             }
         }
         var toggleVal = component.get("v.groupBytoggle1");
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page , function(){});
     },
 
     checkToogle2: function(component, event, helper) {
@@ -82,7 +82,7 @@
 
         }
         var toggleVal = component.get("v.groupBytoggle2");
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page , function(){});
     },
 
     closetab: function(component, event, helper) {
@@ -215,28 +215,53 @@
         
         //alert("haii");
         btadminaction.setCallback(this, function(response) {
+            console.log(response.getError() , '::::::ERROR MESSAGE::::::');
             if (response.getState() === 'SUCCESS') {
                 var result = response.getReturnValue();
+                console.log('Admin Data ==> ',result);
+
+                var page = component.get("v.page") || 1;
                 component.set("v.Isbtvalue", true);
-                if (result == true) {
-                    var page = component.get("v.page") || 1;
-                    console.log('page --> ',page);
-                    component.find("vendor").set("v.checked", true);
+                // result.buildertek__Budget_Grouping_Data__c = 'test'
+                if (result.buildertek__Budget_Grouping_Data__c == 'Group By Category') {
+                    // component.find("Cost Code").set("v.checked", true);
+                    component.set("v.groupBytoggle2", true);
+                    component.set("v.groupByVendortoggle", false);
+                    component.set("v.groupByCostCode", false);
+                    component.set("v.groupBytoggle", false);
+                    helper.getBudgetGroups(component, event, helper, page ,function(){});
+
+                } else if(result.buildertek__Budget_Grouping_Data__c == 'Group By Vendor') {
+                    component.set("v.groupBytoggle2", false);
+                    component.set("v.groupBytoggle", true);
+                    component.set("v.groupByVendortoggle2", false);
+                    component.set("v.groupByVendortoggle1", false);
+                    component.set("v.groupByCostCode", false);
+                    component.set("v.groupByVendortoggle", true);
+                    helper.getBudgetGroups(component, event, helper, page ,function(){});
+                    
+                } else if(result.buildertek__Budget_Grouping_Data__c == 'Group By Cost Code') {
+                    console.log('-----))))----');
+                    component.set("v.groupBytoggle", false);
+                    component.set("v.groupByVendortoggle", false);
                     component.set("v.groupByVendortoggle1", false);
                     component.set("v.groupByVendortoggle2", false);
-                    component.set("v.groupByCostCode", false);
-                    
-                    helper.getBudgetGroups(component, event, helper, page);
-                    
+                    component.set("v.groupBytoggle2", false);
+                    helper.CostCodeFilterHelper(component, event, helper, page);
+                    helper.getBudgetGroups(component, event, helper, page ,function(){});
+
+
                 } else {
                     component.set("v.groupByVendortoggle", false);
-                    var page = component.get("v.page") || 1;
-                    console.log('page --> ',page);
-                    helper.getBudgetGroups(component, event, helper, page);
+                    helper.getBudgetGroups(component, event, helper, page ,function(){});
+
                 }
+
             }
+
         });
         $A.enqueueAction(btadminaction);
+
 
 
 
@@ -264,7 +289,7 @@
         if (groupByCostCode == true) {
             helper.CostCodeFilterHelper(component, event, helper, page);
         } else{
-            helper.getBudgetGroups(component, event, helper, page);
+            helper.getBudgetGroups(component, event, helper, page , function(){});
         }
 
     },
@@ -358,7 +383,7 @@
         if (event) {
             if (event.getParams().message && event.getParams().message.indexOf('was saved') != -1) {
                 var page = component.get("v.page") || 1
-                helper.getBudgetGroups(component, event, helper, page);
+                helper.getBudgetGroups(component, event, helper, page , function(){});
                 $A.get("e.force:refreshView").fire();
             }
         }
@@ -1760,7 +1785,7 @@
 
         // $A.get('e.force:refreshView').fire();
 
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page , function(){});
     },
     onSaveSuccess: function(component, event, helper) {
         if (event) {
@@ -1772,7 +1797,7 @@
                 var page = component.get("v.page") || 1
                 component.set("v.TotalRecords", {});
                 component.set('v.selectedRecs', []);
-                helper.getBudgetGroups(component, event, helper, page);
+                helper.getBudgetGroups(component, event, helper, page , function(){});
             }
         }
     },
@@ -1824,7 +1849,7 @@ helper.getProductDetails(component,event,helper);
                     "onSuccess": function() {
                         var page = component.get("v.page") || 1
                         component.set("v.TotalRecords", {});
-                        helper.getBudgetGroups(component, event, helper, page);
+                        helper.getBudgetGroups(component, event, helper, page , function(){});
                     }
                 }],
 
@@ -2287,7 +2312,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 var page = component.get("v.page") || 1
                     //To much loading on deletion problem
                 component.set("v.TotalRecords", {});
-                helper.getBudgetGroups(component, event, helper, page);
+                helper.getBudgetGroups(component, event, helper, page , function(){});
             }
         });
         $A.enqueueAction(action);
@@ -2327,7 +2352,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 var page = component.get("v.page") || 1
                     //To much loading on deletion problem
                 component.set("v.TotalRecords", {});
-                helper.getBudgetGroups(component, event, helper, page);
+                helper.getBudgetGroups(component, event, helper, page , function(){});
             }
         });
         $A.enqueueAction(action);
@@ -2362,7 +2387,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         component.set('v.selectedRecs', noRecord);
                         var page = component.get("v.page") || 1
                         component.set("v.TotalRecords", {});
-                        helper.getBudgetGroups(component, event, helper, page ,function(response) {
+                        helper.getBudgetGroups(component, event, helper, page ,function() {
                             // Callback function to execute after the helper method has finished
                             var toastEvent = $A.get("e.force:showToast");
                             toastEvent.setParams({
@@ -2507,7 +2532,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         //$A.enqueueAction(component.get('c.doInit'));
         var page = component.get("v.page") || 1
         component.set("v.TotalRecords", {});
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page , function(){});
     },
     SaveEditedValues: function(component, event, helper) {
         $A.get("e.c:BT_SpinnerEvent").setParams({
@@ -2541,7 +2566,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 );
                 var page = component.get("v.page") || 1
                 component.set("v.TotalRecords", {});
-                helper.getBudgetGroups(component, event, helper, page);
+                helper.getBudgetGroups(component, event, helper, page , function(){});
             }
         });
         $A.enqueueAction(action);
@@ -2604,7 +2629,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                     );
                     var page = component.get("v.page") || 1
                     component.set("v.TotalRecords", {});
-                    helper.getBudgetGroups(component, event, helper, page);
+                    helper.getBudgetGroups(component, event, helper, page , function(){});
                 }
             });
             $A.enqueueAction(action);
@@ -2644,7 +2669,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                     var page = component.get("v.page") || 1
                     component.set("v.TotalRecords", {});
                     component.set("v.selectedRecs", []);
-                    helper.getBudgetGroups(component, event, helper, page);
+                    helper.getBudgetGroups(component, event, helper, page , function(){});
                 }
             });
             $A.enqueueAction(action);
@@ -2729,7 +2754,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         component.set("v.Spinner", true);
         var page = component.get("v.page") || 1;
         component.set("v.TotalRecords", {});
-        helper.getBudgetGroups(component, event, helper, page);
+        helper.getBudgetGroups(component, event, helper, page , function(){});
     },
     changeNameHandler: function(component, event, helper) {
         component.set('v.isChangeData', true)
@@ -2966,7 +2991,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         toastEvent.fire();
                         var page = component.get("v.page") || 1;
                         component.set("v.TotalRecords", {});
-                        helper.getBudgetGroups(component, event, helper, page) //,start,output);
+                        helper.getBudgetGroups(component, event, helper, page , function(){}) //,start,output);
                     }
                 });
                 $A.enqueueAction(action);
@@ -3485,7 +3510,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             component.set("v.groupBytoggle2", false);
             helper.CostCodeFilterHelper(component, event, helper, page);
         } else{
-            helper.getBudgetGroups(component, event, helper, page);
+            helper.getBudgetGroups(component, event, helper, page , function(){});
         }
 
     }, 

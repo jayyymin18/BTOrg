@@ -1336,8 +1336,9 @@
                     } else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Vendor__c') {
                         newMassQuoteItem.buildertek__Vendor__c = ListOfEachRecord[i].recordList[j].originalValue;
                     } else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Priority__c') {
-                        // debugger;
                         newMassQuoteItem.buildertek__Priority__c = ListOfEachRecord[i].recordList[j].originalValue;
+                    }else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Tax__c') {
+                        newMassQuoteItem.buildertek__Tax__c = ListOfEachRecord[i].recordList[j].originalValue;
                     }
                 }
                 newMassQuoteItem.Id = ListOfEachRecord[i].recordId;

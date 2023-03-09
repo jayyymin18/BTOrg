@@ -845,7 +845,7 @@ budgetRec.buildertek__Budget_Line_Group__c = budGroup.Id;
         } catch (Exception e){
             //System.debug('Error Message::' + e.getMessage());
            System.debug('Error Line::' + e.getLineNumber());
-            throw new AuraHandledException(e.getMessage());
+            throw new AuraHandledException(e.getMessage()+''+  e.getLineNumber());
         }
     }
     
@@ -2606,6 +2606,45 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
                     System.debug('Insert ExpenseBudget Successfully');
                 }            
         }
+    }
+
+    @AuraEnabled
+    public static void CreateLineAddExpense(string selectedExpense, string RecId){
+
+        buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId];
+        
+        buildertek__Expense__c Expense = [SELECT Id, Name, buildertek__Description__c, buildertek__Budget__c, buildertek__Budget_Line__c FROM buildertek__Expense__c WHERE Id =: selectedExpense];
+
+        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Expense' limit 1];
+
+        String groupId = '';
+
+        if (budgetLineGroup.size() > 0) {
+            groupId = budgetLineGroup[0].Id;
+        } else {
+            buildertek__Budget_Line_Group__c budgetGroup = new buildertek__Budget_Line_Group__c();
+            budgetGroup.Name = 'Expense';
+            insert budgetGroup;
+            
+            groupId = budgetGroup.Id;
+        }
+
+        buildertek__Budget_Item__c budgetItem = new buildertek__Budget_Item__c();
+        budgetItem.Name = Expense.buildertek__Description__c;
+        budgetItem.buildertek__Budget__c = RecId;
+        budgetItem.buildertek__Group__c = groupId;
+        insert budgetItem;
+
+        Expense.buildertek__Budget_Line__c = budgetItem.Id;
+        Expense.buildertek__Budget__c = budgetItem.buildertek__Budget__c;
+        Expense.buildertek__Project__c = budgetRec.buildertek__Project__c;
+        update Expense;
+
+        buildertek__Expense_To_Budget_Item_Link__c ExpenseItemToBudgetItemLink = new buildertek__Expense_To_Budget_Item_Link__c();
+        ExpenseItemToBudgetItemLink.Expense__c = Expense.Id;
+        ExpenseItemToBudgetItemLink.Budget_Line__c = budgetItem.Id;
+        ExpenseItemToBudgetItemLink.Auto_Roll_Up__c = true;
+        insert ExpenseItemToBudgetItemLink;
     }
     
 

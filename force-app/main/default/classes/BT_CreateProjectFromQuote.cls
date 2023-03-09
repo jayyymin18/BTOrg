@@ -98,7 +98,9 @@ public with sharing class BT_CreateProjectFromQuote {
                              buildertek__Additional_Discount__c,
                              buildertek__Purchase_Order__c,
                              buildertek__Grouping__r.Name, 
-                             buildertek__RFQ__c
+                             buildertek__RFQ__c,
+                             buildertek__Tax__c,
+                             buildertek__Additional_Costs__c
                              FROM buildertek__Quote_Item__c
                              WHERE buildertek__Quote__c = :quoteList[0].Id]; 
 
@@ -159,7 +161,7 @@ public with sharing class BT_CreateProjectFromQuote {
                     contractLine.buildertek__Notes__c = quoteLine.buildertek__Notes__c;
                     contractLine.buildertek__Contract__c = contract.Id;
                     contractLine.buildertek__Discount__c = quoteLine.buildertek__Discount__c;
-                    //contractLine.buildertek__Total_Cost__c = quoteLine.buildertek__Total_Cost__c;
+                    contractLine.buildertek__Tax__c = quoteLine.buildertek__Tax__c;
                     contractLine.buildertek__Unit_Cost__c = quoteLine.buildertek__Unit_Cost__c;
                     contractItemList.add(contractLine);
                 }
@@ -217,8 +219,13 @@ public with sharing class BT_CreateProjectFromQuote {
                     BudgetLineRecord.buildertek__Cost_Code__c = quoteLine.buildertek__Cost_Code__c;
                     BudgetLineRecord.buildertek__Quantity__c = quoteLine.buildertek__Quantity__c;
                     BudgetLineRecord.buildertek__Unit_Price__c = quoteLine.buildertek__Unit_Cost__c;
-                    BudgetLineRecord.buildertek__Sales_Price__c = quoteLine.buildertek__Net_Total_Price__c; 
-                    //BudgetLineRecord.buildertek__Budget_Line_Group__c = quoteLine.buildertek__Grouping__c;
+
+                    BudgetLineRecord.buildertek__Sales_Price__c = quoteLine.buildertek__Net_Unit__c; 
+                    BudgetLineRecord.buildertek__Tax__c = quoteLine.buildertek__Tax__c;
+                    BudgetLineRecord.buildertek__Discount__c = quoteLine.buildertek__Additional_Discount__c;
+                    BudgetLineRecord.buildertek__Markup__c = quoteLine.buildertek__Markup__c;
+
+                    BudgetLineRecord.buildertek__Additional_Fees__c = quoteLine.buildertek__Additional_Costs__c;
                     BudgetLineRecord.buildertek__Group__c = groupMap.get(quoteLine.buildertek__Grouping__r.Name);
                     BudgetLineRecord.buildertek__Budget__c  =  Budget.Id;
                      BudgetLineRecord.buildertek__UOM__c = quoteLine.buildertek__UOM__c;

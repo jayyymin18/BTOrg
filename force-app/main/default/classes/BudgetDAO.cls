@@ -818,6 +818,11 @@ budgetRec.buildertek__Budget_Line_Group__c = budGroup.Id;
             allFields.add('buildertek__CostCodeDivision__c');
             allFields.add('buildertek__Cost_Code__c');
             allFields.add('buildertek__Cost_Code__r.Name');
+            if(!allFields.contains('buildertek__Contractor__r.Name')){
+                allFields.add('buildertek__Contractor__c');
+                allFields.add('buildertek__Contractor__r.Name');
+                fieldsType += '{"fieldName": "buildertek__Contractor__c","fieldType": "Reference","isEditable": false},';
+            }
             fieldsType += '{"fieldName": "buildertek__Group__c","fieldType": "Reference","isEditable": false},';
             fieldsType += '{"fieldName": "buildertek__Group__r.Name","fieldType": "Reference","isEditable": false},';
             fieldsType += '{"fieldName": "buildertek__Sub_Grouping__c","fieldType": "Reference","isEditable": false},';
@@ -1401,6 +1406,7 @@ insert s;*/
     
     @AuraEnabled
     public static TargetTable getBudgetItemData(String recordId, List<String> fieldsList, String fieldString, Decimal recordToDisply, Integer offset){
+
         List<FieldClass> fieldClassList = (List<FieldClass>)System.JSON.deserialize(fieldString, List<FieldClass>.class);
         TargetTable TargetTable_inst = new TargetTable();
         List<EachRecord> allListOfRecords = new List<EachRecord>();
@@ -1408,7 +1414,7 @@ insert s;*/
         String objectName = 'buildertek__Budget_Item__c';
         String listType = 'List<' + objectName + '>';
         String EachRecordType = '' + objectName + '';
-        
+
         SObject IndividualMember = (SObject)Type.forName(EachRecordType).newInstance();
         for (string sumOfFields : fieldsList){
             if (sumOfFields != null){

@@ -85,11 +85,6 @@
             var state = response.getState();
             if(state === "SUCCESS"){
                 var budgets = response.getReturnValue();
-                var noneOption = {
-                    Name: "Please Select Budget",
-                    Id: ""
-                };
-                budgets.push(noneOption);
                 console.log('budgetsOptions => ',budgets);
                 component.set("v.budgetsOptions", budgets);
             }
@@ -136,10 +131,17 @@
                 });
                 toastEvent.fire();
             }
+            component.set("v.Spinner", false);
+            component.set("v.selectedExpenses", []);
+            component.set("v.selectedProjectId", "");
+            component.set("v.selectedBudgetId", "");
+            component.set("v.SelectExp", true);
+            component.set("v.SelectBLines", false);
+            component.set("v.expenses", []);
+            component.set("v.tableDataList", []);
         }
         );
         $A.enqueueAction(saveExp);
-        component.set("v.Spinner", false);
     }
 
 })

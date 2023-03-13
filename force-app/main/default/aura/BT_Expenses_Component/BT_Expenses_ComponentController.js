@@ -25,8 +25,16 @@
     },
 
     checkboxChange : function(component, event, helper) {
-        // console.log('tableDataList => '+JSON.stringify(component.get("v.tableDataList")));
-        // console.log('expenses => '+JSON.stringify(component.get("v.expenses")));
+        //iterate through all the rows in the table and check if all are selected then check the select all checkbox
+        var tableDataList = component.get("v.tableDataList");
+        var checkAll = true;
+        tableDataList.forEach(element => {
+            if (!element.selected) {
+                checkAll = false;
+            }
+        }
+        );
+        component.find("selectAll").set("v.checked", checkAll);
     },
 
     addExpensesToBudgetLineItem : function(component, event, helper) {

@@ -68,6 +68,9 @@
                                 <div class="slds-truncate" title="Product Name">Description</div>
                             </th>
                             <th class="" scope="col">
+                                <div class="slds-truncate" title="Prodcut Code">Cost Code</div>
+                            </th>
+                            <th class="" scope="col">
                                 <div class="slds-truncate" title="Prodcut Description">Expense Total</div>
                             </th>
                             <th class="" scope="col">
@@ -93,6 +96,11 @@
                                         {!exp.buildertek__Description__c}
                                     </div>
                                 </td>
+                                <td data-label="CostCode">
+                                    <div class="slds-truncate" title='{!exp.buildertek__Cost_Code__c}'>
+                                        {!exp.buildertek__Cost_Code__r.Name}
+                                    </div>
+                                </td>
                                 <td data-label="Expense Total">
                                     <div class="slds-truncate" title='{!exp.buildertek__Total_Expense__c}'>
                                         <lightning:formattedNumber value="{!exp.buildertek__Total_Expense__c}" style="currency"/>
@@ -107,7 +115,7 @@
                         </aura:iteration>
                     </tbody>
                     <aura:if isTrue="{!empty(v.expenses)}">
-                        <td colspan="4" style="text-align: center; line-height: 10rem; font-size: 18px; ">
+                        <td colspan="6" style="text-align: center; line-height: 10rem; font-size: 18px; ">
                             No Data Found
                         </td>
                     </aura:if>
@@ -123,22 +131,26 @@
                 </lightning:layout> -->
 
                 <lightning:layout>
-                    <lightning:layoutItem padding="around-small" size="4">
-                        <label class="slds-form-element__label slds-size_4-of-12">Budget</label>
+                    <lightning:layoutItem padding="around-small" size="6">
+                        <label class="slds-form-element__label slds-size_6-of-12">Budget</label>
                         <div>
                             <ui:inputSelect aura:id="selectedBudget" value="{!v.selectedBudgetId}" change="{!c.changeBudget}">
+                                <option value="" selected="true">Select a Budget</option>
                                 <aura:iteration items="{!v.budgetsOptions}" var="option" >
-                                    <option value="{!option.Id}" selected="{!option.value == v.selectedBudgetId}">{!option.Name}</option>
+                                    <option value="{!option.Id}" selected="{!option.Id == v.selectedBudgetId}">{!option.Name}</option>
                                 </aura:iteration>
                             </ui:inputSelect>
                         </div>
                     </lightning:layoutItem>
-                    <lightning:layoutItem padding="around-small" size="4">
-                        <label class="slds-form-element__label slds-size_4-of-12"> </label>
-                        <div style="text-align: right;">
+                    <lightning:layoutItem padding="around-small" size="6">
+                        <label class="slds-form-element__label slds-size_6-of-12"> </label>
+                        <div class="btnSet">
                         <lightning:button label="Save" variant="brand" onclick="{!c.saveExpenses}" />
+                        <lightning:button label="Back" variant="brand" onclick="{!c.backToExpenses}" />
                         </div>
+                        
                     </lightning:layoutItem>
+                    
                 </lightning:layout>
                 
                 <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table of Opportunities">
@@ -151,14 +163,17 @@
                                 <div class="slds-truncate" title="Product Name">Description</div>
                             </th>
                             <th class="" scope="col">
+                                <div class="slds-truncate" title="Prodcut Code">Cost Code</div>
+                            </th>
+                            <th class="" scope="col">
                                 <div class="slds-truncate" title="Prodcut Description">Expense Total</div>
                             </th>
                             <th class="" scope="col">
                                 <div class="slds-truncate" title="Prodcut Code">Vendor</div>
                             </th>
-                            <th class="" scope="col">
+                            <!-- <th class="" scope="col">
                                 <div class="slds-truncate" title="Prodcut Code">Budget</div>
-                            </th>
+                            </th> -->
                             <th class="" scope="col">
                                 <div class="slds-truncate" title="Prodcut Code">Budget Line</div>
                             </th>
@@ -177,6 +192,11 @@
                                         {!exp.buildertek__Description__c}
                                     </div>
                                 </td>
+                                <td data-label="Budget">
+                                   <div class="slds-truncate" title='{!exp.buildertek__Cost_Code__c}'>
+                                       {!exp.buildertek__Cost_Code__r.Name}                            
+                                   </div>
+                                </td>
                                 <td data-label="Expense Total">
                                     <div class="slds-truncate" title='{!exp.buildertek__Total_Expense__c}'>
                                         <lightning:formattedNumber value="{!exp.buildertek__Total_Expense__c}" style="currency"/>
@@ -187,11 +207,11 @@
                                         {!exp.buildertek__Vendor__c}
                                     </div>
                                 </td>
-                                <td data-label="Budget">
+                                <!-- <td data-label="Budget">
                                     <div class="slds-truncate" title='{!exp.buildertek__Budget__c}'>
                                         {!v.selectedBudgetName}
                                     </div>
-                                 </td>
+                                 </td> -->
                                 <td data-label="Budget Line">
                                     <div class="slds-truncate" title='{!exp.buildertek__Budget_Line__c}'>
                                         <ui:inputSelect aura:id="selectedBudgetLine" value="{!exp.buildertek__Budget_Line__c}" change="{!c.changeBudgetLine}">

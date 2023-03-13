@@ -23,5 +23,18 @@ public with sharing class BT_Expenses_ComponentController {
         return BudgetList;
     }
 
+    @AuraEnabled
+    public static List<buildertek__Budget_Item__c> getBudgetLines(Id budgetId){
+        List<buildertek__Budget_Item__c> BudgetLineList = new List<buildertek__Budget_Item__c>();
+        BudgetLineList = [SELECT Id, Name, buildertek__Budget__c FROM buildertek__Budget_Item__c
+                                WHERE buildertek__Budget__c=: budgetId ORDER BY Name ASC];
+        return BudgetLineList;
+    }
+
+    @AuraEnabled
+    public static void saveExp(List<buildertek__Expense__c> expenses){
+        System.debug('expenses: ' + expenses);
+        update expenses;
+    }
 
 }

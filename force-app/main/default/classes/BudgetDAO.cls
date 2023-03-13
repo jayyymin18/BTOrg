@@ -2617,6 +2617,8 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
     @AuraEnabled
     public static void CreateLineAddExpense(string selectedExpense, string RecId){
 
+        BudgetDAO.isCreateExpense = true;
+
         buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId];
         
         buildertek__Expense__c Expense = [SELECT Id, Name, buildertek__Description__c, buildertek__Budget__c, buildertek__Budget_Line__c FROM buildertek__Expense__c WHERE Id =: selectedExpense];
@@ -2651,6 +2653,8 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         ExpenseItemToBudgetItemLink.Budget_Line__c = budgetItem.Id;
         ExpenseItemToBudgetItemLink.Auto_Roll_Up__c = true;
         insert ExpenseItemToBudgetItemLink;
+
+        BudgetDAO.isCreateExpense = false;
     }
     
 

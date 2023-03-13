@@ -76,7 +76,7 @@ public class ExpenseToBudgetItemTriggerHandler {
      
     public void OnAfterUpdate(buildertek__Expense__c[] oldExpense, buildertek__Expense__c[] updatedExpense, Map<ID, buildertek__Expense__c> ExpenserecMap, Map<Id, buildertek__Expense__c> oldExpenseMap){
        // if(!CreateBudgetLineItemForExpenseAC.isUpdateExpense){
-            // CreateBudgetLineItemForExpenseAC.createExpenseToBudgetItemLink(updatedExpense);  
+            CreateBudgetLineItemForExpenseAC.createExpenseToBudgetItemLink(updatedExpense);  
       //  }
       CreateBudgetLineItemForExpenseAC.RollUpExpenseAmount(ExpenserecMap.KeySet());
        list<Id> budgetitemIds = new list<Id>();
@@ -119,4 +119,13 @@ public class ExpenseToBudgetItemTriggerHandler {
         }
     }
 
+    public void OnBeforeDelete(buildertek__Expense__c[] oldExpense, Map<Id, buildertek__Expense__c> oldExpenseMap){
+        System.debug('oldExpense-->>'+oldExpense);
+        for(buildertek__Expense__c exp:oldExpense){
+            System.debug('In For Loop');
+            if(exp.buildertek__Finance_Transaction__c != null){
+                exp.addError('You cannot delete this Expense because it is related to a Finance Transaction record. Please delete the Finance Transaction record first, then try again.');
+            }
+        }
+    }
 }

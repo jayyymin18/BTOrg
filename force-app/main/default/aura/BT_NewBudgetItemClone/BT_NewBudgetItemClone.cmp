@@ -241,6 +241,9 @@
     <aura:attribute name="Isbtvalue" type="Boolean" default="false" />
     <aura:attribute name="groupByCostCode" type="Boolean" default="false" />
 
+    <aura:attribute name="vendorIsThere" type="Boolean"  default="false" />
+
+
 
     <!-- Pagination End -->
 
@@ -824,41 +827,7 @@
                                                     
                                                 </tr>
                                                 <aura:iteration items="{!group.subGroupRecords}" var="subGroupRec" indexVar="subGroupIndex">
-                                                    <!-- <tr class="groupHeader">
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td colspan="{!v.TotalRecords.totalColumns}">
-                                                        <div class="slds-grid slds-gutters">
-                                                            <div class="slds-col slds-size_6-of-12"
-                                                                data-index='{!subGroupRec}'>
-                                                                {!subGroupRec.subGroupName}
-                                                            </div>
-                                                            <div class="slds-col slds-size_6-of-12 slds-float_right">
-                                                                
-                                                            </div>
-                                                        </div>
-                                                        <div class="slds-grid slds-gutters">
-                                                            <div class="slds-col slds-size_1-of-12">
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td colspan="{!v.TotalRecords.columns.length}">
-                                                    <td>
-                                                    </td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                    <td>
-                                                    </td>
-                                                </tr> -->
+                                                    
                                                     <aura:iteration items="{!subGroupRec.records}" var="recs" indexVar="recIndex">
 
                                                         <tr class="{!v.currentTab+' '+v.budgetId+' groupRows_'+parentGroupIndex}" style="display:table-row;">
@@ -1125,6 +1094,7 @@
                                                                         </aura:if>
 
                                                                     </td>
+                                                                    
                                                                 </aura:if>
                                                             </aura:iteration>
 

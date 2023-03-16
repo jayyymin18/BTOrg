@@ -1,24 +1,24 @@
 ({
 
-    getProjects : function(component) {
-        var action = component.get("c.getProjects");
-        action.setCallback(this, function(response){
-            var state = response.getState();
-            if(state === "SUCCESS"){
-                console.log(response.getReturnValue());
-                //add none option
-                var noneOption = {
-                    Name: "--None--",
-                    Id: ""
-                };
-                component.set("v.selectedProjectId", '');
-                var projects = response.getReturnValue();
-                projects.unshift(noneOption);
-                component.set("v.projectsOptions", projects);
-            }
-        });
-        $A.enqueueAction(action);
-    },
+    // getProjects : function(component) {
+    //     var action = component.get("c.getProjects");
+    //     action.setCallback(this, function(response){
+    //         var state = response.getState();
+    //         if(state === "SUCCESS"){
+    //             console.log(response.getReturnValue());
+    //             //add none option
+    //             var noneOption = {
+    //                 Name: "--None--",
+    //                 Id: ""
+    //             };
+    //             // component.set("v.selectedProjectId", '');
+    //             var projects = response.getReturnValue();
+    //             projects.unshift(noneOption);
+    //             component.set("v.projectsOptions", projects);
+    //         }
+    //     });
+    //     $A.enqueueAction(action);
+    // },
 
     tabName : function(component) {
         var workspaceAPI = component.find("workspace");
@@ -43,7 +43,7 @@
     getExpenses : function(component) {
         var action = component.get("c.getExpenses");
         action.setParams({
-            "projectId": component.get("v.selectedProjectId")
+            "projectId": component.get("v.recordId")
         });
         action.setCallback(this, function(response){
             var state = response.getState();
@@ -80,7 +80,7 @@
     getBudegts : function(component) {
         var action = component.get("c.getBudgets");
         action.setParams({
-            "projectId": component.get("v.selectedProjectId")
+            "projectId": component.get("v.recordId")
         });
         action.setCallback(this, function(response){
             var state = response.getState();
@@ -141,7 +141,7 @@
                 }
                 component.set("v.Spinner", false);
                 component.set("v.selectedExpenses", []);
-                component.set("v.selectedProjectId", "");
+                // component.set("v.selectedProjectId", "");
                 component.set("v.selectedBudgetId", "");
                 component.set("v.Page1", true);
                 component.set("v.Page2", false);
@@ -170,7 +170,7 @@
     getTimeCards : function(component) {
         var action = component.get("c.getTimeCards");
         action.setParams({
-            "projectId": component.get("v.selectedProjectId")
+            "projectId": component.get("v.recordId")
         });
         action.setCallback(this, function(response){
             var state = response.getState();
@@ -348,7 +348,7 @@
                 console.log('TimeCard => '+JSON.stringify(TimeCard));
                 component.set("v.Spinner", false);
                 component.set("v.selectedTimeCards", []);
-                component.set("v.selectedProjectId", "");
+                // component.set("v.selectedProjectId", "");
                 component.set("v.selectedBudgetId", "");
                 component.set("v.Page1", true);
                 component.set("v.Page2", false);
@@ -376,7 +376,7 @@
         component.set("v.Spinner", true);
         var action = component.get("c.getInvoices");
         action.setParams({
-            "projectId": component.get("v.selectedProjectId")
+            "projectId": component.get("v.recordId")
         });
         action.setCallback(this, function(response) {
             var state = response.getState();
@@ -496,7 +496,7 @@
                 console.log('Invoices => '+JSON.stringify(Invoices));
                 component.set("v.Spinner", false);
                 component.set("v.selectedInvoices", []);
-                component.set("v.selectedProjectId", "");
+                // component.set("v.selectedProjectId", "");
                 component.set("v.selectedBudgetId", "");
                 component.set("v.Page1", true);
                 component.set("v.Page2", false);
@@ -524,7 +524,7 @@
         component.set("v.Spinner", true);
         var action = component.get("c.getPurchaseOrders");
         action.setParams({
-            "projectId": component.get("v.selectedProjectId")
+            "projectId": component.get("v.recordId")
         });
         action.setCallback(this, function(response) {
             var state = response.getState();
@@ -657,7 +657,7 @@
                 console.log('purchaseOrders => '+JSON.stringify(purchaseOrders));
                 component.set("v.Spinner", false);
                 component.set("v.selectedPurchaseOrders", []);
-                component.set("v.selectedProjectId", "");
+                // component.set("v.selectedProjectId", "");
                 component.set("v.selectedBudgetId", "");
                 component.set("v.Page1", true);
                 component.set("v.Page2", false);
@@ -679,6 +679,34 @@
             });
             toastEvent.fire();
         }
+    },
+
+    getProjectData : function(component, event, helper) {
+        var selectedTransactionType = component.get("v.selectedTransactionType");
+        component.set("v.Spinner", true);
+        if(selectedTransactionType == 'Expense'){
+            helper.getExpenses(component);
+        }else if(selectedTransactionType == 'Time Card'){
+            helper.getTimeCards(component);
+        }else if(selectedTransactionType == 'Purchase Order'){
+            helper.getPurchaseOrders(component);
+        }else if(selectedTransactionType == 'Invoice(AP)'){
+            helper.getInvoices(component);
+        }else{
+            component.set("v.Spinner", false);
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                title: 'Error',
+                message: 'Please select Transaction Type.',
+                duration: ' 2000',
+                key: 'info_alt',
+                type: 'error',
+                mode: 'pester'
+            });
+            toastEvent.fire();
+        }
+  
+        component.set("v.checkedAll", false);
     },
 
 

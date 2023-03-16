@@ -427,11 +427,7 @@
         component.set("v.budgetLineItemName", event.target.title);
     },
 
-    saveSelectedPO: function(component, event, helper) {
-        console.log(event);
-        component.set("v.selectedExistingPO", event.currentTarget.id);
-    },
-
+ 
     saveSelectedTC: function(component, event, helper) {
         console.log(event);
         component.set("v.selectedExistingTC", event.currentTarget.id);
@@ -1144,6 +1140,7 @@
                         for (var i = 0; i < response.getReturnValue().length; i++) {
 
                             rowData = response.getReturnValue()[i];
+                            console.log({rowData});
                             var newPOItem = new Object();
                             newPOItem.Name = rowData.Name;
                             newPOItem.buildertek__Product__c = rowData.buildertek__Product__c;
@@ -1152,9 +1149,12 @@
                             newPOItem.buildertek__Quantity__c = rowData.buildertek__Quantity__c;
                             newPOItem.buildertek__Unit_Price__c = rowData.buildertek__Unit_Price__c;
                             newPOItems.push(newPOItem);
+                            console.log({newPOItems});
+
                         }
 
                         var isExisting = component.get("v.isExistingPo");
+                        console.log({isExisting});
                         if (!isExisting) {
                             var PO = component.get("v.newPO");
                             PO.buildertek__Budget__c = component.get("v.sampleNewRecord").Id;
@@ -1166,46 +1166,40 @@
                         var overlayLib;
                         if (isExisting) {
 
-                            if (component.get("v.selectedExistingPO") != null && component.get("v.selectedExistingPO") != "" && component.get("v.selectedExistingPO") != undefined) {
+                            let getExistingPOList =component.get("v.selectedExistingPO");
+                            if (getExistingPOList.length > 0) {
                                 component.set("v.isExistingPo", false);
                                 component.set("v.addposection", false);
-                                $A.createComponents([
+                                getExistingPOList.forEach(function(element){
+                                    $A.createComponents([
                                         ["c:BT_New_Purchase_Order", {
                                             "aura:id": "btNewPo",
                                             "newPOItems": newPOItems,
-                                            "selectedPO": component.get("v.selectedExistingPO"),
+                                            "selectedPO": element,
                                             "isFromExistingPOs": isExisting,
                                             "budgetlineid": budgetlineid,
                                             "saveCallback": component.get("v.refreshGridAction"),
                                             "selectedbudgetRecs": selectedRecs,
                                             "cancelCallback": function() {
-                                                component.set("v.selectedExistingPO", "");
+                                            // component.set("v.selectedExistingPO", "");
                                             }
                                         }],
                                     ],
                                     //overlayLib.close();   
                                     function(components, status, errorMessage) {
-                                        if (status === "SUCCESS") {
-                                            //  alert(status);
-                                            $A.get('e.force:refreshView').fire();
-                                            /* var a = component.get('c.refreshList');
-                                       
-                                             $A.enqueueAction(a);*/
+                                        console.log({status});
+                                        console.log({errorMessage});
 
-                                            /*component.find('overlayLib').showCustomModal({
-                                               // header: "Add Budget Lines To Purchase Order",
-                                               // body: components[0],
-                                                //footer: components[0].find("footer").get("v.body"),
-                                                showCloseButton: false,
-                                                cssClass: "btmodal",
-                                                closeCallback: function () {}
-                                            }).then(function (overlay) {
-                                                overlayLib = overlay;
-                                            });*/
+                                        if (status === "SUCCESS") {
+                                            $A.get('e.force:refreshView').fire();
+                                            
                                         }
 
                                     }
                                 );
+
+                                })
+                               
 
                             } else {
                                 component.set("v.addposection", true);
@@ -3732,6 +3726,36 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         component.set("v.ExpenseRecordList", tableDataList);
 
     },
+    checkAllPO:function(component, event, helper){
+        var value = event.getSource().get("v.checked"); 
+        console.log({value});
+        var tableDataList = component.get("v.recordList");
+        let expenseIdList=[];
+        tableDataList.forEach(element => {
+            console.log({element});
+            element.Selected = value;
+            expenseIdList.push(element.Id);
 
+        });
+        component.set("v.recordList", tableDataList);
+        // component.get('v.selectedRecs');
+
+    },
+    checkPO:function(component, event, helper){
+        var tableDataList = component.get("v.recordList");
+        var existingPoId=[];
+        var checkedAll = true;
+        tableDataList.forEach(element => {
+            if (!element.Selected) {
+                checkedAll = false;
+            }else{
+                existingPoId.push(element.Id);
+            }
+        });
+        component.find("selectAllPO").set("v.checked", checkedAll); 
+        component.set("v.selectedExistingPO", existingPoId);
+        console.log( component.get("v.selectedExistingPO"));
+
+    },
 
 })

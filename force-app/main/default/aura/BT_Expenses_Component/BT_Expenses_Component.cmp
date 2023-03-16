@@ -1,7 +1,7 @@
 <aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:isUrlAddressable,lightning:actionOverride,force:hasSObjectName,force:appHostable" access="global" controller="BT_Expenses_ComponentController">
 
-    <aura:attribute name="projectsOptions" type="List" />
-    <aura:attribute name="selectedProjectId" type="Id" />
+    <!-- <aura:attribute name="projectsOptions" type="List" /> -->
+    <!-- <aura:attribute name="selectedProjectId" type="Id" /> -->
     <aura:attribute name="expenses" type="List" />
     <aura:attribute name="tableDataList" type="List" />
     <aura:attribute name="Spinner" type="Boolean" default="false" />
@@ -63,9 +63,15 @@
                             </ui:inputSelect>
                         </div>
                     </lightning:layoutItem>
+                    <lightning:layoutItem padding="around-small" size="6">
+                        <label class="slds-form-element__label slds-size_6-of-12"> </label>
+                        <div style="text-align: right;">
+                        <lightning:button label="Add to Budget Line Item" variant="brand" onclick="{!c.page2}" />
+                        </div>
+                    </lightning:layoutItem>
                 </lightning:layout>
     
-                <lightning:layout>
+                <!-- <lightning:layout>
                     <lightning:layoutItem padding="around-small" size="6">
                         <label class="slds-form-element__label slds-size_6-of-12">Project</label>
                         <div>
@@ -82,7 +88,7 @@
                         <lightning:button label="Add to Budget Line Item" variant="brand" onclick="{!c.page2}" />
                         </div>
                     </lightning:layoutItem>
-                </lightning:layout>
+                </lightning:layout> -->
             </aura:if>
 
             <aura:if isTrue="{!v.SelectExp}">            
@@ -676,14 +682,5 @@
             </aura:if>
 
         </lightning:card>
-
-                
-
-
-
-
-
-    
-
 
 </aura:component>

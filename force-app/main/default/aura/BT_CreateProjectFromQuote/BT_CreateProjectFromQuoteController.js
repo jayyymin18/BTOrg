@@ -72,6 +72,8 @@
         console.log('Project-->>',{project});
         var accountId = component.find("accountId").get("v.value");
         console.log('Project-->>',{accountId});
+
+        let customerAccountId= component.get('v.recordFields.buildertek__Customer_Account__c');
         var projectManagerId = component.find("projectManagerId").get("v.value");
         var contractDateId = component.find("contractDateId").get("v.value");
         var QuoteRec = component.get("v.recordData");        
@@ -112,6 +114,7 @@
                 account : accountId,
                 projectManager : projectManagerId,
                 contractDate : contractDateId,
+                customerAccount:customerAccountId
             });
             action.setCallback(this, function(response){
                 var state = response.getState();

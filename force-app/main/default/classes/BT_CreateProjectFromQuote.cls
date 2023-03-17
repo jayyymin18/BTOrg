@@ -38,16 +38,17 @@ public with sharing class BT_CreateProjectFromQuote {
     }
     
     @AuraEnabled
-    public static String createProject(String recordId, String projectName, String account, String projectManager, Date contractDate){
+    public static String createProject(String recordId, String projectName, String account, String projectManager, Date contractDate , String customerAccount){
         buildertek__Project__c project = new buildertek__Project__c();
         project.Name = projectName;
         if(account != null){
             project.buildertek__Account__c = account;
-            // project.buildertek__Customer__c = customerAccount;
+            project.buildertek__Customer__c = customerAccount;
             
         }
         project.buildertek__Project_Manager__c = projectManager;
         project.buildertek__Contract_Date__c = contractDate;
+        insert project;
 
         
         List<buildertek__Quote__c> quoteList = new List<buildertek__Quote__c>();
@@ -68,8 +69,8 @@ public with sharing class BT_CreateProjectFromQuote {
             
 
 
-            project.buildertek__Customer__c=quoteList[0].buildertek__Customer_Account__c;
-            insert project;
+            // project.buildertek__Customer__c=quoteList[0].buildertek__Customer_Account__c;
+            // insert project;
 
             quoteList[0].buildertek__Project__c = project.Id;
             update quoteList;

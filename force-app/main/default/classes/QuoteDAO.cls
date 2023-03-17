@@ -769,7 +769,9 @@ public with sharing class QuoteDAO{
             if (dtFields.type != 'reference'){
                 allFields.add(dtFields.fieldName);
             }
-            if (dtFields.type == 'currency'){
+            if (dtFields.type == 'currency' && dtFields.fieldName != 'buildertek__Tax__c'){
+                fieldsList.add(dtFields.fieldName);
+            } else if(dtFields.fieldName == 'buildertek__Quantity__c'){
                 fieldsList.add(dtFields.fieldName);
             }
             if (dtFields.type == 'reference'){
@@ -1568,12 +1570,6 @@ public with sharing class QuoteDAO{
         String queryFields = '';
         integer i = 1;
 
-        for(string quantityField: allFields){
-            if(quantityField == 'buildertek__Quantity__c'){
-                queryFields += ', ' + quantityField.trim();
-            }
-
-        }
         for (string sumOfFields : currencyFields){
             queryFields += ', ' + sumOfFields.trim();
         }
@@ -1594,16 +1590,6 @@ public with sharing class QuoteDAO{
         quoteItemList = database.query(myquery);
         system.debug('----quoteItemList -----------> ' + quoteItemList.Size());
         /*}*/
-
-        for(string quantityField: allFields){
-            if(quantityField == 'buildertek__Quantity__c'){
-                aggregateFields += ', SUM(' + quantityField.trim()+') total' + i;
-                i++;
-        
-            }
-
-        }
-
         for (string sumOfFields : currencyFields){
             aggregateFields += ', SUM(' + sumOfFields.trim()+') total' + i;
             i++;
@@ -1637,13 +1623,6 @@ public with sharing class QuoteDAO{
         system.debug('GroupNameMap ------------> ' + GroupNameMap);
 
         Map<String, Boolean> fieldTypeMap = new Map<String, Boolean>();
-        for (string quantityField : allFields){
-            if(quantityField == 'buildertek__Quantity__c'){
-                fieldTypeMap.put(quantityField, true);
-            }
-
-        }
-
         for (string sumOfFields : currencyFields){
             fieldTypeMap.put(sumOfFields, true);
         }

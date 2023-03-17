@@ -433,29 +433,33 @@
         component.set("v.selectedExistingTC", event.currentTarget.id);
     },
 
-    saveSelectedINVO: function(component, event, helper) {
-        console.log(event);
-        component.set("v.selectedExistingINVO", event.currentTarget.id);
-    },
+    // saveSelectedINVO: function(component, event, helper) {
+    //     console.log(event);
+    //     component.set("v.selectedExistingINVO", event.currentTarget.id);
+    // },
     addTimeCard: function(component, event, helper) {
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
         var selectedRecs = component.get('v.selectedRecs');
+
+        selectedRecs.filter((item,index) => selectedRecs.indexOf(item) === index);
+
         console.log('v.selectedRecs ==> ', { selectedRecs });
         if (selectedRecs.length > 0) {
-            var BudgetIds = [];
-            var rowData;
-            var newPOItems = [];
+            if(selectedRecs.length == 1){
 
-            if (selectedRecs.length > 0) {
+                var BudgetIds = [];
+                var rowData;
+                var newPOItems = [];
+            // if (selectedRecs.length > 0) {
                 var budgetlineid = BudgetIds[0];
-                var action;
-                action = component.get("c.BudgetItemList");
+                var action=component.get("c.BudgetItemList");
                 action.setParams({
                     BudgetIds: selectedRecs
                 });
                 action.setCallback(this, function(response) {
+                    console.log(response.getState() , '::::::::STATE;;;;;;;');
                     if (component.isValid() && response.getState() === "SUCCESS") {
                         $A.get("e.c:BT_SpinnerEvent").setParams({
                             "action": "HIDE"
@@ -472,17 +476,34 @@
                 $A.enqueueAction(action);
 
 
-            } else {
+            // } else {
+            //     $A.get("e.c:BT_SpinnerEvent").setParams({
+            //         "action": "HIDE"
+            //     }).fire();
+            //     component.find('notifLib').showNotice({
+            //         "variant": "error",
+            //         "header": "Please Select Budget Line!",
+            //         "message": "Please Select Budget Line to Create TimeCard.",
+            //         closeCallback: function() {}
+            //     });
+            // }
+
+
+            }else{
                 $A.get("e.c:BT_SpinnerEvent").setParams({
                     "action": "HIDE"
                 }).fire();
                 component.find('notifLib').showNotice({
                     "variant": "error",
-                    "header": "Please Select Budget Line!",
-                    "message": "Please Select Budget Line to Create TimeCard.",
+                    "header": "Select Budget Line",
+                    "message": "Please Select only 1 Budget Line to Create Time Card.",
+                    //"header": "No Budget Lines",
+                    //"message": "Please select a Budget Line.",
                     closeCallback: function() {}
                 });
+
             }
+            
         } else {
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "HIDE"
@@ -609,8 +630,6 @@
                 "variant": "error",
                 "header": "Select Budget Line",
                 "message": "Please Select at least One Budget Line to Add PO.",
-                //"header": "No Budget Lines",
-                //"message": "Please select a Budget Line.",
                 closeCallback: function() {}
             });
         }
@@ -1041,12 +1060,14 @@
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
-        var timeCardId = component.get("v.selectedExistingINVO");
+        var selectedInvoiceId = component.get("v.selectedExistingINVO");
+        selectedInvoiceId = selectedInvoiceId.toString();
+
         var selectedRecords = component.get('v.selectedRecs');
         selectedRecords = selectedRecords.toString();
         var action = component.get("c.updateInvoicePrice");
         action.setParams({
-            recordId : timeCardId,
+            recordId : selectedInvoiceId,
             budgeLineIds : selectedRecords
         });
         action.setCallback(this, function (response) {
@@ -1085,6 +1106,12 @@
             "action": "SHOW"
         }).fire();
         var timeCardId = component.get("v.selectedExistingTC");
+        timeCardId = timeCardId.toString();
+        // console.log({timeCardId});
+        // let timeCardIdList=[];
+        // timeCardIdList=
+
+
         var selectedRecords = component.get('v.selectedRecs');
         selectedRecords = selectedRecords.toString();
         var action = component.get("c.updateLaborPrice");
@@ -1095,6 +1122,8 @@
         action.setCallback(this, function (response) {
             var state = response.getState();
             var result = response.getReturnValue();
+            console.log(state , ':::::::::::::::::STATE::::::::::::');
+            console.log(response.getReturnValue());
             if (result === 'Success') {
                 $A.get("e.c:BT_SpinnerEvent").setParams({
                     "action": "HIDE"
@@ -1127,143 +1156,136 @@
             var rowData;
             var newPOItems = [];
 
-            if (selectedRecs.length > 0) {
-                var budgetlineid = BudgetIds[0];
-                var action;
-                action = component.get("c.BudgetItemList");
-                action.setParams({
-                    BudgetIds: selectedRecs
-                });
-                action.setCallback(this, function(response) {
-                    if (component.isValid() && response.getState() === "SUCCESS") {
+            var budgetlineid = BudgetIds[0];
+            console.log({budgetlineid});
+            var action=component.get("c.BudgetItemList");
+            action.setParams({
+                BudgetIds: selectedRecs
+            });
+            action.setCallback(this, function(response) {
+                if (component.isValid() && response.getState() === "SUCCESS") {
 
-                        for (var i = 0; i < response.getReturnValue().length; i++) {
+                    for (var i = 0; i < response.getReturnValue().length; i++) {
 
-                            rowData = response.getReturnValue()[i];
-                            console.log({rowData});
-                            var newPOItem = new Object();
-                            newPOItem.Name = rowData.Name;
-                            newPOItem.buildertek__Product__c = rowData.buildertek__Product__c;
-                            newPOItem.buildertek__Budget_Item__c = rowData.Id;
-                            newPOItem.buildertek__Description__c = rowData.Name; //rowData.buildertek__Description__c;
-                            newPOItem.buildertek__Quantity__c = rowData.buildertek__Quantity__c;
-                            newPOItem.buildertek__Unit_Price__c = rowData.buildertek__Unit_Price__c;
-                            newPOItems.push(newPOItem);
-                            console.log({newPOItems});
+                        rowData = response.getReturnValue()[i];
+                        console.log({rowData});
+                        var newPOItem = new Object();
+                        newPOItem.Name = rowData.Name;
+                        newPOItem.buildertek__Product__c = rowData.buildertek__Product__c;
+                        newPOItem.buildertek__Budget_Item__c = rowData.Id;
+                        newPOItem.buildertek__Description__c = rowData.Name; //rowData.buildertek__Description__c;
+                        newPOItem.buildertek__Quantity__c = rowData.buildertek__Quantity__c;
+                        newPOItem.buildertek__Unit_Price__c = rowData.buildertek__Unit_Price__c;
+                        newPOItems.push(newPOItem);
+                        console.log({newPOItems});
 
-                        }
+                    }
 
-                        var isExisting = component.get("v.isExistingPo");
-                        console.log({isExisting});
-                        if (!isExisting) {
-                            var PO = component.get("v.newPO");
-                            PO.buildertek__Budget__c = component.get("v.sampleNewRecord").Id;
-                            PO.buildertek__Project__c = component.get("v.sampleNewRecord").buildertek__Project__c;
-                            PO.buildertek__Status__c = 'Pending';
-                        }
+                    var isExisting = component.get("v.isExistingPo");
+                    console.log({isExisting});
+                    if (!isExisting) {
+                        var PO = component.get("v.newPO");
+                        PO.buildertek__Budget__c = component.get("v.sampleNewRecord").Id;
+                        PO.buildertek__Project__c = component.get("v.sampleNewRecord").buildertek__Project__c;
+                        PO.buildertek__Status__c = 'Pending';
+                    }
 
 
-                        var overlayLib;
-                        if (isExisting) {
+                    var overlayLib;
+                    if (isExisting) {
 
-                            let getExistingPOList =component.get("v.selectedExistingPO");
-                            if (getExistingPOList.length > 0) {
-                                component.set("v.isExistingPo", false);
-                                component.set("v.addposection", false);
-                                getExistingPOList.forEach(function(element){
+                        let getExistPoList=component.get("v.selectedExistingPO");
+                        console.log({getExistPoList});
+                        if (getExistPoList.length > 0) {
+                            component.set("v.isExistingPo", false);
+                            component.set("v.addposection", false);
+                            selectedRecs.forEach(function(value , i){
+                                console.log(i, '====selected Budget Lines');
+                                getExistPoList.forEach(function(element , Index){
+                                    console.log('Craete Component :::::' , Index);
                                     $A.createComponents([
                                         ["c:BT_New_Purchase_Order", {
                                             "aura:id": "btNewPo",
                                             "newPOItems": newPOItems,
-                                            "selectedPO": element,
+                                            "selectedPO":element,
                                             "isFromExistingPOs": isExisting,
                                             "budgetlineid": budgetlineid,
                                             "saveCallback": component.get("v.refreshGridAction"),
-                                            "selectedbudgetRecs": selectedRecs,
+                                            "selectedbudgetRecs": value,
                                             "cancelCallback": function() {
-                                            // component.set("v.selectedExistingPO", "");
+                                                // component.set("v.selectedExistingPO", "");
                                             }
                                         }],
                                     ],
-                                    //overlayLib.close();   
                                     function(components, status, errorMessage) {
-                                        console.log({status});
-                                        console.log({errorMessage});
-
                                         if (status === "SUCCESS") {
                                             $A.get('e.force:refreshView').fire();
                                             
                                         }
-
+    
                                     }
                                 );
-
+    
                                 })
-                               
 
-                            } else {
-                                component.set("v.addposection", true);
-                                component.find('notifLib').showNotice({
-                                    "variant": "error",
-                                    "header": "Select Purchase Order",
-                                    "message": "Please Select a Purchase Order.",
-                                    closeCallback: function() {}
-                                });
-                            }
+                            })
+                            
+                           
+
                         } else {
-                            $A.createComponents([
-                                    ["c:BT_New_Purchase_Order", {
-                                        "aura:id": "btNewPo",
-                                        "newPO": PO,
-                                        "newPOItems": newPOItems,
-                                        "selectedPO": component.get("v.selectedExistingPO"),
-                                        "isFromExistingPOs": isExisting,
-                                        "budgetlineid": budgetlineid,
-                                        "saveCallback": component.get("v.refreshGridAction"),
-                                        "cancelCallback": function() {
-                                            overlayLib.close();
-                                        }
-                                    }],
-                                ],
-                                function(components, status, errorMessage) {
-                                    if (status === "SUCCESS") {
-
-                                        $A.get('e.force:refreshView').fire();
-                                        component.find('overlayLib').showCustomModal({
-                                            header: "New Purchase Order",
-                                            body: components[0],
-                                            footer: components[0].find("footer").get("v.body"),
-                                            showCloseButton: true,
-                                            cssClass: "btmodal",
-                                            closeCallback: function() {}
-                                        }).then(function(overlay) {
-                                            overlayLib = overlay;
-                                        });
-                                        $A.get('e.force:refreshView').fire();
-                                    }
-
-                                }
-                            );
+                            component.set("v.addposection", true);
+                            component.find('notifLib').showNotice({
+                                "variant": "error",
+                                "header": "Select Purchase Order",
+                                "message": "Please Select a Purchase Order.",
+                                closeCallback: function() {}
+                            });
                         }
-                    }
-                });
-                $A.enqueueAction(action);
+                    } else {
+                        $A.createComponents([
+                                ["c:BT_New_Purchase_Order", {
+                                    "aura:id": "btNewPo",
+                                    "newPO": PO,
+                                    "newPOItems": newPOItems,
+                                    "selectedPO": component.get("v.selectedExistingPO"),
+                                    "isFromExistingPOs": isExisting,
+                                    "budgetlineid": budgetlineid,
+                                    "saveCallback": component.get("v.refreshGridAction"),
+                                    "cancelCallback": function() {
+                                        overlayLib.close();
+                                    }
+                                }],
+                            ],
+                            function(components, status, errorMessage) {
+                                if (status === "SUCCESS") {
 
-            } else {
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": " Select Budget Line",
-                    "message": "Please Select Budget Line to Create PO.",
-                    closeCallback: function() {}
-                });
-            }
+                                    $A.get('e.force:refreshView').fire();
+                                    component.find('overlayLib').showCustomModal({
+                                        header: "New Purchase Order",
+                                        body: components[0],
+                                        footer: components[0].find("footer").get("v.body"),
+                                        showCloseButton: true,
+                                        cssClass: "btmodal",
+                                        closeCallback: function() {}
+                                    }).then(function(overlay) {
+                                        overlayLib = overlay;
+                                    });
+                                    $A.get('e.force:refreshView').fire();
+                                }
+
+                            }
+                        );
+                    }
+                }
+            });
+            $A.enqueueAction(action);
+
+           
         } else {
             component.find('notifLib').showNotice({
                 "variant": "error",
                 "header": "Select Budget Line",
                 "message": "Please Select at least One Budget Line to Create PO.",
-                //"header": "No Budget Lines",
-                //"message": "No Budget Lines Records.",
                 closeCallback: function() {}
             });
             $A.get('e.force:refreshView').fire();
@@ -3738,7 +3760,9 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
         });
         component.set("v.recordList", tableDataList);
-        // component.get('v.selectedRecs');
+        component.set("v.selectedExistingPO", expenseIdList);
+        console.log( component.get("v.selectedRecs") , 'selectedRecs::::::::');
+
 
     },
     checkPO:function(component, event, helper){
@@ -3754,8 +3778,75 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         });
         component.find("selectAllPO").set("v.checked", checkedAll); 
         component.set("v.selectedExistingPO", existingPoId);
-        console.log( component.get("v.selectedExistingPO"));
+        console.log( component.get("v.selectedRecs") , 'selectedRecs::::::::');
 
     },
+    checkAllInvoices:function(component, event, helper){
+        var value= event.getSource().get('v.value');
+        let listOfRecords= component.get("v.recordList");
+        var existingId=[];
+
+        listOfRecords.forEach(function(element){
+            element.Selected=value;
+            existingId.push(element.Id);
+
+        });
+        component.set("v.recordList", listOfRecords);
+        component.set("v.selectedExistingINVO", existingId);
+
+    },
+    checkInvoice:function(component, event, helper){
+        let listOfRecords= component.get("v.recordList");
+        let checkedAll= true;
+        var existingId=[];
+
+        listOfRecords.forEach(function(element){
+            if(!element.Selected){
+                checkedAll=false;
+            }else{
+                existingId.push(element.Id);
+            }
+        });
+
+        component.find("selectAllInvoices").set("v.checked", checkedAll); 
+        component.set("v.selectedExistingINVO", existingId);
+
+
+
+    },
+    checkAllTimeCards:function(component, event, helper){
+        var value= event.getSource().get('v.value');
+        let listOfRecords= component.get("v.recordList");
+        var existingId=[];
+
+        listOfRecords.forEach(function(element){
+            element.Selected=value;
+            existingId.push(element.Id);
+
+        });
+        component.set("v.recordList", listOfRecords);
+        component.set("v.selectedExistingTC", existingId);
+
+    },
+    checkTimeCard:function(component, event, helper){
+        let listOfRecords= component.get("v.recordList");
+        let checkedAll= true;
+        var existingId=[];
+
+        listOfRecords.forEach(function(element){
+            if(!element.Selected){
+                checkedAll=false;
+            }else{
+                existingId.push(element.Id);
+            }
+        });
+
+        component.find("selectAllTimeCards").set("v.checked", checkedAll); 
+        component.set("v.selectedExistingTC", existingId);
+
+
+
+    }
+    
 
 })

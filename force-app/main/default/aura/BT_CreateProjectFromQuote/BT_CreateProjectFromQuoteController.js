@@ -10,6 +10,10 @@
             var state = response.getState();
             if(state === "SUCCESS"){
                 var result = response.getReturnValue();
+                if(result.buildertek__Customer_Account__c != null){
+                    component.set("v.accountId", result.buildertek__Customer_Account__c);
+                    console.log('result.buildertek__Customer_Account__c-->>>',{result}); 
+                }
             }
         });
         $A.enqueueAction(action);

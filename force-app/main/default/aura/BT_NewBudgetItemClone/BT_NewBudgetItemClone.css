@@ -181,3 +181,7 @@
 .THIS .costInputField{
     max-width: 110px;
 }
+
+.THIS bgcolor {
+    background: red !important;
+}

@@ -578,14 +578,15 @@
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "HIDE"
             }).fire();
-            component.find('notifLib').showNotice({
-                "variant": "error",
-                "header": "Select Budget Line",
-                "message": "Please Select at least One Budget Line to add the Invoice.",
-                //"header": "No Budget Lines",
-                //"message": "Please select a Budget Line.",
-                closeCallback: function() {}
-            });
+            // component.find('notifLib').showNotice({
+            //     "variant": "error",
+            //     "header": "Select Budget Line",
+            //     "message": "Please Select at least One Budget Line to add the Invoice.",
+            //     //"header": "No Budget Lines",
+            //     //"message": "Please select a Budget Line.",
+            //     closeCallback: function() {}
+            // });
+            
         }
     },
     addPO: function(component, event, helper) {

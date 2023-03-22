@@ -4,6 +4,7 @@
         var url = window.location.href;
         console.log('url', url);
         if(url != null){
+            //if condition to check if the url has the string 'buildertek__Project__c' in it
             if(url.indexOf('%2Fbuildertek__Project__c%2F') != -1){
                 var newurl2 = url.substring(url.indexOf('%2Fbuildertek__Project__c%2F') + 28, url.indexOf('%2Fview'));
                 if(newurl2 != null){

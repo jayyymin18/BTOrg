@@ -182,6 +182,7 @@
     max-width: 110px;
 }
 
-.THIS bgcolor {
-    background: red !important;
+/* *added color in table row* */
+.THIS .tableRow {
+    background-color: #F3F3F3;
 }

@@ -320,7 +320,7 @@
                             <aura:set attribute="else">
                                 <div>
                                     <lightning:button iconPosition="left" onclick="{!c.addProductFromGroup}"
-                                        label="Add Lines" class="sldsButtonGroup" />
+                                        label="Add Products" class="sldsButtonGroup" />
                                 </div>&nbsp;
 
                                 <div>
@@ -330,9 +330,9 @@
                                 </div>&nbsp;
 
 
-                                <!-- <div>
+                                <div>
                                 <lightning:button iconPosition="left" onclick="{!c.onClickAddlines}" label="Mass Add Line" class="sldsButtonGroup" />
-                            </div>&nbsp; -->
+                            </div>&nbsp;
 
                                 <div>
                                     <aura:if isTrue="{!!v.displayGrouping}">
@@ -1278,7 +1278,7 @@
                                                                                 <lightning:formattedNumber
                                                                                     value="{!value.originalValue/100}"
                                                                                     style="percent"
-                                                                                    minimumFractionDigits="4"
+                                                                                    minimumFractionDigits="2"
                                                                                     class="inputCss" />
                                                                             </aura:if>
                                                                             <aura:if

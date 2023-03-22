@@ -41,7 +41,10 @@
                     "UOMvalues" : '',
                     "Vendor" : {},
                 };
-                list.unshift(obj);
+                // list.unshift(obj);
+                for(var i=0;i<5;i++){
+                    list.push(obj);
+                }
                 component.set('v.listOfRecords', list);
                 
             }), 1000

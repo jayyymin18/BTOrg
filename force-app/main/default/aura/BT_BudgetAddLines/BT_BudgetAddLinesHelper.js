@@ -257,7 +257,6 @@
     
     
     updateMassRecords: function (component, event, helper) {
-        debugger;
         component.set('v.isLoading', true);
          var listOfRecords = component.get('v.DuplistOfRecords');
        // var listOfRecords = component.get('v.listOfRecords');

@@ -20,10 +20,8 @@
             }
 
             component.set("v.parentRecordId", parentRecordId);
+            console.log({parentRecordId});
         }
-        //alert('parentRecordId----'+parentRecordId);
-        //component.find('POId').set("v.value", parentRecordId);
-        //component.find('quantityId').set("v.value", 1);
         helper.fetchpricebooks(component, event, helper);
         helper.getFields(component, event, helper);
     },

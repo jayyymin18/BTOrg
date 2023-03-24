@@ -4,7 +4,8 @@ public with sharing class ReceiveMaterialPOLinesController {
     public static list<buildertek__Purchase_Order_Item__c> getProducts(String recordId)
     {
         //system.debug(recordId);
-        list<buildertek__Purchase_Order_Item__c> Products =[select id,Name,buildertek__Purchase_Order__c, buildertek__Product__r.Name,buildertek__Product__r.Id,buildertek__Product__c,buildertek__Quantity__c from buildertek__Purchase_Order_Item__c WHERE buildertek__Purchase_Order__c =:recordId];
+        list<buildertek__Purchase_Order_Item__c> Products =[select id,Name,buildertek__Purchase_Order__c, buildertek__Product__r.Name,buildertek__Product__r.Id,buildertek__Product__c,buildertek__Quantity__c, buildertek__Quantity_Remaining__c
+        from buildertek__Purchase_Order_Item__c WHERE buildertek__Purchase_Order__c =:recordId];
         system.debug(Products);
         return Products;
     }
@@ -18,6 +19,30 @@ public with sharing class ReceiveMaterialPOLinesController {
         system.debug('productsKist'+ ProductsList);
         List<String> selectedProdIds = new List<String>();
         list<RfqDataTableWrapper> newProductList = (list<RfqDataTableWrapper>)JSON.deserialize(ProductsList, list<RfqDataTableWrapper>.class);
+
+        //iterate over list and store the polineid in a list
+        List<Id> polineIds = new List<Id>();
+        for(RfqDataTableWrapper p: newProductList){
+            polineIds.add(p.polineId);
+        }
+        //System.debug(polineIds);
+        List<buildertek__Purchase_Order_Item__c> polineList = [Select Id,buildertek__Quantity_Received__c,buildertek__Quantity_Remaining__c FROM buildertek__Purchase_Order_Item__c WHERE Id IN:polineIds];
+        System.debug(polineList);
+        for(buildertek__Purchase_Order_Item__c poline: polineList){
+            if(poline.buildertek__Quantity_Remaining__c - newProductList[0].quantity_recieved >= 0){
+                if(poline.buildertek__Quantity_Received__c == null)
+                    poline.buildertek__Quantity_Received__c = newProductList[0].quantity_recieved;
+                else if(poline.buildertek__Quantity_Received__c != null){
+                    poline.buildertek__Quantity_Received__c = poline.buildertek__Quantity_Received__c + newProductList[0].quantity_recieved;
+                }
+            }else{
+                return false;
+            }
+        }
+        System.debug(polineList);
+        update polineList;
+
+        
         
         if (newProductList != null)
         {
@@ -55,6 +80,8 @@ public with sharing class ReceiveMaterialPOLinesController {
             update newProdListToUpdate;
             
             system.debug(newProdListToUpdate);
+
+
             return true;
         }
         
@@ -87,5 +114,8 @@ PoItemList.add(POItem);
         
         @AuraEnabled
         public Id prodId{ get; set; }
+
+        @AuraEnabled
+        public Id polineId{ get; set;}
     }
 }

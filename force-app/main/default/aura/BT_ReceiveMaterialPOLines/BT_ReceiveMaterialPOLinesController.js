@@ -50,15 +50,17 @@
         var  purchaseId = component.get("v.recordId");
       
         var rfqlist= component.get("v.rfqRecordList");
-     //  alert( JSON.stringify(rfqlist));
-  //  alert(rfqlist[i].buildertek__Product__c );
         var action =component.get("c.addProducts");
+        let productIdList=[];
         
         
         var productList = [];
         for(var i=0;i<rfqlist.length;i++){
             if(rfqlist[i].buildertek__Product__c != null){
+                productIdList.push(rfqlist[i].buildertek__Product__c);
                 var obj = {};
+                console.log(rfqlist[i].quantity_recieved);
+                console.log('{{{{{{{{{{{{{{}}}}}}}}}}}}}}}}}}}}}}}}');
                 if(rfqlist[i].quantity_recieved != null){
                     obj['prodId'] = rfqlist[i].buildertek__Product__c
                     obj['quantity_recieved'] = rfqlist[i].quantity_recieved
@@ -69,18 +71,38 @@
             }
             
         }
-        
+        console.log(rfqlist);
         console.log(productList);
+        for(var i=0;i<rfqlist.length;i++){
+            if(rfqlist[i].quantity_recieved != null){
+                if(rfqlist[i].quantity_recieved >= rfqlist[i].buildertek__Quantity_Remaining__c){
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: 'Error',
+                        message: 'Quantity delivered must be less than or equal to quantity remaining on PO line: '+rfqlist[i].Name ,
+                        duration: ' 5000',
+                        key: 'info_alt',
+                        type: 'error',
+                        mode: 'pester'
+                    });
+                    toastEvent.fire();
+                    return;
+                }
+            }
+        }
         debugger;
+
         component.set("v.Spinner", true);
         component.set("v.showMessage", true);
         action.setParams({
+            productId:productIdList,
             "ProductsList" : JSON.stringify(productList),
             
         })
         
         action.setCallback(this,function(response){
-            
+            console.log(response.getState() , 'State=====');
+            console.log(response.getError());
             if(response.getState() == "SUCCESS"){
                // console.log(response);
                 //alert(response.getState());
@@ -160,7 +182,7 @@
         
         if(quantityReceived > POQuantity) {
             
-            inputField.setCustomValidity("Items Delivered must be lessthan Quantity");
+            inputField.setCustomValidity("Items Delivered must be less than Quantity remaining");
        
             component.find("submit").set("v.disabled", true);
         }else{

@@ -2642,6 +2642,7 @@ console.log(document.getElementsByClassName(className)[0]);
     onclickBOMGrouping : function(component, event, helper){
         component.set("v.isBOMmodalOpen", true);
         var opts = [
+            {label: "Phase", value:"buildertek__Grouping__c"},
             {label: "Sub Group", value:"buildertek__Sub_Group__c"},
             {label: "Build Phase", value:"buildertek__Build_Phase__c"},
             {label: "Build Reference 1", value:"buildertek__Build_Reference_1__c"},
@@ -2650,7 +2651,7 @@ console.log(document.getElementsByClassName(className)[0]);
             {label: "Location Detailed Area", value:"buildertek__Location_Detailed_Area__c"},
             {label: "Location Detail Reference 1", value:"buildertek__Location_Detail_Reference_1__c"},
             {label: "Service Category", value:"buildertek__BL_SERVICE_CATEGORY__c"},
-            {label: "Product Family", value:"buildertek__Product_Family__c"}
+            {label: "Product Family", value:"buildertek__Product_Family__c"},
         ]
         component.set("v.GroupingOptions", opts);
     },

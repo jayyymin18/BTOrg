@@ -16,6 +16,7 @@
     <aura:attribute name="massUpdateEnable" type="Boolean" default="true" />
     <aura:attribute name="isLoading" type="Boolean" default="false" />
     <aura:attribute name="quoteLineWrapperList" type="List" />
+    <aura:attribute name="pricebookOptions" type="List" />
     
     
     <aura:attribute name="PageNumber" type="integer" default="1" />
@@ -94,8 +95,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <aura:iteration items="{!v.fieldSetValues}" var="row" indexVar="index">                            
-                        </aura:iteration> -->
+                        <aura:iteration items="{!v.quoteLineWrapperList}" var="quoteLineWrapper">
+                            <tr id="{!quoteLineWrapper.index}" class="slds-hint-parent">
+                                <td>
+                                    <ui:inputSelect value="{!quoteLineWrapper.pricebookEntryId}" class="pricebook-class pointer1" change="{!c.getFamily}">
+                                        <aura:iteration items="{!v.pricebookOptions}" var="pricebookOption">
+                                            <option value="{!pricebookOption.value}">{!pricebookOption.label}</option>
+                                        </aura:iteration>
+                                    </ui:inputSelect>
+                                </td>
+                            </tr>
+                        </aura:iteration>
                     </tbody>
                 </table>
             </div>

@@ -1419,7 +1419,7 @@
                         <!-- *** BOM Grouping *** -->
                         <aura:set attribute="else">
                             <div class="mainBomDiv">
-                                <table class="slds-table">
+                                <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
                                     <tbody>
                                         <aura:if isTrue="{!v.firstGrouping}">
                                             <aura:iteration items="{!v.QuoteLineWrapper.groupWrapper}" var="group1">
@@ -1454,7 +1454,7 @@
                                                         </aura:if>
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <tr style='line-height: 2;font-size: 12px;' class="slds-text-heading--label">
                                                     <th class="tableHeaderDiv blankDiv"></th>
                                                     <aura:iteration items="{!v.QuoteLineWrapper.columns}" var="col">
                                                         <th class="tableHeaderDiv">
@@ -1463,7 +1463,7 @@
                                                     </aura:iteration>
                                                 </tr>
                                                 <aura:iteration items="{!group1.quoteLineList}" var="quoteItem">
-                                                    <tr class="{!'record_'+group1.groupIndex}">
+                                                    <tr style="line-height: 2.5;display:table-row;" class="{!'record_'+group1.groupIndex}" >
                                                         <td class="blankDiv"> </td>
                                                         <aura:iteration items="{!quoteItem.FieldDataList}"
                                                             var="fildData">
@@ -1556,6 +1556,7 @@
                                                         </td>
                                                     </aura:iteration>
                                                 </tr>
+                                                <br/>
                                             </aura:iteration>
                                         </aura:if>
 
@@ -1564,9 +1565,9 @@
                                                 <tr>
                                                     <td class="groupHeaderDiv" colspan="{!v.totalColumn+4}">
                                                         <aura:if isTrue="{!group1.groupName != undefined}">
-                                                            {!group1.groupName}
+                                                            {!group1.groupName} Group Second Test
                                                             <aura:set attribute="else">
-                                                                No Grouping
+                                                                No Grouping Group Second Test2
                                                             </aura:set>
                                                         </aura:if>
                                                     </td>
@@ -1614,7 +1615,7 @@
                                                         </aura:iteration>
                                                     </tr>
                                                     <aura:iteration items="{!group2.quoteLineList}" var="quoteItem">
-                                                        <tr class="{!'record_'+group1.groupIndex+group2.groupIndex}">
+                                                        <tr style="line-height: 2.5;display:table-row;" class="{!'record_'+group1.groupIndex+group2.groupIndex}">
                                                             <td class="blankDiv"> </td>
                                                             <td class="blankDiv"> </td>
                                                             <aura:iteration items="{!quoteItem.FieldDataList}"
@@ -1712,6 +1713,7 @@
                                                             </td>
                                                         </aura:iteration>
                                                     </tr>
+                                                    <br/>
                                                 </aura:iteration>
                                             </aura:iteration>
                                         </aura:if>
@@ -1787,7 +1789,7 @@
                                                             </aura:iteration>
                                                         </tr>
                                                         <aura:iteration items="{!group3.quoteLineList}" var="quoteItem">
-                                                            <tr
+                                                            <tr style="line-height: 2.5;display:table-row;"
                                                                 class="{!'record_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}">
                                                                 <td class="blankDiv"> </td>
                                                                 <td class="blankDiv"> </td>
@@ -1890,6 +1892,7 @@
                                                                 </td>
                                                             </aura:iteration>
                                                         </tr>
+                                                        <br/>
                                                     </aura:iteration>
                                                 </aura:iteration>
                                             </aura:iteration>
@@ -1982,7 +1985,7 @@
                                                             </tr>
                                                             <aura:iteration items="{!group4.quoteLineList}"
                                                                 var="quoteItem">
-                                                                <tr
+                                                                <tr style="line-height: 2.5;display:table-row;"
                                                                     class="{!'record_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}">
                                                                     <td class="blankDiv"> </td>
                                                                     <td class="blankDiv"> </td>
@@ -2092,6 +2095,7 @@
                                                                     </td>
                                                                 </aura:iteration>
                                                             </tr>
+                                                            <br/>
                                                         </aura:iteration>
                                                     </aura:iteration>
                                                 </aura:iteration>

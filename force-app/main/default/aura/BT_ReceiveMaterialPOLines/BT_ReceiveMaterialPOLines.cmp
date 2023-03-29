@@ -112,7 +112,7 @@
                             
                             <div class="slds-truncate" title="{!item.Name}" >
                                 <aura:if isTrue="{!item.buildertek__Quantity_Remaining__c != 0}">
-                                    <lightning:input name="{!index}" type="number" value="{!item.quantity_recieved}" autocomplete="off" onkeyup="{!c.handleBlur}"  messageWhenBadInput="You must say foo"  />
+                                    <lightning:input name="{!index}" type="number" value="{!item.quantity_recieved}" autocomplete="off" onkeyup="{!c.handleBlur}"  messageWhenBadInput="You must enter number"  />
                                 </aura:if>
                                 <aura:if isTrue="{!item.buildertek__Quantity_Remaining__c == 0}">
                                     <lightning:input name="{!index}" type="number" value="{!item.quantity_recieved}" autocomplete="off" onkeyup="{!c.handleBlur}"  messageWhenBadInput="You must say foo" disabled="true" />

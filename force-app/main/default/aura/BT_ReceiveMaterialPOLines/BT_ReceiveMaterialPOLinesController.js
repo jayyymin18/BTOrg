@@ -52,7 +52,52 @@
         var rfqlist= component.get("v.rfqRecordList");
         var action =component.get("c.addProducts");
         let productIdList=[];
+        console.log(rfqlist);
         
+        for(var i=0;i<rfqlist.length;i++){
+            if(rfqlist[i].quantity_recieved != null){
+                console.log(rfqlist[i].quantity_recieved);
+                if(rfqlist[i].quantity_recieved < 0 ){
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: 'Error',
+                        message: 'Quantity received should not be in negative.',
+                        duration: ' 5000',
+                        key: 'info_alt',
+                        type: 'error',
+                        mode: 'pester'
+                    });
+                    toastEvent.fire();
+                    return;
+                }
+                if(rfqlist[i].quantity_recieved % 1 != 0){
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: 'Error',
+                        message: 'Quantity received should not be in decimal.',
+                        duration: ' 5000',
+                        key: 'info_alt',
+                        type: 'error',
+                        mode: 'pester'
+                    });
+                    toastEvent.fire();
+                    return;
+                }
+                if(isNaN(rfqlist[i].quantity_recieved)){
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: 'Error',
+                        message: 'Quantity received should be a number.',
+                        duration: ' 5000',
+                        key: 'info_alt',
+                        type: 'error',
+                        mode: 'pester'
+                    });
+                    toastEvent.fire();
+                    return;
+                }
+            }
+        }
         
         var productList = [];
         for(var i=0;i<rfqlist.length;i++){
@@ -60,7 +105,7 @@
                 productIdList.push(rfqlist[i].buildertek__Product__c);
                 var obj = {};
                 console.log(rfqlist[i].quantity_recieved);
-                if(rfqlist[i].quantity_recieved != null){
+                if(rfqlist[i].quantity_recieved != null && rfqlist[i].quantity_recieved != 0){
                     obj['prodId'] = rfqlist[i].buildertek__Product__c
                     obj['quantity_recieved'] = rfqlist[i].quantity_recieved
                     obj['polineId'] = rfqlist[i].Id
@@ -71,7 +116,7 @@
             else{
                 var obj = {};
                 console.log(rfqlist[i].quantity_recieved);
-                if(rfqlist[i].quantity_recieved != null){
+                if(rfqlist[i].quantity_recieved != null && rfqlist[i].quantity_recieved != 0){
                     obj['quantity_recieved'] = rfqlist[i].quantity_recieved
                     obj['polineId'] = rfqlist[i].Id
                     
@@ -82,24 +127,7 @@
         }
         console.log(rfqlist);
         console.log(productList);
-        for(var i=0;i<rfqlist.length;i++){
-            if(rfqlist[i].quantity_recieved != null){
-                if((rfqlist[i].quantity_recieved > (rfqlist[i].buildertek__Quantity_Remaining__c )) && (rfqlist[i].quantity_recieved != 0) ){
-                    // var toastEvent = $A.get("e.force:showToast");
-                    // toastEvent.setParams({
-                    //     title: 'Error',
-                    //     message: 'Quantity delivered must be less than or equal to quantity remaining on PO line: '+rfqlist[i].Name ,
-                    //     duration: ' 5000',
-                    //     key: 'info_alt',
-                    //     type: 'error',
-                    //     mode: 'pester'
-                    // });
-                    // toastEvent.fire();
-                    return;
-                }
-            }
-        }
-        debugger;
+
 
         component.set("v.Spinner", true);
         component.set("v.showMessage", true);

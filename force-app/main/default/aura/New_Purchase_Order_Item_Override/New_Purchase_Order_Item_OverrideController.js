@@ -307,9 +307,15 @@
 
         }
         let poName=fields['Name'];
-        if(poName.length > 80){
-            console.log('its greater then 80');
+        console.log(poName);
+        if(poName !=null || poName!= undefined){
+            if(poName.length > 80){
+                poName=poName.substring(0 , 80)
+                fields['Name']=poName;
+            }
+
         }
+
 
         var allData = JSON.stringify(fields);
 

@@ -172,30 +172,7 @@
     },
 
     onMassUpdateCancel: function (component, event, helper) {
-        if (component.get('v.massUpdateEnable')) {
-            var workspaceAPI = component.find("workspace");
-            workspaceAPI.getFocusedTabInfo().then(function (response) {
-                var focusedTabId = response.tabId;
-                workspaceAPI.closeTab({
-                    tabId: focusedTabId
-                });
-            }) 
-         
-            .catch(function (error) {
-                var navEvt = $A.get("e.force:navigateToSObject");
-                navEvt.setParams({
-                    "recordId": component.get('v.recordId'),
-                    "slideDevName": "related"
-                });
-                navEvt.fire();
-            });
-            $A.get("e.force:closeQuickAction").fire();
-            window.setTimeout(
-                $A.getCallback(function () {
-                    $A.get('e.force:refreshView').fire();
-                }), 1000
-            );
-        }
+        helper.closeNrefresh(component, event, helper);
     },
 
     closeScreen: function (component, event, helper) {

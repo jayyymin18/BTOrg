@@ -765,7 +765,9 @@
 
 
     editQuote: function(component, event, helper) {
+        console.log(event.currentTarget);
         var recordId = event.currentTarget.dataset.id;
+        console.log({recordId});
         var editRecordEvent = $A.get("e.force:editRecord");
         editRecordEvent.setParams({
             "recordId": recordId
@@ -1003,7 +1005,15 @@
                     }), 3000
                 );
                 var page = component.get("v.page") || 1
-                helper.getGroups(component, event, helper, page);
+                
+                let getValue=component.get('v.displayGrouping')
+                if (getValue) {
+                    helper.submitDetails(component, event, helper); 
+                } else{
+                    helper.getGroups(component, event, helper, page);
+                }
+
+                
             }
         });
         $A.enqueueAction(action);
@@ -1766,10 +1776,62 @@
                         }), 3000
                     );
                     var page = component.get("v.page") || 1
-                    helper.getGroups(component, event, helper, page);
+                    // helper.getGroups(component, event, helper, page);
+                    let getValue=component.get('v.displayGrouping')
+                    if (getValue) {
+                        helper.submitDetails(component, event, helper); 
+                    } else{
+                        helper.getGroups(component, event, helper, page);
+                    }
                 }
             });
             $A.enqueueAction(action);
+        }
+    },
+    duplicateQuote2: function(component, event, helper) {
+        let text = "Press a button!\nEither OK or Cancel.";
+        console.log(confirm(text));
+        if (confirm(text) == true) {
+
+            var currentId = component.get("v.currentId");
+            if (currentId != "" && currentId != undefined) {
+                component.set("v.isDuplicate", false);
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "SHOW"
+                }).fire();
+                var checkvalue = component.find("selectAll");
+                var duplicateRecs = [];
+                duplicateRecs.push(currentId);
+                var action = component.get("c.massDuplicateQuoteLineItem");
+                action.setParams({
+                    "quoteLineRecords": duplicateRecs
+                });
+                action.setCallback(this, function(respo) {
+                    console.log('response is : ', respo.getState());
+                    if (respo.getState() === "SUCCESS") {
+                        component.set("v.value", false);
+                        component.set("v.currentId", "");
+                        $A.get('e.force:refreshView').fire();
+                        window.setTimeout(
+                            $A.getCallback(function() {
+                                var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    mode: 'sticky',
+                                    message: 'Duplicate records for selected quote items created successfully.',
+                                    type: 'success',
+                                    duration: '10000',
+                                    mode: 'dismissible'
+                                });
+                                toastEvent.fire();
+                            }), 3000
+                        );
+                        
+                        helper.submitDetails(component, event, helper); 
+                        
+                    }
+                });
+                $A.enqueueAction(action);
+            }
         }
     },
     closeDuplicateModel: function(component, event, helper) {
@@ -1976,6 +2038,7 @@
         }).fire();
         var page = component.get("v.page") || 1;
         helper.getGroups(component, event, helper, page);
+
 
     },
     onInputChange: function(component, event, helper) {
@@ -2640,6 +2703,7 @@ console.log(document.getElementsByClassName(className)[0]);
     // *** BOM Grouping ***
 
     onclickBOMGrouping : function(component, event, helper){
+        console.log('onclickBOMGrouping');
         component.set("v.isBOMmodalOpen", true);
         var opts = [
             {label: "Phase", value:"buildertek__Grouping__c"},
@@ -2661,41 +2725,7 @@ console.log(document.getElementsByClassName(className)[0]);
     //  },
     
      submitDetails: function(component, event, helper) {
-        var valueofField1 = component.get("v.valueofField1")
-        var valueofField2 = component.get("v.valueofField2")
-        var valueofField3 = component.get("v.valueofField3")
-        var valueofField4 = component.get("v.valueofField4")
-
-        if(valueofField1 == "" && valueofField2 == "" && valueofField3 == "" && valueofField4 == ""){
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                "type": "Error",
-                "title": "Error!",
-                "message": 'Please Select At Least One Field'
-            });
-            toastEvent.fire();           
-        } else{
-            var selectedFieldList = [];
-            if (valueofField1 != "") {
-                selectedFieldList.push(valueofField1)
-            }
-            if (valueofField2 != "") {
-                selectedFieldList.push(valueofField2)
-            }
-            if (valueofField3 != "") {
-                selectedFieldList.push(valueofField3)
-            }
-            if (valueofField4 != "") {
-                selectedFieldList.push(valueofField4)
-            }
-            console.log('selectedFieldList ==> ',{selectedFieldList});
-            component.set("v.isBOMmodalOpen", false); 
-            component.set("v.displayGrouping", true);
-
-            component.set("v.groupFieldList", selectedFieldList);
-            helper.getQuoteGrouping(component, event, helper);
-
-        }
+        helper.submitDetails(component, event, helper);
 
      },
 

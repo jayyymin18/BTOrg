@@ -185,8 +185,7 @@
 .THIS .tableHeaderDiv{
     /* font-weight: 600; */
     padding: 5px;
-    /* background: #fafaf9; */
-    text-transform: uppercase;
+    background: #fafaf9;
 }
 
 .THIS .groupHeaderDiv {
@@ -195,9 +194,7 @@
     background-color: #f3f3f3;
     font-family: 'Salesforce Sans', 'Open Sans', Arial, sans-serif;
     font-size: 18px;
-    /* color: #000000; */
-    color: #6b6d70;
-
+    color: #000000;
     font-weight: 500;
     font-style: normal;
     text-decoration: none;
@@ -207,6 +204,19 @@
     border-bottom-color: #dedbd7;
     border-bottom-style: solid;
     border-bottom-width: 1px;
+}
+.THIS .groupHeaderTotal{
+    background-color: #f3f3f3;
+    color: #000000;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin: 0;
+    border: 0;
+    padding: 5px;
+    border-bottom-color: #dedbd7;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    font-weight: bold;
 }
 
 .THIS .groupHeaderIcon{

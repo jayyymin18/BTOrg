@@ -282,19 +282,247 @@
                 buildertek__Markup__c : '',
             },
             productFamilyList : [],
+            productList : [],
+            productOptionList : [],
         };
         return quoteLineWrapper;
     },
 
     createQuoteLineWrapperList : function(component, event, helper) {
         var quoteLineWrapperList = [];
-        var quoteLineWrapper = helper.createQuoteLineWrapper(component, event, helper);
+        // var quoteLineWrapper = helper.createQuoteLineWrapper(component, event, helper);
         for(var i = 0; i < 5; i++) {
+            let quoteLineWrapper = helper.createQuoteLineWrapper(component, event, helper);
             quoteLineWrapperList.push(quoteLineWrapper);
         }
         console.log('quoteLineWrapperList', quoteLineWrapperList);
         component.set('v.quoteLineWrapperList', quoteLineWrapperList);
-    }
+    },
+
+    getFamily : function(component, event, helper, priceBookId, index) {
+        // console.log('helper.getFamily : PriceBookId : ', priceBookId , ' index : ', index);
+        var action = component.get("c.ProductsthroughPB");
+        action.setParams({
+            pbookId : priceBookId
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var result = response.getReturnValue();
+                console.log('result', result);
+                
+                var familySet = new Set();
+                for(var i = 0; i < result.length; i++) {
+                    familySet.add(result[i].Family);
+                }
+                //create a list of family where we have label and value
+                var familyList = [];
+                familyList.push({
+                    label : '-- All Families --',
+                    value : ''
+                });
+                familySet.forEach(function(family) {
+                    if(family){
+                        familyList.push({
+                            label : family,
+                            value : family
+                        });
+                    }
+                });
+                var quoteLineWrapperList = component.get('v.quoteLineWrapperList');
+                quoteLineWrapperList[index].GroupingOptions = component.get('v.GroupingOptions');
+                quoteLineWrapperList[index].productList = result;
+                quoteLineWrapperList[index].productFamilyList = familyList;
+                var productOptionList = [];
+                if(result.length > 0) {
+                    productOptionList.push({
+                        label : 'Please Select Product',
+                        value : ''
+                    });
+                    for(var i = 0; i < result.length; i++) {
+                        productOptionList.push({
+                            label : result[i].Name,
+                            value : result[i].Id
+                        });
+                    }
+                }
+                quoteLineWrapperList[index].productOptionList = productOptionList;
+                quoteLineWrapperList[index].QuoteLine = {
+                    buildertek__Quote__c : component.get('v.recordId'),
+                    buildertek__Product__c : '',
+                    Name : '',
+                    buildertek__Grouping__c : '',
+                    buildertek__Notes__c : '',
+                    buildertek__Quantity__c : '',
+                    buildertek__Unit_Cost__c : '',
+                    buildertek__Margin__c : '',
+                    buildertek__Markup__c : '',
+                }
+                component.set('v.quoteLineWrapperList', quoteLineWrapperList);
+                console.log('quoteLineWrapperList', quoteLineWrapperList);
+                component.set('v.isLoading', false);
+            } else if (state === "ERROR") {
+                console.log('A Problem Occurred: ' + JSON.stringify(response.error));
+                var toast = $A.get("e.force:showToast");
+                toast.setParams({
+                    title: "Error",
+                    message: "A Problem Occurred: " + JSON.stringify(response.error),
+                    type: "error"
+                });
+                toast.fire();
+                component.set('v.isLoading', false);
+            }
+        }); 
+        $A.enqueueAction(action);
+        
+    },
+
+    setProductDetails : function(component, event, helper, index, productId) {
+        var quoteLineWrapperList = component.get('v.quoteLineWrapperList');
+        
+        quoteLineWrapperList[index].QuoteLine.buildertek__Product__c = productId;
+        var productList = quoteLineWrapperList[index].productList;
+        for(var i = 0; i < productList.length; i++) {
+            if(productList[i].Id == productId) {
+                quoteLineWrapperList[index].Product = productList[i];
+            }
+        }       
+        quoteLineWrapperList[index].QuoteLine.Name = quoteLineWrapperList[index].Product.Name;
+        if(!quoteLineWrapperList[index].QuoteLine.buildertek__Quantity__c) {
+            quoteLineWrapperList[index].QuoteLine.buildertek__Quantity__c = 1;
+        }
+        if(quoteLineWrapperList[index].Product.UnitPrice) {
+            quoteLineWrapperList[index].QuoteLine.buildertek__Unit_Cost__c = quoteLineWrapperList[index].Product.UnitPrice;
+        }
+        if(quoteLineWrapperList[index].Product.MarkUp) {
+            quoteLineWrapperList[index].QuoteLine.buildertek__Markup__c = quoteLineWrapperList[index].Product.MarkUp;
+        }
+        if(quoteLineWrapperList[index].Product.Phase) {
+            quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c = quoteLineWrapperList[index].Product.Phase;
+        }else {
+            var GroupingOptions = component.get('v.GroupingOptions');
+            for(var i = 0; i < GroupingOptions.length; i++) {
+                if(GroupingOptions[i].Name == 'No Grouping') {
+                    quoteLineWrapperList[index].QuoteLine.buildertek__Grouping__c = GroupingOptions[i].Id;
+                }
+            }
+        }
+        component.set("v.quoteLineWrapperList", quoteLineWrapperList);
+        console.log('quoteLineWrapperList', quoteLineWrapperList);
+        component.set('v.isLoading', false);
+    },
+
+    QuoteLineGroups : function(component, event, helper) {
+        var action = component.get("c.QLGroups");
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var result = response.getReturnValue();
+                component.set('v.GroupingOptions', result);
+
+            } else if (state === "ERROR") {
+                console.log('A Problem Occurred: ' + JSON.stringify(response.error));
+                var toast = $A.get("e.force:showToast");
+                toast.setParams({
+                    title: "Error",
+                    message: "A Problem Occurred: " + JSON.stringify(response.error),
+                    type: "error"
+                });
+                toast.fire();
+            }
+        });
+        $A.enqueueAction(action);
+    },
+
+    getProduct : function(component, event, helper, family, index) {
+        var quoteLineWrapperList = component.get("v.quoteLineWrapperList");
+        var productList = quoteLineWrapperList[index].productList;
+        var productOptionList = [
+            {
+                label : 'Please Select Product',
+                value : '',
+            }
+        ];
+        for(var i = 0; i < productList.length; i++){
+            if(productList[i].Family == family){
+                productOptionList.push({
+                    label : productList[i].Name,
+                    value : productList[i].Id,
+                })
+            }
+        }
+        quoteLineWrapperList[index].productOptionList = productOptionList;
+        quoteLineWrapperList[index].QuoteLine = {
+            buildertek__Quote__c : component.get('v.recordId'),
+            buildertek__Product__c : '',
+            Name : '',
+            buildertek__Grouping__c : '',
+            buildertek__Notes__c : '',
+            buildertek__Quantity__c : '',
+            buildertek__Unit_Cost__c : '',
+            buildertek__Margin__c : '',
+            buildertek__Markup__c : '',
+        }
+        component.set("v.quoteLineWrapperList", quoteLineWrapperList);
+        console.log('quoteLineWrapperList',quoteLineWrapperList);
+        component.set('v.isLoading', false);
+    },
+
+    resetProductDetails : function(component, event, helper, index) {
+        var quoteLineWrapperList = component.get('v.quoteLineWrapperList');
+        quoteLineWrapperList[index].QuoteLine = {
+            buildertek__Quote__c : component.get('v.recordId'),
+            buildertek__Product__c : '',
+            Name : '',
+            buildertek__Grouping__c : '',
+            buildertek__Notes__c : '',
+            buildertek__Quantity__c : '',
+            buildertek__Unit_Cost__c : '',
+            buildertek__Margin__c : '',
+            buildertek__Markup__c : '',
+        }
+        component.set("v.quoteLineWrapperList", quoteLineWrapperList);
+        console.log('quoteLineWrapperList', quoteLineWrapperList);
+        component.set('v.isLoading', false);
+    },
+
+    saveQuoteLine : function(component, event, helper, quotelineList) {
+        console.log('quotelineList', quotelineList);
+        var action = component.get("c.saveQuoteLine");
+        action.setParams({
+            quotelineList : quotelineList,
+        });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var result = response.getReturnValue();
+                var toast = $A.get("e.force:showToast");
+                toast.setParams({
+                    title: "Success",
+                    message: "Quote Line Saved Successfully",
+                    type: "success"
+                });
+                toast.fire();
+                component.set('v.isLoading', false);
+            } else if (state === "ERROR") {
+
+                var error = response.getError();
+                console.log('Error =>',{error});
+
+                console.log(response.getError)
+                console.log('A Problem Occurred: ' + JSON.stringify(response.error));
+                var toast = $A.get("e.force:showToast");
+                toast.setParams({
+                    title: "Error",
+                    message: "A Problem Occurred: " + JSON.stringify(response.error),
+                    type: "error"
+                });
+                toast.fire();
+                component.set('v.isLoading', false);
+            }
+        });
+        $A.enqueueAction(action);
+    },
 
 
 })

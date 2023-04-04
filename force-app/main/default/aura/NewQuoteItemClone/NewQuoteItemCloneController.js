@@ -986,7 +986,7 @@
             if (state === "SUCCESS") {
                 var result = response.getReturnValue();
                 component.set("v.isOpen", false);
-                $A.get("e.force:refreshView").fire();
+                // $A.get("e.force:refreshView").fire();
                 window.setTimeout(
                     $A.getCallback(function() {
                         var toastEvent = $A.get("e.force:showToast");
@@ -1003,12 +1003,30 @@
                         });
                         toastEvent.fire();
                     }), 3000
+
+
                 );
+
+                // let wrap= component.get('v.QuoteLineWrapper');
+                // let list=[]
+                // for(let i in wrap){
+                //    wrap.quoteLineList.forEach(function(elem){
+                //         if(elem.Id===recordId){
+                //             console.log({wrap});
+                //         }else{
+                //             list.push(elem);
+                //         }
+                //     });
+                //     wrap.quoteLineList=list;
+                //     console.log(wrap);
+                //     component.set('v.QuoteLineWrapper' , wrap);
+                // }
+               
                 var page = component.get("v.page") || 1
                 
                 let getValue=component.get('v.displayGrouping')
                 if (getValue) {
-                    helper.submitDetails(component, event, helper); 
+                    helper.getQuoteGrouping(component, event, helper); 
                 } else{
                     helper.getGroups(component, event, helper, page);
                 }
@@ -1779,59 +1797,13 @@
                     // helper.getGroups(component, event, helper, page);
                     let getValue=component.get('v.displayGrouping')
                     if (getValue) {
-                        helper.submitDetails(component, event, helper); 
+                        helper.getQuoteGrouping(component, event, helper); 
                     } else{
                         helper.getGroups(component, event, helper, page);
                     }
                 }
             });
             $A.enqueueAction(action);
-        }
-    },
-    duplicateQuote2: function(component, event, helper) {
-        let text = "Press a button!\nEither OK or Cancel.";
-        console.log(confirm(text));
-        if (confirm(text) == true) {
-
-            var currentId = component.get("v.currentId");
-            if (currentId != "" && currentId != undefined) {
-                component.set("v.isDuplicate", false);
-                $A.get("e.c:BT_SpinnerEvent").setParams({
-                    "action": "SHOW"
-                }).fire();
-                var checkvalue = component.find("selectAll");
-                var duplicateRecs = [];
-                duplicateRecs.push(currentId);
-                var action = component.get("c.massDuplicateQuoteLineItem");
-                action.setParams({
-                    "quoteLineRecords": duplicateRecs
-                });
-                action.setCallback(this, function(respo) {
-                    console.log('response is : ', respo.getState());
-                    if (respo.getState() === "SUCCESS") {
-                        component.set("v.value", false);
-                        component.set("v.currentId", "");
-                        $A.get('e.force:refreshView').fire();
-                        window.setTimeout(
-                            $A.getCallback(function() {
-                                var toastEvent = $A.get("e.force:showToast");
-                                toastEvent.setParams({
-                                    mode: 'sticky',
-                                    message: 'Duplicate records for selected quote items created successfully.',
-                                    type: 'success',
-                                    duration: '10000',
-                                    mode: 'dismissible'
-                                });
-                                toastEvent.fire();
-                            }), 3000
-                        );
-                        
-                        helper.submitDetails(component, event, helper); 
-                        
-                    }
-                });
-                $A.enqueueAction(action);
-            }
         }
     },
     closeDuplicateModel: function(component, event, helper) {

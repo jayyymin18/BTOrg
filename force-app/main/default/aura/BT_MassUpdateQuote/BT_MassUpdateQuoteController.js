@@ -142,15 +142,10 @@
     onMassUpdate: function (component, event, helper) {
         component.set('v.loading', true);
         var quoteLineWrapperList = component.get("v.quoteLineWrapperList");
-        let duplicate = component.get("v.quoteLineWrapperList");
         var quotelineList = [];
         console.log('on Save quotelinewrapperlist: ',quoteLineWrapperList);
         for(var i=0;i<quoteLineWrapperList.length;i++){
-            if(quoteLineWrapperList[i].QuoteLine.Name == ''){
-                delete quoteLineWrapperList[i];
-                quoteLineWrapperList.splice(i,1);
-                i--;
-            }else{
+            if(quoteLineWrapperList[i].QuoteLine.Name != ''){
                 quotelineList.push(quoteLineWrapperList[i].QuoteLine);                
             }
         }
@@ -160,13 +155,15 @@
         }else{
             var toastEvent = $A.get("e.force:showToast");
             toastEvent.setParams({
-                title : 'Error Message',
-                message:'Please enter atleast one quote line.',
+                title: 'Error',
+                message: 'Please enter atleast one Quote Line.',
+                duration: ' 3000',
+                key: 'info_alt',
                 type: 'error',
-                mode: 'sticky'
+                mode: 'pester'
             });
             toastEvent.fire();
-            helper.createQuoteLineWrapperList(component, event, helper);
+            // helper.createQuoteLineWrapperList(component, event, helper);
             component.set('v.loading', false);
         }
     },

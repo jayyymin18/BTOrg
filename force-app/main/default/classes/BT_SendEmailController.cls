@@ -726,9 +726,12 @@ public with sharing class BT_SendEmailController{
                     }
                     if (Id.valueOf(recordId).getSObjectType().getDescribe().getName() == 'buildertek__Quote__c'){
                         buildertek__Quote__c quote = new buildertek__Quote__c();
-                        quote.Id = recordId;
+                        quote = [select Id, buildertek__Status__c, buildertek__Sender_Email_Response__c, buildertek__Date_Sent_To_Customer__c, buildertek__Date_Accepted_by_Customer__c, buildertek__Date_Rejected_by_Customer__c from buildertek__Quote__c where Id = :recordId];
+                        // quote.Id = recordId;
                         quote.buildertek__Status__c = 'Sent';
-                        quote.buildertek__Date_Sent_To_Customer__c = system.today();
+                        if(quote.buildertek__Date_Accepted_by_Customer__c == null && quote.buildertek__Date_Rejected_by_Customer__c == null){
+                            quote.buildertek__Date_Sent_To_Customer__c = system.today();
+                        }
                         quote.buildertek__Sender_Email_Response__c = UserInfo.getUserEmail();
                        // if (Schema.sObjectType.buildertek__Quote__c.fields.Id.isUpdateable() 
                            // && Schema.sObjectType.buildertek__Quote__c.fields.buildertek__Status__c.isUpdateable() 
@@ -1453,7 +1456,15 @@ public with sharing class BT_SendEmailController{
         string pdfName;
         if (objectAPIName == 'buildertek__Change_Order__c'){
             buildertek__Change_Order__c changeRec = [select id, Name , buildertek__Auto_Number__c , buildertek__Project__r.Name , buildertek__Project__r.buildertek__Auto_Number__c from buildertek__Change_Order__c where Id =: recordId Limit 1];
-            pdfName=changeRec.buildertek__Project__r.Name + '-' + changeRec.buildertek__Project__r.buildertek__Auto_Number__c +'-' + changeRec.buildertek__Auto_Number__c;
+            if(changeRec.buildertek__Project__r.Name != null || changeRec.buildertek__Project__r.buildertek__Auto_Number__c !=null ){
+                    pdfName=changeRec.buildertek__Project__r.Name + '-' + changeRec.buildertek__Project__r.buildertek__Auto_Number__c +'-' + changeRec.buildertek__Auto_Number__c;
+            }else{
+                pdfName=changeRec.buildertek__Auto_Number__c;
+            }
+           
+        }else if (objectAPIName == 'buildertek__Quote__c'){
+            buildertek__Quote__c quoteRec=[Select Id , Name From buildertek__Quote__c where Id=:recordId LIMIT 1];
+            pdfName=quoteRec.Name;
         }else{
             pdfName='';
         }

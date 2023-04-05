@@ -81,6 +81,20 @@
         var toIds = [];
         var ccIds = [];
         var to = component.get("v.selectedToContact");
+        if (to == null) {
+            component.set("v.Spinner", false);
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                title: 'Error',
+                message: 'Please select To Address to send Email',
+                duration: ' 3000',
+                key: 'info_alt',
+                type: 'error',
+                mode: 'pester'
+            });
+            toastEvent.fire();
+            return;
+        }
         var cc = component.get("v.selectedCcContact");
         var emailIds = component.get("v.emailIds");
         to.forEach(function(v) {
@@ -156,22 +170,35 @@
         var emailId = component.find('emailForm').get('v.value');
         var emailIds = component.get('v.emailIds');
         var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-        if (emailId.charAt(emailId.length - 1) == ';') {
+        if (emailId.charAt(emailId.length - 1) == ';' || emailId.charAt(emailId.length - 1) == ',' || emailId.charAt(emailId.length - 1) == ' ') {
             emailId = emailId.replace(';', '');
+            emailId = emailId.replace(',', '');
+            emailId = emailId.replace(' ', '');
+            console.log('hurray', emailId);
             if (reg.test(emailId)) {
                 component.set("v.toEmail", '');
                 if (!emailIds.includes(emailId)) {
                     emailIds.push(emailId);
                 }
             }
-        }
-        if (emailIds != null && emailIds != '') {
+            console.log('emailIds', emailIds);
             component.set('v.emailIds', emailIds);
-        } else {
-            component.set('v.emailIds', emailId);
         }
 
-        //component.set('v.emailIds', emailIds);
+    },
+
+    onAddEmail: function(component, event, helper) {
+        var emailId = component.find('emailForm').get('v.value');
+        console.log('emailId', emailId)
+        var emailIds = component.get('v.emailIds');
+        var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        if (reg.test(emailId)) {
+            component.set("v.toEmail", '');
+            if (!emailIds.includes(emailId)) {
+                emailIds.push(emailId);
+            }
+        }
+        component.set('v.emailIds', emailIds);
     },
 
     handleEmailRemove: function(component, event, helper) {

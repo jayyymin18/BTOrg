@@ -77,6 +77,40 @@
     },
 
     sendEmail: function(component, event, helper) {
+        var addEmailBox = component.find('emailForm').get('v.value');
+        var emailIds = component.get("v.emailIds");
+        if (addEmailBox != undefined && addEmailBox != '') {
+            var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+            if (!emailReg.test(addEmailBox)) {
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    title: 'Error',
+                    message: 'Please enter valid email address in Additional Email',
+                    duration: ' 3000',
+                    key: 'info_alt',
+                    type: 'error',
+                    mode: 'pester'
+                });
+                toastEvent.fire();
+                return;
+            }
+            if (emailIds.indexOf(addEmailBox) == -1) {
+                emailIds.push(addEmailBox);
+                component.set("v.emailIds", emailIds);
+                component.set("v.toEmail", '');
+            } else {
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    title: 'Error',
+                    message: 'Additional Email already added',
+                    duration: ' 3000',
+                    key: 'info_alt',
+                    type: 'error',
+                    mode: 'pester'
+                });
+                toastEvent.fire();
+            }
+        }
         component.set("v.Spinner", true);
         var toIds = [];
         var ccIds = [];

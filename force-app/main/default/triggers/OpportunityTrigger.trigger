@@ -13,7 +13,7 @@ trigger OpportunityTrigger on Opportunity (before update, after update) {
     if (Trigger.isUpdate && Trigger.isAfter){
         System.debug('in trigger after update');
 		//handler.OnBeforeUpdate(Trigger.new, trigger.oldMap);
-        handler.afterUpdate(Trigger.newMap);
+        handler.afterUpdate(Trigger.newMap, Trigger.oldMap);
 	}
 
 }

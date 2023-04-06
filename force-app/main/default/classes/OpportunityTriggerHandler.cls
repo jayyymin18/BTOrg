@@ -4,6 +4,8 @@ Date: 25/02/2021
 */
 public without sharing class OpportunityTriggerHandler {
 
+    public static Boolean isFirstTime = true;
+
     public void onBeforeUpdateCloseWon(Opportunity[] newOpportunity,Opportunity[] oldOpportunity, Map<Id, Opportunity> newOpportunityMap,Map<Id, Opportunity> oldOpportunityMap){
         system.debug(newOpportunityMap.keySet());
         system.debug(oldOpportunityMap.keySet());
@@ -32,7 +34,7 @@ public without sharing class OpportunityTriggerHandler {
        // system.debug(oldOpportunityMap.get(newOpportunityMap.keySet()[0]).StageName);
     }
 
-    public void afterUpdate(Map<Id, Opportunity> newOpportunityMap) {
+    public void afterUpdate(Map<Id, Opportunity> newOpportunityMap, Map<Id, Opportunity> oldOpportunityMap) {
         //* Added logic for updating opp details to the BT quote e.g. Oppty Account Name, Description
         System.debug('in after update method *&*&*&');
         List<buildertek__Quote__c> quoteList = new List<buildertek__Quote__c>();
@@ -41,10 +43,15 @@ public without sharing class OpportunityTriggerHandler {
         if (quoteList.size() > 0) {
             for (buildertek__Quote__c qt : quoteList) {
                 Opportunity opp = newOpportunityMap.get(qt.buildertek__Opportunity__c);
-                qt.buildertek__Description__c = opp.Description;
-                qtListToUpdate.add(qt);
+                Opportunity oldOpp = oldOpportunityMap.get(qt.buildertek__Opportunity__c);
+                if (oldOpp.Description != opp.Description) {
+                    qt.buildertek__Description__c = opp.Description;
+                    qtListToUpdate.add(qt);
+                }
             }
-            update qtListToUpdate;
+            if (qtListToUpdate.size() > 0) {
+                update qtListToUpdate;
+            }
         }
     }
 
@@ -56,9 +63,6 @@ public without sharing class OpportunityTriggerHandler {
         for(Opportunity qutrec : newOpportunity){
             System.debug('qutrec.StageName '+qutrec.StageName);
             System.debug('oldOpportunityMap.get(qutrec.id).StageName '+oldOpportunityMap.get(qutrec.id).StageName);
-            for (Opportunity key : oldOpportunityMap.values()) {
-                System.debug('key '+key);
-            }
             if(qutrec.StageName == 'Closed Won' && oldOpportunityMap.get(qutrec.id).StageName != qutrec.StageName){
                 oppoids.add(qutrec.id);
             }

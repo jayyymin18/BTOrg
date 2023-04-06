@@ -50,6 +50,18 @@
                 });
                 toastEvent.fire();
                 $A.get('e.force:refreshView').fire();
+            }else{
+                component.set("v.Spinner", false);
+                $A.get("e.force:closeQuickAction").fire();
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({ 
+                    "message": "Something went wrong",
+                    "mode": 'sticky',
+                    "type": 'error',
+                    "duration": 3000
+                });
+                toastEvent.fire();
+
             }
         });
         $A.enqueueAction(action);

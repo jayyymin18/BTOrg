@@ -542,7 +542,7 @@ global without sharing class QuoteGroupFromBom {
     }
 
     public class totalFieldClass{
-        
+
     }
 
 }

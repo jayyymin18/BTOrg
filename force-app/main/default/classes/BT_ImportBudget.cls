@@ -154,6 +154,8 @@ public with sharing class BT_ImportBudget{
                 }
             }
         }
+        system.debug('selectedIds -------------> ' + selectedIds);
+        sysytem.debug('masterBudgetItemList -------------> ' + masterBudgetItemList);
         insert masterBudgetItemList;
         Map<String, String> budgetMap = new Map<String, String>();
         Map<String, String> budgetNameMap = new Map<String, String>();
@@ -180,6 +182,7 @@ public with sharing class BT_ImportBudget{
             if (Schema.sObjectType.buildertek__Quote_Line_Group__c.fields.Name.isCreateable()){
                 budGroup.Name = 'No Grouping';
             }
+            system.debug('budGroup -------------> ' + budGroup);
             insert budGroup;
             groupId = budGroup.Id;
         }

@@ -151,6 +151,8 @@
     <aura:attribute name="hideMarkup" type="Boolean" default="false" />
 
     <aura:attribute type="Map" name="checkboxState" />
+    <aura:attribute name="phaseName" type="String" default="" />
+
 
 
     <lightning:workspaceAPI aura:id="workspace" />
@@ -976,12 +978,8 @@
                                                             {!group.Name}
 
                                                         </div>
-                                                        <div class="slds-col slds-size_6-of-12 slds-float_right"
-                                                            style="font-size: 10px; height:1.5rem; width:0px;">
-                                                            <lightning:button variant="neutral" label="Add Quote Line"
-                                                                name="{!groupIndex}" title="Add Quote Line"
-                                                                class="addBudgetLineStyle"
-                                                                onclick="{!c.addProductFromGroup}" />
+                                                        <div class="slds-col slds-size_6-of-12 slds-float_right" style="font-size: 10px; height:1.5rem; width:0px;">
+                                                            <lightning:button variant="neutral" value='{!group.Id}' label="Add Quote Line" name="{!groupIndex}" title="Add Quote Line" class="addBudgetLineStyle" onclick="{!c.addProductFromGroup}" />
                                                         </div>
                                                     </div>
                                                     <!-- <div class="slds-grid slds-gutters">
@@ -1632,7 +1630,7 @@
                                                                 <div class="slds-form-element">
                                                                     <div class="slds-form-element__control">
                                                                         <label class="slds-checkbox" style="width:2px;">
-                                                                            <ui:inputCheckbox name="{!quoteItem.buildertek__Grouping__c}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
+                                                                            <ui:inputCheckbox name="{!group1.groupName+'_'+group2.groupName}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
                                                                             <span class="slds-checkbox--faux"  style="top:-2px;"></span>
                                                                             <span  class="slds-form-element__label text"></span>
                                                                         </label>
@@ -1810,7 +1808,7 @@
                                                                 <div class="slds-form-element">
                                                                     <div class="slds-form-element__control">
                                                                         <label class="slds-checkbox" width="10px">
-                                                                            <ui:inputCheckbox name="{!group1.groupName}" value="{!group1.isSelected}" change="{!c.handleSelectAllGroup}" aura:id="selectAllGroup" class="" />
+                                                                            <ui:inputCheckbox name="{!group1.groupName+'_'+group2.groupName+'_'+group3.groupName}" value="{!group3.isSelected}" change="{!c.handleSelectAllGroup}" aura:id="selectAllGroup" class="" />
                                                                             <span class="slds-checkbox--faux" style="top:-2px;"></span>
                                                                             <span class="slds-form-element__label text"></span>
                                                                         </label>
@@ -1832,7 +1830,7 @@
                                                                     <div class="slds-form-element">
                                                                         <div class="slds-form-element__control">
                                                                             <label class="slds-checkbox" style="width:2px;">
-                                                                                <ui:inputCheckbox name="{!quoteItem.buildertek__Grouping__c}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
+                                                                                <ui:inputCheckbox name="{!group1.groupName+'_'+group2.groupName+'_'+group3.groupName}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
                                                                                 <span class="slds-checkbox--faux"  style="top:-2px;"></span>
                                                                                 <span  class="slds-form-element__label text"></span>
                                                                             </label>
@@ -2044,7 +2042,7 @@
                                                                     <div class="slds-form-element">
                                                                         <div class="slds-form-element__control">
                                                                             <label class="slds-checkbox" width="10px">
-                                                                                <ui:inputCheckbox name="{!group1.groupName}" value="{!group1.isSelected}" change="{!c.handleSelectAllGroup}" aura:id="selectAllGroup" class="" />
+                                                                                <ui:inputCheckbox name="{!group1.groupName+'_'+group2.groupName+'_'+group3.groupName+'_'+group4.groupName}" value="{!group4.isSelected}" change="{!c.handleSelectAllGroup}" aura:id="selectAllGroup" class="" />
                                                                                 <span class="slds-checkbox--faux" style="top:-2px;"></span>
                                                                                 <span class="slds-form-element__label text"></span>
                                                                             </label>
@@ -2067,7 +2065,7 @@
                                                                         <div class="slds-form-element">
                                                                             <div class="slds-form-element__control">
                                                                                 <label class="slds-checkbox" style="width:2px;">
-                                                                                    <ui:inputCheckbox name="{!quoteItem.buildertek__Grouping__c}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
+                                                                                    <ui:inputCheckbox name="{!group1.groupName+'_'+group2.groupName+'_'+group3.groupName+'_'+group4.groupName}"   aura:id='checkGroupQuoteItem1' text="{!quoteItem.Id}" value="{!quoteItem.isSelected}" change="{!c.unCheckAllGroup}" />
                                                                                     <span class="slds-checkbox--faux"  style="top:-2px;"></span>
                                                                                     <span  class="slds-form-element__label text"></span>
                                                                                 </label>
@@ -2227,7 +2225,7 @@
                             }
                             
                         </aura:html>                       
-                            <c:Add_QuoteLine_In_Quote quoteId="{!v.recordId}" openProductBox="{!v.openProductBox}" />
+                            <c:Add_QuoteLine_In_Quote getPhase="{!v.phaseName}" quoteId="{!v.recordId}" openProductBox="{!v.openProductBox}" />
 
                     </aura:if>
 

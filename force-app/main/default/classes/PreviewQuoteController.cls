@@ -45,7 +45,8 @@ public without sharing class PreviewQuoteController{
                    limit 1];
         }
         String[] toaddres;
-        toaddres = new String[]{con.email};
+        // toaddres = new String[]{con.email};
+        toaddres = new String[]{'info@buildertek.com'};
         Savepoint sp = Database.setSavepoint();
         list<Messaging.SingleEmailMessage> msgList = new List<Messaging.SingleEmailMessage>();
         list<Messaging.SingleEmailMessage> msgList1 = new List<Messaging.SingleEmailMessage>();
@@ -152,6 +153,11 @@ public without sharing class PreviewQuoteController{
 
         List<EmailTemplate> et = [SELECT Id,Name,Subject FROM EmailTemplate WHERE Id =:templateId];
 
+        //* nishit's logic for wide org email starts from here 
+        buildertek__WideOrgEmailsettings__c getEmail = buildertek__WideOrgEmailsettings__c.getOrgDefaults();
+        String wideOrgEmailName = getEmail.buildertek__WideEmail__c;
+        List<OrgWideEmailAddress> wideOrgEmail =[select Id,Address from OrgWideEmailAddress WHERE Address =:wideOrgEmailName];
+        //* nishit's logic for wide org email ends from here 
 
         system.debug('recordId----' + recordId);
             system.debug('templateId----' + templateId);
@@ -286,6 +292,9 @@ public without sharing class PreviewQuoteController{
              body += '<a href='+ SiteUrl +'buildertek__ConfirmationPage?Id='+recordId+'&templateId='+templateId+'>Click here</a>';
              body += '&nbsp;to confirm your Quote Order details.' ; */
             mail.setReplyTo(fromAddress);
+            if (wideOrgEmail.size() > 0) {
+                mail.setOrgWideEmailAddressId(wideOrgEmail[0].Id);
+            }
             subject = subject + '[ref:' + recordId + ']';
             mail.setSubject(subject);
             mail.setHTMLBody(templateBody1);
@@ -443,6 +452,13 @@ public without sharing class PreviewQuoteController{
             List<string> strCC = new List<string>();
             SET<Id> contactIdSet = new SET<Id>();
             List<Contact> conList = new List<Contact>();
+
+            //* nishit's logic for wide org email starts from here 
+            buildertek__WideOrgEmailsettings__c getEmail = buildertek__WideOrgEmailsettings__c.getOrgDefaults();
+            String wideOrgEmailName = getEmail.buildertek__WideEmail__c;
+            List<OrgWideEmailAddress> wideOrgEmail =[select Id,Address from OrgWideEmailAddress WHERE Address =:wideOrgEmailName];
+            //* nishit's logic for wide org email ends from here
+            
             system.debug('to'+to);
             if (Schema.sObjectType.Contact.fields.Id.isAccessible() && Schema.sObjectType.Contact.fields.email.isAccessible()){
                 conList = [Select Id, email
@@ -500,6 +516,9 @@ public without sharing class PreviewQuoteController{
              body += '<a href='+ SiteUrl +'buildertek__ConfirmationPage?Id='+recordId+'&templateId='+templateId+'>Click here</a>';
              body += '&nbsp;to confirm your Quote Order details.' ; */
             mail.setReplyTo(fromAddress);
+            if (wideOrgEmail.size() > 0) {
+                mail.setOrgWideEmailAddressId(wideOrgEmail[0].Id);
+            }
             subject = subject + '[ref:' + recordId + ']';
             mail.setSubject(subject);
             mail.setHTMLBody(body);

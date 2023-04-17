@@ -48,17 +48,46 @@ public class ImportProductsOnRfqLines {
         public string productfamilyvalues{ get; set; }
     }
 
-    @AuraEnabled
-    public static List<Pricebook2>  pricebookList (){
-        List<Pricebook2> pbList= [Select Id,Name,Description From Pricebook2 ORDER BY Name];
-        return pbList;
+    // @AuraEnabled
+    // public static List<Pricebook2>  pricebookList (){
+    //     List<Pricebook2> pbList= [Select Id,Name,Description From Pricebook2 ORDER BY Name];
+    //     return pbList;
+    // }
+    public class pricebookWrapper{
+        @AuraEnabled
+        public List<pricebook2> priceWrapList;
+
+        @AuraEnabled
+        public pricebook2 defaultValue;
     }
     @AuraEnabled
-    public static RfqDataTableWrapper getProducts(Integer pageNumber, Integer pageSize, string RFQRecId, String productFamily, String tradeType, String productType, String Product,String category, String priceBook, String vendor){
+    public static List<pricebookWrapper> pricebookList(string recordId){
+        List<pricebookWrapper> priceWrapper = new List<pricebookWrapper>();
+        
+        pricebookWrapper priceWrap = new pricebookWrapper();
+        priceWrap.defaultValue= new pricebook2();
+        priceWrap.priceWrapList = new List<pricebook2>();
+        List<Pricebook2> pbList= [Select Id,Name,Description From Pricebook2 ORDER BY Name];
+        priceWrap.priceWrapList=pbList;
+
+        if(recordId != null){
+            System.debug('recordId*********' + recordId);
+            buildertek__RFQ__c rfqRecord = [Select Id, Name , buildertek__Project__c , buildertek__Project__r.buildertek__Price_Book__c , buildertek__Project__r.buildertek__Price_Book__r.Name From buildertek__RFQ__c  WHERE Id = :recordId];
+            if(rfqRecord.buildertek__Project__c != null && rfqRecord.buildertek__Project__r.buildertek__Price_Book__c !=null){
+                pricebook2 selectedPriceList = [SELECT Id, Name , Description FROM pricebook2 where Id=:rfqRecord.buildertek__Project__r.buildertek__Price_Book__c LIMIT 1];
+                priceWrap.defaultValue= selectedPriceList;
+                System.debug(selectedPriceList+'selectedPriceList*********');
+
+            }
+        }
+        priceWrapper.add(priceWrap);
+        return priceWrapper;
+    }
+
+    @AuraEnabled
+    public static RfqDataTableWrapper getProducts( string RFQRecId, String productFamily, String tradeType, String productType, String Product,String category, String priceBook, String vendor){
         List<Product2> rfqList = new List<Product2>();
         
-        Integer offset = (pageNumber - 1) * pageSize;
-        //Total Records 
         Integer totalRecords = 0;
         system.debug('pricebook'+priceBook);
         list<String> pB1 = new list<String>();
@@ -66,7 +95,6 @@ public class ImportProductsOnRfqLines {
         
         if(priceBook != '' && priceBook != null){
             system.debug('pricebookAt starting'+priceBook);
-          // String query1 = 'select Id, Name,Pricebook2.Name,Product2Id from PricebookEntry where Pricebook2.Name LIKE  \'%'+String.escapeSingleQuotes(priceBook)+'%\'';
            String query1 = 'select Id, Name,Pricebook2.Name,Product2Id from PricebookEntry where Pricebook2Id=: priceBook';
             system.debug('query111111111'+query1);
             list<PricebookEntry> productIdInPB = Database.Query(query1);
@@ -98,7 +126,7 @@ public class ImportProductsOnRfqLines {
             if(priceBook != '' && priceBook != null){
                 query = query+ ' AND Id IN:pB1';
                
-
+    
             }
             if(vendor != '' && vendor != null){
                 query = query+ ' AND buildertek__Vendor__r.Name LIKE \'%'+String.escapeSingleQuotes(vendor)+'%\'';
@@ -109,21 +137,9 @@ public class ImportProductsOnRfqLines {
         }else{
             totalRecords = [SELECT COUNT() FROM Product2 ];
         }
-        /* else{
-totalRecords = [SELECT COUNT() FROM buildertek__RFQ__c 
-WHERE buildertek__Status__c ='Awarded' OR buildertek__Status__c ='Accepted'];
-}  */
-        
-        
-        Integer recordEnd = pageSize * pageNumber;
         
         //Instance of Contact DataTable Wrapper Class
         RfqDataTableWrapper objDT = new RfqDataTableWrapper();
-        objDT.pageSize = pageSize;
-        objDT.pageNumber = pageNumber;
-        objDT.recordStart = offset + 1;
-        objDT.recordEnd = totalRecords >= recordEnd ? recordEnd : totalRecords;
-        objDT.totalRecords = totalRecords;
         if(productFamily != '' || tradeType != '' || productType != '' || Product  != '' || category != '' || priceBook != '' || vendor != ''){
             String queryList2 = '';
             String queryList = 'Select Id,Name,Family,buildertek__Product_Type__r.Name,buildertek__Category__r.Name,buildertek__Trade_Type__r.Name,buildertek__Vendor__r.Name,StockKeepingUnit FROM Product2 WHERE id!=NULL ';
@@ -150,13 +166,22 @@ WHERE buildertek__Status__c ='Awarded' OR buildertek__Status__c ='Accepted'];
                 queryList = queryList+ ' AND (buildertek__Vendor__r.Name LIKE \'%'+vendor+'%\')';
             }
             queryList2 = queryList+ ' ORDER BY Name';
-            queryList = queryList+ ' ORDER BY Name LIMIT :pageSize OFFSET :offset';
+            queryList = queryList+ ' ORDER BY Name';
+
+            // queryList = queryList+ ' ORDER BY Name LIMIT :pageSize OFFSET :offset';
             
             List<Product2> allProds =  Database.query(queryList2);
-            // system.debug(queryList);
-            objDT.recordList = Database.query(queryList);
-             system.debug(objDT.recordList);
-             List<String> categoryNameList = new List<String>();
+            objDT.recordList = new List<ProductWrapper>();
+            List<Product2> productList = Database.query(queryList);
+            for (Product2 prod : productList) {
+                ProductWrapper productWrapper = new ProductWrapper();
+                productWrapper.product = prod;
+                productWrapper.isChecked = false;
+                objDT.recordList.add(productWrapper);
+
+            }  
+
+            List<String> categoryNameList = new List<String>();
             List<String> producttypeNameList = new List<String>();
             List<String> tradeTypeNameList = new List<String>();
             List<String> vendorNameList = new List<String>();
@@ -227,41 +252,16 @@ WHERE buildertek__Status__c ='Awarded' OR buildertek__Status__c ='Accepted'];
             
         }
         else{
-            objDT.recordList = [Select Id,Name,Family,buildertek__Product_Type__r.Name,buildertek__Trade_Type__r.Name,buildertek__Vendor__r.Name,buildertek__Category__r.Name,StockKeepingUnit 
-                                FROM Product2  ORDER BY Name 
-                                LIMIT :pageSize
-                                OFFSET :offset];
-            /*if(objDT.recordList.size() > 0){
-                for(Product2 rec : objDT.recordList){
-                    if(rec.buildertek__Category__r != null){
-                        if(objDT.categoryList.contains(rec.buildertek__Category__r.Name) == false){
-                            objDT.categoryList.add(rec.buildertek__Category__r.Name);
-                        } 
-                    }
-                }
-            }*/
-            /* if(objDT.recordList.size() > 0){
-                for(Product2 rec : objDT.recordList){
-                    system.debug(rec);
-                    if(rec.buildertek__Category__r != null){
-                        if(objDT.categoryList!= null){
-                            if(objDT.categoryList.contains(rec.buildertek__Category__r.Name) == false){
-                                if(rec.buildertek__Category__r.Name != null){
-                                 objDT.categoryList.add(rec.buildertek__Category__r.Name);
-                            }
-                            } 
-                        }else{
-                            if(rec.buildertek__Category__r.Name != null){
-                                 objDT.categoryList.add(rec.buildertek__Category__r.Name);
-                            }
-                           
-                        }
-                        
-                    }
-                    
-                }
-            }*/
             
+            List<Product2> productList = [Select Id,Name,Family,buildertek__Product_Type__r.Name,buildertek__Trade_Type__r.Name,buildertek__Vendor__r.Name,buildertek__Category__r.Name,StockKeepingUnit FROM Product2  ORDER BY Name];
+            for (Product2 prod : productList) {
+                ProductWrapper productWrapper = new ProductWrapper();
+                productWrapper.product = prod;
+                productWrapper.isChecked = false;
+                objDT.recordList.add(productWrapper);
+
+            }   
+                    
         }
         
         
@@ -348,25 +348,18 @@ rfqItem.buildertek__Contractor__c = rfqLineItem.buildertek__RFQ_Package__r.build
         
     }
     
-    
+    public class ProductWrapper {
+        @AuraEnabled
+        public Product2 product { get; set; }
+        @AuraEnabled
+        public Boolean isChecked { get; set; }          
+    }
+
     public class RfqDataTableWrapper{
-        @AuraEnabled
-        public Integer pageSize{ get; set; }
+        
         
         @AuraEnabled
-        public Integer pageNumber{ get; set; }
-        
-        @AuraEnabled
-        public Integer totalRecords{ get; set; }
-        
-        @AuraEnabled
-        public Integer recordStart{ get; set; }
-        
-        @AuraEnabled
-        public Integer recordEnd{ get; set; }
-        
-        @AuraEnabled
-        public List<Product2> recordList{ get; set; }
+        public List<ProductWrapper> recordList{ get; set; }
         
        @AuraEnabled
         public List<String> categoryList {get; set;}

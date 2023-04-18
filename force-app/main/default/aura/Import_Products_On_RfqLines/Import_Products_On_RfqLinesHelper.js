@@ -76,7 +76,9 @@
         });
         $A.enqueueAction(action);
     },
-    getRfqList: function(component, event, helper, pageNumber, pageSize, productFamilyValue, tradeValue, productTypeValue, productValue, productCategoryValue, priceBook, vendor) {
+    getRfqList: function(component, event, helper, productFamilyValue, tradeValue, productTypeValue, productValue, productCategoryValue, priceBook, vendor) {
+       
+        component.set("v.Spinner", true);
         var action = component.get("c.getProducts");
         var tradetype = component.get("v.rfqtradeType");
         var recId = component.get("v.recordId");
@@ -101,6 +103,11 @@
                 var resultData = result.getReturnValue();
                 var records=resultData.recordList;
                 component.set("v.rfqRecordList", resultData.recordList);
+                console.log({records});
+                console.log({productFamilyValue});
+                console.log({priceBook});
+                console.log({tradeValue});
+
 
 
 
@@ -113,6 +120,7 @@
 
                 var PaginationLst = [];
                 for(var i=0; i < pageSize; i++){
+                    console.log(component.get("v.rfqRecordList").length > i);
                     if(component.get("v.rfqRecordList").length > i){
                         PaginationLst.push(records[i]);    
                     } 
@@ -141,6 +149,8 @@
                     component.set("v.rfqvendorList", resultData.vendorList.slice(0, 5));
                 }
 
+                 component.set("v.Spinner", false);
+
                
                 
             }
@@ -153,6 +163,7 @@
         component.set("v.Spinner", true);
         component.find("selectAllRFQ").set("v.value", false);
 
+        console.log(component.get("v.searchPriceBookFilter") , '{{}}');
 
 		var productAction = component.get("c.productfamilyList");
         productAction.setParams({
@@ -174,7 +185,7 @@
                     }
 				}
 
-                
+                helper.getRfqList(component, event, helper, '', '', '', '', '', component.get("v.searchPriceBookFilter"), '');
                 
             }else{
                 component.set("v.Spinner", false);
@@ -238,33 +249,168 @@
 
         }
     },
-    searchFamilyHelper:function(component, event, helper) {
-        var allRecordList= component.get('v.rfqRecordList');
-        var paginationList=component.get('v.PaginationList');
-        var updatedList=[];
-        console.log(component.get('v.searchProductFamilyFilter'));
-        var productFamily=component.get('v.searchProductFamilyFilter');
-        allRecordList.forEach(function(value){
-            if(productFamily!== undefined && productFamily!== ''){
-                console.log('go there go');
+    applyFilters : function(component, event, helper) {
+        var filters = {
+            productFamily: component.get('v.productFamily'),
+            productCategory: component.get('v.productCategory'),
+            productType: component.get('v.productType'),
+            tradeType: component.get('v.tradeType'),
+            vendor: component.get('v.vendor')
+        };
+        
+        var updatedList = helper.searchHelper(component.get('v.rfqRecordList'), filters);
+        component.set('v.filteredList', updatedList);
+    },
 
-                if(value.product.Family === component.get('v.searchProductFamilyFilter')){
-                    updatedList.push(value);
-                }
-            }else{
-                console.log('go here');
-                updatedList=allRecordList;
+    searchHelper : function(originalList, filters) {
+        var updatedList = [];
+        
+        component.get('v.rfqRecordList').forEach(function(value) {
+            if(helper.passesFilters(value, filters)) {
+                updatedList.push(value);
             }
+        });
+        console.log({updatedList});
+        
+        return updatedList;
+    },
+    passesFilters : function(value, filters) {
+        if(filters.productFamily && value.product.Family !== filters.productFamily) {
+            return false;
+        }
+        
+        if(filters.productCategory && (!value.product.buildertek__Category__c || value.product.buildertek__Category__r.Name !== filters.productCategory)) {
+            return false;
+        }
+        
+        if(filters.productType && (!value.product.buildertek__Product_Type__c || value.product.buildertek__Product_Type__r.Name !== filters.productType)) {
+            return false;
+        }
+        
+        if(filters.tradeType && (!value.product.buildertek__Trade_Type__c || value.product.buildertek__Trade_Type__r.Name !== filters.tradeType)) {
+            return false;
+        }
+        
+        if(filters.vendor && (!value.product.buildertek__Vendor__c || value.product.buildertek__Vendor__r.Name !== filters.vendor)) {
+            return false;
+        }
+        
+        return true;
+    },
+
+    // searchHelper:function(component, event, helper, selectedValue , filterName) {
+    //     console.log({filterName});
+    //     var allRecordList= component.get('v.rfqRecordList');
+    //     var paginationList=component.get('v.PaginationList');
+    //     var updatedList=[];
+    //     var productFamily=component.get('v.searchProductFamilyFilter');
+    //     var product=component.get('v.searchProductFilter');
+    //     var productCategory=component.get('v.searchCategoryFilter');
+    //     var productType=component.get('v.searchProductTypeFilter');
+    //     var tradeType=component.get('v.searchTradeTypeFilter');
+    //     var vendor=component.get('v.searchVendorFilter');
+
+    //     console.log({productFamily});
+    //     console.log({product});
+    //     console.log({productCategory});
+    //     console.log({productType});
+    //     console.log({tradeType});
+    //     console.log({vendor});
+
+
+
+
+
+    //     var familyFilter=component.get('v.searchProductFamilyFilter');
+        
+    //     // var productFamily=selectedValue;
+    //     allRecordList.forEach(function(value){
+    //         if(selectedValue!== undefined && selectedValue!== ''){
+                
+    //             // if(productFamily!='' && productFamily!= undefined && product== '' && productCategory == '' && productType =='' &&  tradeType== '' && vendor==''){
+    //             //     if(value.product.Family === productFamily){
+    //             //                 updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily!='' && productFamily!= undefined && product== '' && productCategory != '' && productType =='' &&  tradeType== '' && vendor==''){
+    //             //     if(value.product.Family === productFamily &&  value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name ===productCategory){
+    //             //             updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily!='' && productFamily!= undefined && product== '' && productCategory != '' && productType !='' &&  tradeType== '' && vendor==''){
+    //             //     if(value.product.Family === productFamily &&  value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name ===productCategory &&  value.product.buildertek__Product_Type__c!= undefined && value.product.buildertek__Product_Type__r.Name ===productType){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily!='' && productFamily!= undefined && product== '' && productCategory != '' && productType !='' &&  tradeType!= '' && vendor==''){
+    //             //     if(value.product.Family === productFamily &&  value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name ===productCategory &&  value.product.buildertek__Product_Type__c!= undefined && value.product.buildertek__Product_Type__r.Name ===productType &&  value.product.buildertek__Trade_Type__c!= undefined && value.product.buildertek__Trade_Type__r.Name ===tradeType){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily!='' && productFamily!= undefined && product== '' && productCategory != '' && productType !='' &&  tradeType!= '' && vendor!=''){
+    //             //     if(value.product.Family === productFamily &&  value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name ===productCategory &&  value.product.buildertek__Product_Type__c!= undefined && value.product.buildertek__Product_Type__r.Name ===productType &&  value.product.buildertek__Trade_Type__c!= undefined && value.product.buildertek__Trade_Type__r.Name ===tradeType &&  value.product.buildertek__Vendor__c!= undefined && value.product.buildertek__Vendor__r.Name ===vendor){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily=='' && product== '' && productCategory != '' && productType =='' &&  tradeType== '' && vendor==''){
+    //             //     if(value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name ===productCategory){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily=='' && product== '' && productCategory == '' && productType !='' &&  tradeType == '' && vendor==''){
+    //             //     if(value.product.buildertek__Product_Type__c!= undefined && value.product.buildertek__Product_Type__r.Name ===productType){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily=='' && product== '' && productCategory == '' && productType =='' &&  tradeType != '' && vendor==''){
+    //             //     if(value.product.buildertek__Trade_Type__c!= undefined && value.product.buildertek__Trade_Type__r.Name ===tradeType){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }else if(productFamily=='' && product== '' && productCategory == '' && productType =='' &&  tradeType == '' && vendor !=''){
+    //             //     if(value.product.buildertek__Vendor__c!= undefined && value.product.buildertek__Vendor__r.Name ===vendor){
+    //             //         updatedList.push(value);        
+    //             //     }
+    //             // }
+
+
+    //             // if(filterName === 'Family'){
+    //             //     if(value.product.Family === component.get('v.searchProductFamilyFilter')){
+    //             //         updatedList.push(value);
+    //             //         // familyList.push(value);
+
+    //             //     }
+    //             // }
+    //             // if(filterName === 'Category'){
+    //             //     if(value.product.Family!= undefined && value.product.Family === component.get('v.searchProductFamilyFilter') 
+    //             //         && value.product.buildertek__Category__c!= undefined && value.product.buildertek__Category__r.Name === component.get('v.searchCategoryFilter')){
+    //             //         updatedList.push(value);
+
+    //             //     }
+
+    //             // }
+              
+                
+    //         }else{
+    //             updatedList=allRecordList;
+    //         }
            
 
-        });
-        console.log({allRecordList});
-        console.log({updatedList});
-        component.set('v.PaginationList' ,updatedList);
+    //     });
+    //     console.log({allRecordList});
+    //     console.log({updatedList});
 
-        console.log(component.get('v.PaginationList').length);
+    //     updatedList.filter(function(value){
 
+    //     });
 
+    //     component.set('v.PaginationList' ,updatedList);
 
-    },
+    //     console.log(component.get('v.PaginationList').length);
+
+    //     const allActive = updatedList.every(function(obj) {
+    //         return obj.isChecked === true;
+    //      });
+    //      if(allActive){
+    //         component.find("selectAllRFQ").set("v.value", true);
+
+    //     }else{
+    //        component.find("selectAllRFQ").set("v.value", false);
+
+    //     }
+
+        
+    // },
 })

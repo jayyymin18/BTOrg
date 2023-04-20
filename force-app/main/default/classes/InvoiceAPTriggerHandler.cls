@@ -25,6 +25,7 @@ public class InvoiceAPTriggerHandler {
 
         Set<Id> budgetIdSet = new Set<Id>();
         Set<Id> invoiceIds = new Set<Id>();
+        List<buildertek__Account_Payable_Clone__c> invoicewithBL = new List<buildertek__Account_Payable_Clone__c>();
 
         for (buildertek__Account_Payable_Clone__c invoice : invoiceList) {
             buildertek__Account_Payable_Clone__c oldInvoiceData = invoiceOldMap.get(invoice.Id);
@@ -71,6 +72,9 @@ public class InvoiceAPTriggerHandler {
 
             if (invoice.buildertek__Total_Amount__c != oldInvoiceData.buildertek__Total_Amount__c) {
                 invoiceIds.add(invoice.Id);
+                if(invoice.buildertek__Budget_Line__c != null){
+                    invoicewithBL.add(invoice);
+                }
             }
         }
 
@@ -83,6 +87,19 @@ public class InvoiceAPTriggerHandler {
             if (transactionList.size() > 0) {
                 update transactionList;
             }
+        }
+
+        if(invoicewithBL.size() > 0){
+            Map<Id, Decimal> budgetLineMap = new Map<Id, Decimal>();
+            for(buildertek__Account_Payable_Clone__c invoice : invoicewithBL){
+                budgetLineMap.put(invoice.buildertek__Budget_Line__c, invoice.buildertek__Total_Amount__c);
+            }
+            List<buildertek__Budget_Item__c> budgetItemList = [SELECT Id, Name, buildertek__Invoice_total__c FROM buildertek__Budget_Item__c WHERE Id IN: budgetLineMap.keySet()];
+            for(buildertek__Budget_Item__c budgetItem : budgetItemList){
+                budgetItem.buildertek__Invoice_total__c = budgetLineMap.get(budgetItem.Id);
+            }
+            System.debug('budgetItemList : ' + budgetItemList);
+            update budgetItemList;
         }
 
         /* if (budgetIdSet.size() > 0) {

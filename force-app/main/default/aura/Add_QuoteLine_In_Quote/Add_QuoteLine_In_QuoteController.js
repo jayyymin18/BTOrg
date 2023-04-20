@@ -88,6 +88,26 @@
            toastEvent.fire();
        });
        $A.enqueueAction(action10);
+   },
+   removeQuoteLine:function(component, event, helper){
+     var currentId=event.currentTarget.dataset.id;
+     var productList=component.get('v.selectedProducts');
+     var updatedList=[];
+     productList.forEach(function(value){
+        if(value.Id !== currentId){
+            updatedList.push(value);
+        }
+
+     })
+     component.set('v.selectedProducts' , updatedList);
+
+     var quoteLineList = component.get("v.quoteLineList");
+       quoteLineList.forEach(element => {
+            if(element.Id === currentId){
+                element.Selected=false;
+            }
+       });
+
    }
 
 })

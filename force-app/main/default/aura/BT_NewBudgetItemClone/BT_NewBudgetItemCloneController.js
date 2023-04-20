@@ -508,15 +508,15 @@
     },
     addPO: function (component, event, helper) {
         var selectedRecs = component.get('v.selectedRecs');
-        // if(selectedRecs.length > 1){
-        //     component.find('notifLib').showNotice({
-        //         "variant": "error",
-        //         "header": "Too many Budget Lines selected.",
-        //         "message": "Please Select only 1 Budget Line to add PO.",
-        //         closeCallback: function() {}
-        //     });
-        //     return;
-        // }
+        if(selectedRecs.length > 1){
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Too many Budget Lines selected.",
+                "message": "Please Select only 1 Budget Line to add PO.",
+                closeCallback: function() {}
+            });
+            return;
+        }
         console.log('v.selectedRecs ==> ', { selectedRecs });
         if (selectedRecs.length > 0) {
             var BudgetIds = [];
@@ -3934,6 +3934,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             toastEvent.fire();
             return;
         }
+        
         var budgetid = component.get("v.sampleNewRecord").Id
         console.log('selectedPOList',{selectedPOList});
         console.log('budgetid',{budgetid});
@@ -3973,6 +3974,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             // window.location.reload();
         });
         $A.enqueueAction(action);
+        
 
     },
 

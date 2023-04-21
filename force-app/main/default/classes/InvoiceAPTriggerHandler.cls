@@ -25,7 +25,6 @@ public class InvoiceAPTriggerHandler {
 
         Set<Id> budgetIdSet = new Set<Id>();
         Set<Id> invoiceIds = new Set<Id>();
-        List<buildertek__Account_Payable_Clone__c> invoicewithBL = new List<buildertek__Account_Payable_Clone__c>();
 
         for (buildertek__Account_Payable_Clone__c invoice : invoiceList) {
             buildertek__Account_Payable_Clone__c oldInvoiceData = invoiceOldMap.get(invoice.Id);
@@ -46,7 +45,7 @@ public class InvoiceAPTriggerHandler {
 
                 //* covering scenario 1 a&b here
                 if (oldInvoiceData.buildertek__Budget_Line__c != invoice.buildertek__Budget_Line__c) {
-                    if (!skipDeleteMethod) {
+                    if (skipDeleteMethod) {
                         AddBudgetLineItemOnPayableInvoice.deleteBudgetItem(invoice.Id, oldInvoiceData.buildertek__Budget_Line__c);
                     }
                     AddBudgetLineItemOnPayableInvoice.updateBudgetLineSub(invoice.Id, invoice.buildertek__Budget__c, oldInvoiceData.buildertek__Budget_Line__c);
@@ -61,6 +60,11 @@ public class InvoiceAPTriggerHandler {
             } 
             //* covering scenario 1 a&b here as well
             else if(oldInvoiceData.buildertek__Budget__c != invoice.buildertek__Budget__c && oldInvoiceData.buildertek__Budget_Line__c != invoice.buildertek__Budget_Line__c){
+                System.debug('oldInvoiceData.buildertek__Budget__c '+oldInvoiceData.buildertek__Budget__c);
+                System.debug('invoice.buildertek__Budget__c '+invoice.buildertek__Budget__c);
+                System.debug('oldInvoiceData.buildertek__Budget_Line__c '+oldInvoiceData.buildertek__Budget_Line__c);
+                System.debug('invoice.buildertek__Budget_Line__c '+invoice.buildertek__Budget_Line__c);
+                System.debug('skipDeleteMethod '+skipDeleteMethod);
                 if (!skipDeleteMethod) {
                     AddBudgetLineItemOnPayableInvoice.deleteBudgetItem(invoice.Id, oldInvoiceData.buildertek__Budget_Line__c);
                 }
@@ -72,9 +76,6 @@ public class InvoiceAPTriggerHandler {
 
             if (invoice.buildertek__Total_Amount__c != oldInvoiceData.buildertek__Total_Amount__c) {
                 invoiceIds.add(invoice.Id);
-                if(invoice.buildertek__Budget_Line__c != null){
-                    invoicewithBL.add(invoice);
-                }
             }
         }
 
@@ -89,17 +90,17 @@ public class InvoiceAPTriggerHandler {
             }
         }
 
-        if(invoicewithBL.size() > 0){
-            Map<Id, Decimal> budgetLineMap = new Map<Id, Decimal>();
-            for(buildertek__Account_Payable_Clone__c invoice : invoicewithBL){
-                budgetLineMap.put(invoice.buildertek__Budget_Line__c, invoice.buildertek__Total_Amount__c);
+        // Just remove etra budget from invoiceAP 
+        List<buildertek__Account_Payable_Clone__c> newUpdatedInvoiceAP = [SELECT Id, Name, buildertek__Budget__c, buildertek__Budget_Line__c FROM buildertek__Account_Payable_Clone__c WHERE Id IN: invoiceNewMap.keySet() AND buildertek__Budget__c != null AND buildertek__Budget_Line__c = null];
+        List<buildertek__Account_Payable_Clone__c> newUpdatedInvoiceAPList = new List<buildertek__Account_Payable_Clone__c>();
+        for (buildertek__Account_Payable_Clone__c invoiceAP : newUpdatedInvoiceAP) {
+            if (invoiceOldMap.get(invoiceAP.Id).buildertek__Budget_Line__c != null) {
+                invoiceAP.buildertek__Budget__c = null;
+                newUpdatedInvoiceAPList.add(invoiceAP);
             }
-            List<buildertek__Budget_Item__c> budgetItemList = [SELECT Id, Name, buildertek__Invoice_total__c FROM buildertek__Budget_Item__c WHERE Id IN: budgetLineMap.keySet()];
-            for(buildertek__Budget_Item__c budgetItem : budgetItemList){
-                budgetItem.buildertek__Invoice_total__c = budgetLineMap.get(budgetItem.Id);
-            }
-            System.debug('budgetItemList : ' + budgetItemList);
-            update budgetItemList;
+        }
+        if (newUpdatedInvoiceAPList.size() > 0) {
+            update newUpdatedInvoiceAPList;
         }
 
         /* if (budgetIdSet.size() > 0) {

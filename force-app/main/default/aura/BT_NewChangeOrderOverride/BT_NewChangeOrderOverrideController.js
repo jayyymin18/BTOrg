@@ -1,8 +1,5 @@
 ({
-    doInit: function (component, event, helper) {
-        
-        debugger;
-        
+    doInit: function (component, event, helper) {        
         var recordTypeId = component.get( "v.pageReference" ).state.recordTypeId;  
         
         component.set("v.RecordTypeId",recordTypeId);
@@ -62,6 +59,8 @@
                     if(objName == 'Account'){
                         component.set("v.CustomerAccountName", parentRecordId);
                     }else if(objName == 'buildertek__Project__c'){
+                        component.set('v.createCO', true);
+                        component.set('v.isopen', true);
                         component.set("v.parentprojectRecordId", parentRecordId);
                         helper.CustomerAccount(component,event,helper);
                     }else if(objName == 'buildertek__RFQ__c'){
@@ -80,6 +79,8 @@
             });
             $A.enqueueAction(action);
         }
+
+        component.set('v.colineList' , 1);
         
         
         
@@ -270,5 +271,8 @@
         event.preventDefault(); // Prevent default submit        
         component.find('recordViewForm').submit(fields); // Submit form
         $A.get('e.force:refreshView').fire();
+    },
+    addNewRow:function (component, event, helper) {
+        document.getElementById('coLineTable');
     }
 })

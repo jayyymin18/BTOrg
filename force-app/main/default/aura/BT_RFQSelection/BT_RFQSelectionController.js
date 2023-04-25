@@ -86,7 +86,7 @@
                 line = {  buildertek__RFQ__c: item.Id,
                         Name:item.Name,
                         buildertek__Item_Name__c:item.Name,
-                        buildertek__Description__c:item.buildertek__RFQ_Details__c,
+                        buildertek__Description__c:item.Name,
                         buildertek__Quantity__c:1,
                         buildertek__Unit_Price__c:item.buildertek__Vendor_Quote__c,
                         buildertek__Markup__c:0,
@@ -123,6 +123,8 @@
 		 for( key in quotes) {
 		    if( !quotes.hasOwnProperty(key) ) continue;
 		    item = quotes[key];
+
+            console.log({item});
 		    line = {  buildertek__RFQ__c: item.buildertek__RFQ__c,
 	    			  Name:item.Name,
 	    			  buildertek__Item_Name__c:item.buildertek__Item_Name__c,

@@ -310,15 +310,16 @@ public with sharing class QuoteDAO{
             }
             System.debug('quoteItemsToInsert' + quoteItemsToInsert);
             insert quoteItemsToInsert;
-            List<buildertek__RFQ_Item__c> rfqLinesList =[Select Id ,buildertek__RFQ_Package__c	, buildertek__Quote_Item__c	,Name From buildertek__RFQ_Item__c where buildertek__RFQ_Package__c=:rfqIds];
+            List<buildertek__RFQ_Item__c> rfqLinesList =[Select Id ,buildertek__RFQ_Package__c  , buildertek__Quote_Item__c ,Name From buildertek__RFQ_Item__c where buildertek__RFQ_Package__c=:rfqIds];
+
 
             for (buildertek__Quote_Item__c qItem : quoteItemsToInsert){
+                qItem.buildertek__RFQ__c=qItem.buildertek__Quote__c;
                 for(buildertek__RFQ_Item__c rfqline:rfqLinesList){
                     rfqline.buildertek__Quote_Item__c=qItem.Id;
                 }
             }
             update rfqLinesList;
-
 
             return 'Success';
         } catch (Exception ex){
@@ -822,7 +823,7 @@ public with sharing class QuoteDAO{
         fieldsType += '{"fieldName": "Id","fieldType": "","isEditable": false}]';
 
         List<wrapperClass> wrapperList = new List<wrapperClass>();
-        wrapperList = groupValues(quoteId, fieldsList, allFields, groupIds, recordToDisply, offset);
+        wrapperList = groupValues(quoteId, fieldsList, allFields, groupIds, recordToDisply, offset ,status );
         TargetTable tarTable = new TargetTable();
         //List<FieldClass> fieldClassList = (List<FieldClass>)System.JSON.deserialize(fieldsType, List<FieldClass>.class);
         tarTable = getQuoteItemData(quoteId, allFields, fieldsType, recordToDisply, offset , status);
@@ -1264,21 +1265,23 @@ public with sharing class QuoteDAO{
             system.debug('quote -----------> ' + quote);
 
             buildertek__Quote__c newQuote = quote.clone(false, true);
-            Integer versionNumber;
+            Decimal versionNumber;
             String quoteName = quote.Name;
 
 
             if (quote.buildertek__Version_Number__c == null){
-                versionNumber = 1;
-                newQuote.Name = quote.Name + ' Ver ' + versionNumber;
-                newQuote.buildertek__Version_Number__c = '1';
+                versionNumber = 1.0;
+                //newQuote.Name = quote.Name + ' Ver ' + versionNumber;
+                newQuote.Name = quote.Name;
+                newQuote.buildertek__Version_Number__c = '1.0';
+                newQuote.buildertek__Status__c = 'Draft';
             } else{
-                versionNumber = Integer.valueOf(quote.buildertek__Version_Number__c);
-                versionNumber = versionNumber + 1;
+                versionNumber = Decimal.valueOf(quote.buildertek__Version_Number__c);
+                versionNumber = versionNumber + .1;
                 //quoteName = quoteName.right(1);
-                quoteName = quoteName.replace(quoteName.right(1), String.valueOf(versionNumber));
-                newQuote.Name = quoteName;
+                //quoteName = quoteName.replace(quoteName.right(1), String.valueOf(versionNumber));
                 newQuote.buildertek__Version_Number__c = String.valueOf(versionNumber);
+                newQuote.buildertek__Status__c = 'Draft';
             }
 
             if (Schema.sObjectType.buildertek__Quote__c.fields.Name.isCreateable() && Schema.sObjectType.buildertek__Quote__c.fields.buildertek__Version_Number__c.isCreateable()){
@@ -1587,7 +1590,7 @@ public with sharing class QuoteDAO{
     }
 
     //@AuraEnabled
-    public static List<wrapperClass> groupValues(String recordId, list<String> currencyFields, List<String> allFields, List<String> groupIds, Decimal recordToDisply, Integer offset){
+    public static List<wrapperClass> groupValues(String recordId, list<String> currencyFields, List<String> allFields, List<String> groupIds, Decimal recordToDisply, Integer offset, string status){
        System.debug(':::::::groupValues:::::::');
         Map<string, string> mapForLabel = new Map<string, string>();
         Map<string, string> mapForFieldType = new Map<string, string>();
@@ -1610,7 +1613,7 @@ public with sharing class QuoteDAO{
         for (string sumOfFields : currencyFields){
             queryFields += ', ' + sumOfFields.trim();
         }
-        string status = 'Accept';
+        // string status = 'Accept';
         myquery = 'select buildertek__Grouping__c ' + queryFields + ' from buildertek__Quote_Item__c where buildertek__Quote__c =: recordId AND buildertek__Status__c =: status Order by buildertek__Grouping__r.buildertek__Sort_Id__c,buildertek__Grouping__r.Name, buildertek__Priority__c ASC, Name ASC limit ' + recordToDisply + ' OFFSET ' + offset;
         system.debug('----myquery -----------> ' + myquery);
         /*if(Schema.sObjectType.buildertek__Quote_Item__c.fields.Id.isAccessible()&&
@@ -2248,7 +2251,7 @@ public with sharing class QuoteDAO{
     public static List<buildertek__Quote_Item__c> getQuoteLines(string recordId){
         try{
         List<buildertek__Quote_Item__c> quoteLineList = new List<buildertek__Quote_Item__c>();
-        quoteLineList= [SELECT  Id, Name, buildertek__Status__c,buildertek__Net_Unit__c,buildertek__Net_Total_Price__c,buildertek__Total_Cost__c	,buildertek__Quantity__c, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c ,buildertek__Quote__c FROM buildertek__Quote_Item__c where buildertek__Quote__c=:recordId AND buildertek__Status__c='Reject'];
+        quoteLineList= [SELECT  Id, Name, buildertek__Status__c,buildertek__Net_Unit__c,buildertek__Net_Total_Price__c,buildertek__Total_Cost__c    ,buildertek__Quantity__c, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c ,buildertek__Quote__c FROM buildertek__Quote_Item__c where buildertek__Quote__c=:recordId AND buildertek__Status__c='Reject'];
         System.debug(quoteLineList);
         return quoteLineList;
         }catch(Exception e){

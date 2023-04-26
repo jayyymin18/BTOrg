@@ -56,6 +56,9 @@ public with sharing class New_PO_ComponentController {
     public static string saveRecord(String data){
         System.debug('In save method');
         buildertek__Purchase_Order__c POInsert = (buildertek__Purchase_Order__c)JSON.deserialize(data, buildertek__Purchase_Order__c.class);
+        if(POInsert.buildertek__Type__c == null){
+            POInsert.buildertek__Type__c = 'Standard';
+        }
         System.debug('POInsert ==? '+POInsert);
         insert POInsert;
         return POInsert.ID;

@@ -92,4 +92,16 @@ public with sharing class New_PO_ComponentController {
 
         return 'Success';
     }
+
+    @AuraEnabled
+    public static String getadminvalues(){
+		buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Send_Vendor_Lien_Release_On_Approval__c,buildertek__Create_PO__c,
+                                                                                              buildertek__Send_PO_On_Approval__c, buildertek__Email_Subject__c,buildertek__Create_Invoice_on_Approval__c
+		                                                                                      from buildertek__Admin_Interface_Node_Configuration__c
+		                                                                                      WHERE Name = :'Purchase Order Configuration'];
+        String createPO = adminInterfaceNodeConfigurations.buildertek__Create_PO__c ;
+
+        return createPO;
+    }   
+
 }

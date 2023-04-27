@@ -62,43 +62,7 @@ public class NewChangeOrderController {
 
        
         return '[' + result + ']~'+COType;
-    }
-
-    @AuraEnabled
-    public static String getCOFieldSet(String objectName, String fieldSetName){
-        String result = '';
-        List<String> pickListValuesList = new List<String>();
-        try{
-            SObjectType objToken = Schema.getGlobalDescribe().get(objectName);
-            Schema.DescribeSObjectResult d = objToken.getDescribe();
-            Map<String, Schema.FieldSet> FsMap = d.fieldSets.getMap();
-            if (FsMap.containsKey(fieldSetName)){
-                for (Schema.FieldSetMember f : FsMap.get(fieldSetName).getFields()){
-                    if (result != ''){
-                        result += ',';
-                    }
-                    String jsonPart = '{';
-                    jsonPart += '"label":"' + f.getLabel()+'",';
-                    jsonPart += '"required":"' + (f.getDBRequired() || f.getRequired())+'",';
-                    jsonPart += '"type":"' + (f.getType())+'",';
-                    jsonPart += '"name":"' + f.getFieldPath()+'"';
-                    if (String.valueOf(f.getType()) == 'PICKLIST'){
-                        pickListValuesList = getDropDown(objectName, String.valueOf(f.getFieldPath()));
-                        jsonPart += ',"pickListValuesList":' + JSON.serialize(pickListValuesList);
-                    }
-                    jsonPart += '}';
-                    result += jsonPart;
-                }
-            }
-            
-        } catch (Exception e){
-            result += e.getLineNumber()+' : ' + e.getMessage();
-            System.debug('Error::' + e.getMessage());
-            System.debug('Error At Line::' + e.getLineNumber());
-        }
-        return '[' + result + ']';
-    }
-    
+    }    
     @AuraEnabled
     public static List<String> getDropDown(String objName, String fieldName){
         List<String> pickListValuesList = new List<String>();
@@ -211,7 +175,7 @@ public static List<ListView> getListViews() {
     }
 
     @AuraEnabled
-    public static List<buildertek__Change_Order_Item__c> saveCOLineItems (List<buildertek__Change_Order_Item__c> listofCOItemsToSave, Id recordId ){
+    public static String saveCOLineItems (List<buildertek__Change_Order_Item__c> listofCOItemsToSave, Id recordId ){
         System.debug('listofPOItemsToSave ==? '+listofCOItemsToSave);
         System.debug('recordId ==? '+recordId);
         //loop over the list and set the PO Id
@@ -220,8 +184,20 @@ public static List<ListView> getListViews() {
         }
         insert listofCOItemsToSave;
 
-        return listofCOItemsToSave;
+        return 'Success';
     }
+
+    @AuraEnabled
+    public static String getadminvalues(){
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id,buildertek__Change_Order_Configuration__c,buildertek__Email_Subject__c , buildertek__Create_Change_order__c 
+                                                                                              from buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Change Order Configuration'];
+
+        String createCO = adminInterfaceNodeConfigurations.buildertek__Create_Change_order__c ;
+
+
+
+        return createCO;
+    }   
 
 
 

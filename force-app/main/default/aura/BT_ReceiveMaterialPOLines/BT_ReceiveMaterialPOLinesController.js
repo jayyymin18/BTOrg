@@ -289,10 +289,27 @@
         var fileName = "No File Selected..";
 		var fileCount = event.target.files;
 		var files = '';
+        var totalSize = 0;
 		if (fileCount.length > 0) {
 			component.set("v.uploadFile", true);
 			for (var i = 0; i < fileCount.length; i++) {
 				fileName = fileCount[i]["name"];
+                totalSize = totalSize + fileCount[i].size;
+                console.log('totalSize ==> ',totalSize);
+                if(totalSize > 4000000){
+                    component.set("v.uploadFile", false);
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: 'Error',
+                        message: 'File size should not exceed 4MB',
+                        duration: ' 5000',
+                        key: 'info_alt',
+                        type: 'error',
+                        mode: 'pester'
+                    });
+                    toastEvent.fire();
+                    return;
+                }
 				if (files == '') {
 					files = fileName;
 				} else {

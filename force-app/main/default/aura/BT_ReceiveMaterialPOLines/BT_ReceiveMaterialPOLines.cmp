@@ -128,7 +128,7 @@
                             
                             <div class="slds-file-selector__dropzone">
                                 <aura:if isTrue="{!item.buildertek__Quantity_Remaining__c != 0}">
-                                    <input type="file" class="slds-file-selector__input slds-assistive-text" data-index = "{!item.Id}" id="{!index}" onchange="{!c.handleFilesChange}" aria-labelledby="file-selector-primary-label file-selector-secondary-label"  multiple="true"/>
+                                    <input type="file" class="slds-file-selector__input slds-assistive-text" data-index = "{!item.Id}" id="{!index}" onchange="{!c.handleFilesChange}" aria-labelledby="file-selector-primary-label file-selector-secondary-label"/>
                                 </aura:if>
                                 <aura:if isTrue="{!item.buildertek__Quantity_Remaining__c == 0}">
                                     <input type="file" class="slds-file-selector__input slds-assistive-text" data-index = "{!index}" id="{!index}" onchange="{!c.handleFilesChange}" aria-labelledby="file-selector-primary-label file-selector-secondary-label"  multiple="true" disabled="true"/>

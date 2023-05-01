@@ -32,63 +32,7 @@ public with sharing class ProjectTriggerHandler {
 
 
     public void OnAfterInsert(Project__c[] newProjects, Map<ID, Project__c> newProjectsMap, Project__c[] oldProjects, Project__c[] updatedProjects, Map<ID, Project__c> ProjectMap, Map<Id, Project__c> oldProjectsMap){
-        // TODO: See if we can avoid query/DML inside for loop.
-
-          //Remove from sharing
-      /*  Set<Id> scheduleShare = new Set<Id>();
-        for(Project__c proMap : ProjectMap.values()){
-         // if(oldProjectsMap.get(proMap.Id).buildertek__Account__c != proMap.buildertek__Account__c ){
-                scheduleShare.add(proMap.buildertek__Account__c);
-         //  }
-
-        }
-
-
-        List<buildertek__Project__c> updateprojectRecList =  new List<buildertek__Project__c>();
-        //update project dates from schedules
-         if (ProjectMap.keySet().size() > 0){
-
-            for(buildertek__Project__c proj : [select Id,Name,buildertek__Actual_Start__c ,buildertek__Actual_Completion_Date__c,buildertek__Project_Completion__c,buildertek__Original_Start_Date__c,buildertek__Original_End_Date__c,
-                                (select id,Name,buildertek__Start_Date__c,buildertek__End_Date__c,buildertek__Actual_Completion_Date_2__c,buildertek__Actual_Start_Date_2__c,buildertek__Original_Start_Date__c,buildertek__Original_End_Date__c from buildertek__Schedules__r ORDER BY CreatedDate ASC)  from buildertek__Project__c where Id IN:ProjectMap.keySet()]){
-                if(proj.buildertek__Schedules__r.size() > 0){
-                    buildertek__Schedule__c sch = proj.buildertek__Schedules__r[0];
-                    buildertek__Project__c newProj = new buildertek__Project__c();
-                    newProj.Id = proj.Id;
-               newProj.buildertek__Actual_Start__c = sch.buildertek__Actual_Start_Date_2__c;
-              newProj.buildertek__Actual_Completion_Date__c = sch.buildertek__Actual_Completion_Date_2__c;
-                    newProj.buildertek__Original_Start_Date__c = sch.buildertek__Original_Start_Date__c;
-                    newProj.buildertek__Original_End_Date__c= sch.buildertek__End_Date__c;
-                  // if(proj.buildertek__Project_Completion__c > 0){
-                   // newProj.buildertek__Actual_Start__c = sch.buildertek__Start_Date__c;
-                   // }
-                    system.debug('proj.....................'+sch.buildertek__Original_End_Date__c);
-                    // system.debug('hai.............'+newProj.buildertek__Original_End_Date__c);
-
-                    updateprojectRecList.add(newProj);
-                   // system.debug('updateprojectRecList....'+updateprojectRecList);
-                }
-            }
-        }
-
-        if(updateprojectRecList.size()>0){
-            system.debug('updateprojectRecList-->'+updateprojectRecList[0].buildertek__Original_End_Date__c );
-            UpdateProjecttOnScheduleUpdateHandler projectUpdateHandler = new UpdateProjecttOnScheduleUpdateHandler();
-            ProjectTriggerHandler.blnSkipProjectTrigger = true;
-            projectUpdateHandler.updateProjectList_New(updateprojectRecList);
-            ProjectTriggerHandler.blnSkipProjectTrigger = false;
-            system.debug('updateprojectRecList-->'+updateprojectRecList[0].buildertek__Original_End_Date__c );
-           // system.debug('updateprojectRecList-->'+updateprojectRecList[0].Id);
-        }
-
-        if(scheduleShare.size()>0){
-            delete [Select Id FROM buildertek__Schedule__Share WHERE UserOrGroupId =:  scheduleShare AND AccessLevel =: 'Read' AND RowCause =: 'Manual'];
-        }*/
-
-
-
-
-
-
+        
         for(Project__c project: newProjects){
 
             if(project.Master_Project__c != null) {
@@ -569,5 +513,70 @@ public with sharing class ProjectTriggerHandler {
                 insert insertPermits;
             }
         }
+    }
+
+    public void dummyMethod(List<buildertek__Project__c> newProjects){
+        
+        List<String> sourceValueList= new List<String>();
+        Set<Id> projectIdSet = new Set<Id>();
+        List<String> selctedObjName= new List<String>();
+        Set<Id> sourcePrjIdSet= new Set<Id>();
+
+       
+        for(buildertek__Project__c proj:newProjects){
+            projectIdSet.add(proj.Id);
+            if(proj.Source_Project__c!= null){
+                sourceValueList.add(proj.Source_Project__c);
+            }    
+        }
+
+        if(sourceValueList.size() > 0){
+            for(String str:sourceValueList){
+                List<String> selectedITems = str.split('~');
+                sourcePrjIdSet.add(selectedITems[0]);
+                if(selectedITems.size() > 1)
+                for(String item :selectedITems[1].split(',')){
+                    selctedObjName.add(item);
+                }
+            }
+        }
+
+
+        List<buildertek__Quote__c> quoteList= [Select  Name , buildertek__Project__c From buildertek__Quote__c where buildertek__Project__c=:sourcePrjIdSet];
+        List<buildertek__Quote__c> cloneList=new List<buildertek__Quote__c>();
+        List<buildertek__Quote__c> newCloneList=new List<buildertek__Quote__c>();
+
+        System.debug('quoteList'+quoteList);
+
+
+
+        for(buildertek__Project__c proj:newProjects){
+
+            if(selctedObjName.size() > 0){
+                for(String objName:selctedObjName){
+                    if(objName == 'Quote'){
+                        for(buildertek__Quote__c quote:quoteList){
+                            buildertek__Quote__c cloneRecords=quote.clone();
+                            cloneRecords.buildertek__Project__c=proj.Id;
+                            newCloneList.add(cloneRecords);
+                        }
+                    }
+                    
+
+                }
+            }
+           
+           
+            
+        }
+
+        System.debug('cloneList'+ newCloneList);
+        if(newCloneList.size() > 0){
+            Insert newCloneList;
+        }
+               
+
+       
+
     }
 }

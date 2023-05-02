@@ -517,66 +517,51 @@ public with sharing class ProjectTriggerHandler {
 
     public void dummyMethod(List<buildertek__Project__c> newProjects){
         
-        List<String> sourceValueList= new List<String>();
-        Set<Id> projectIdSet = new Set<Id>();
-        List<String> selctedObjName= new List<String>();
-        Set<Id> sourcePrjIdSet= new Set<Id>();
+        Map<Id,String> sourceValueMap= new  Map<Id,String>();
+        Map<Id,List<String>> srcProjSelectedObj = new  Map<Id,List<String>>();
 
-       
+        Map<String, Set<Id>> selectedObjectsToProjectIds = new Map<String, Set<Id>>();
+        // Map<Id, List<String>> selectedObjectsToProjectIds = new Map<Id, List<String>>();
+
+        Map<Id, List<Quote__c>> quotesByProjectId = new Map<Id, List<Quote__c>>();
+
+
+
+
+
         for(buildertek__Project__c proj:newProjects){
-            projectIdSet.add(proj.Id);
             if(proj.Source_Project__c!= null){
-                sourceValueList.add(proj.Source_Project__c);
+                // map of new project Id and source project value
+                sourceValueMap.put(proj.Id, proj.Source_Project__c);
             }    
         }
 
-        if(sourceValueList.size() > 0){
-            for(String str:sourceValueList){
-                List<String> selectedITems = str.split('~');
-                sourcePrjIdSet.add(selectedITems[0]);
-                if(selectedITems.size() > 1)
-                for(String item :selectedITems[1].split(',')){
-                    selctedObjName.add(item);
-                }
-            }
-        }
+        System.debug('sourceValueMap'+sourceValueMap);
+        for(Id projectId:sourceValueMap.keySet()){
+            System.debug('projectId'+projectId);
+            // get all the source project value based on new project Id
+            String sourceValue=sourceValueMap.get(projectId);
+            String[] parts = sourceValue.split('~');
+            String selectedObjects = parts[1];
+            String[] objectArray = selectedObjects.split(',');
 
+            // selectedObjectsToProjectIds.put();
 
-        List<buildertek__Quote__c> quoteList= [Select  Name , buildertek__Project__c From buildertek__Quote__c where buildertek__Project__c=:sourcePrjIdSet];
-        List<buildertek__Quote__c> cloneList=new List<buildertek__Quote__c>();
-        List<buildertek__Quote__c> newCloneList=new List<buildertek__Quote__c>();
-
-        System.debug('quoteList'+quoteList);
-
-
-
-        for(buildertek__Project__c proj:newProjects){
-
-            if(selctedObjName.size() > 0){
-                for(String objName:selctedObjName){
-                    if(objName == 'Quote'){
-                        for(buildertek__Quote__c quote:quoteList){
-                            buildertek__Quote__c cloneRecords=quote.clone();
-                            cloneRecords.buildertek__Project__c=proj.Id;
-                            newCloneList.add(cloneRecords);
-                        }
-                    }
-                    
+            // map of source project Id and selected Object
+            for (String objectName : objectArray) {
+                if (!selectedObjectsToProjectIds.containsKey(objectName)) {
+                    selectedObjectsToProjectIds.put(objectName, new Set<Id>());
+                    // selectedObjectsToProjectIds.put(projectId,objectName);
 
                 }
-            }
-           
-           
+                
+                selectedObjectsToProjectIds.get(objectName).add(projectId);
+            }        
             
         }
-
-        System.debug('cloneList'+ newCloneList);
-        if(newCloneList.size() > 0){
-            Insert newCloneList;
-        }
-               
-
-       
+        System.debug('selectedObjectsToProjectIds'+selectedObjectsToProjectIds);
+    
 
     }
+   
 }

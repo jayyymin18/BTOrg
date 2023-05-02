@@ -31,7 +31,7 @@ public with sharing class ReceiveMaterialPOLinesController {
         List<String> selectedProdIds = new List<String>();
         list<RfqDataTableWrapper> newProductList = (list<RfqDataTableWrapper>)JSON.deserialize(ProductsList, list<RfqDataTableWrapper>.class);
         List<buildertek__Inventory_Tracking__c> invTrackList= new List<buildertek__Inventory_Tracking__c>();
-        Map<Id, Id> POLinetoCdId = new map<Id, Id>();
+        Map<Id, List<string>> POLinetoCdId = new map<Id, List<string>>();
         
         //iterate over list and store the polineid in a list
         System.debug(newProductList);
@@ -39,9 +39,7 @@ public with sharing class ReceiveMaterialPOLinesController {
         for(RfqDataTableWrapper p: newProductList){
             polineIds.add(p.polineId);
             if(p.ContentDocumnetIdList != null){
-                for(String cdId : p.ContentDocumnetIdList){
-                    POLinetoCdId.put(p.polineId, cdId);                
-                }
+                POLinetoCdId.put(p.polineId, p.ContentDocumnetIdList);
             }
         }
         System.debug(POLinetoCdId);
@@ -147,13 +145,16 @@ public with sharing class ReceiveMaterialPOLinesController {
             
             Map<Id, Id> ContentDocumentIdtoInvTrackId = new map<Id, Id>();
             for(Id polineId : POLinetoCdId.keySet()){
-                String cdId = POLinetoCdId.get(polineId);
-                Id invTrackId = POLinetoInvTrackId.get(polineId);
-                if(cdId != null && invTrackId != null){
-                    ContentDocumentIdtoInvTrackId.put(cdId, invTrackId);
+               List<Id> cdIdList = POLinetoCdId.get(polineId);
+               Id invTrackId = POLinetoInvTrackId.get(polineId);
+                for(Id cdId : cdIdList){
+                     ContentDocumentIdtoInvTrackId.put(cdId, invTrackId);
                 }
             }
             System.debug('ContentDocumentIdtoInvTrackId' + ContentDocumentIdtoInvTrackId);
+
+            
+            
 
             //create a contentdocumentlink list
             List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>();

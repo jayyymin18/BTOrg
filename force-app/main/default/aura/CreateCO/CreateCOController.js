@@ -1,4 +1,9 @@
 ({
+    doInit: function(component, event, helper) {
+        // $A.get("e.force:closeQuickAction").fire();
+    },
+
+
     createRecord: function(component, event, helper) {
         try {
             component.set("v.Spinner", true);
@@ -15,7 +20,10 @@
                 console.log({ result });
                 if(result=='Error'){
                     helper.showToast("Error", "Error", "CO is already exist", "5000");
+                    $A.get("e.force:closeQuickAction").fire();
                 }else {
+                    $A.get("e.force:closeQuickAction").fire();
+                    $A.get('e.force:refreshView').fire();
                     helper.showToast("Success", "Success", "Your Change Order is created", "5000");
                     var navEvent = $A.get("e.force:navigateToSObject");
                     navEvent.setParams({
@@ -24,7 +32,6 @@
                     navEvent.fire();
                 }
                 component.set("v.Spinner", false);
-                $A.get("e.force:closeQuickAction").fire();
             });
             $A.enqueueAction(action);
         } catch (e) {

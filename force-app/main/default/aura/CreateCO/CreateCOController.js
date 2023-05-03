@@ -1,6 +1,25 @@
 ({
     doInit: function(component, event, helper) {
-        // $A.get("e.force:closeQuickAction").fire();
+        // console.log('recordId: ' + component.get("v.recordId"));
+        // component.set("v.Spinner", true);
+        // var action = component.get("c.checkChangeOrder");
+        // action.setParams({
+        //     optionId: component.get("v.recordId")
+        // });
+        // action.setCallback(this, function(response) {
+        //     component.set("v.Spinner", false);
+        //     var state = response.getState();
+        //     console.log({ state });
+        //     var result = response.getReturnValue();
+        //     console.log({ result });
+        //     if (result == true) {
+        //         $A.get("e.force:closeQuickAction").fire();
+        //         helper.showToast("Error", "Error", "CO already exist", "5000");
+        //     }
+        // });
+        // $A.enqueueAction(action);
+
+
     },
 
 
@@ -19,7 +38,7 @@
                 var result = response.getReturnValue();
                 console.log({ result });
                 if(result=='Error'){
-                    helper.showToast("Error", "Error", "CO is already exist", "5000");
+                    helper.showToast("Error", "Error", "CO already exist", "5000");
                     $A.get("e.force:closeQuickAction").fire();
                 }else {
                     $A.get("e.force:closeQuickAction").fire();

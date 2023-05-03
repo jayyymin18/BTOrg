@@ -37,5 +37,17 @@ public class createCO {
        
     }
 
+    @AuraEnabled
+    public static Boolean checkChangeOrder(String optionId) {
+        buildertek__Question__c optionList = new buildertek__Question__c();
+        optionList = [SELECT Id , Name, buildertek__Quantity__c, buildertek__Cost__c, buildertek__Total_Cost_Per_Unit__c, buildertek__Markup__c, buildertek__Change_Order__c, buildertek__Purchase_Order__c, buildertek__Upgrade_Costs__c, buildertek__Manufacturer__c, buildertek__Question_Group__r.buildertek__Section__r.buildertek__Selection__r.buildertek__Project__c FROM buildertek__Question__c WHERE Id =: optionId];
+        if (optionList.buildertek__Change_Order__c == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
  
 }

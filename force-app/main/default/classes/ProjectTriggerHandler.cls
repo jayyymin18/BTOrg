@@ -115,7 +115,7 @@ public with sharing class ProjectTriggerHandler {
             }
 
             if(project.Source_Project__c != null){
-
+    
                 List<String> selectedITems = project.Source_Project__c.split('~');
                 String projectId = selectedITems[0];
                 if(selectedITems.size() > 1)
@@ -237,6 +237,16 @@ public with sharing class ProjectTriggerHandler {
                 }
             }
         }
+
+        // Added by Krunal
+        try {
+            // dummyMethodNew(newProjects, newProjectsMap);
+        } catch (Exception e) {
+            System.debug('Error Message => '+e.getMessage()); 
+            System.debug('Error Line no => '+e.getLineNumber());
+            newProjects[0].Id.addError('Dummy Method Error => '+e.getMessage());		
+        }
+
     }
 
     public void OnAfterInsetCreateWarranty(Project__c[] newProjects, Map<ID, Project__c> newProjectsMap){
@@ -515,6 +525,7 @@ public with sharing class ProjectTriggerHandler {
         }
     }
 
+    // Method added by sakina
     public void dummyMethod(List<buildertek__Project__c> newProjects){
         
         Map<Id,String> sourceValueMap= new  Map<Id,String>();
@@ -562,6 +573,194 @@ public with sharing class ProjectTriggerHandler {
         System.debug('selectedObjectsToProjectIds'+selectedObjectsToProjectIds);
     
 
+    }
+
+
+    // Method added by krunal
+    public static Set<String> sourceProjectIdsSet = new Set<String>();
+    public static Map<String, String> sourceToProjectIdsMap = new Map<String, String>();
+    public static Map<String, List<String>> sourceObjectsMap= new  Map<String, List<String>>();
+
+    public static List<String> parentRecordList;
+
+    public static void dummyMethodNew(List<buildertek__Project__c> projectList, Map<Id, buildertek__Project__c> projectMap){
+
+        Set<String> sourceProjectIds = new Set<String>();
+        Map<String, String> sourceToProjectMap = new  Map<String, String>();
+        Map<String, List<String>> sourceObjectMap= new  Map<String, List<String>>();
+        Set<String> objectSet = new Set<String>();
+
+        for(buildertek__Project__c proj: projectList){
+            if(proj.Source_Project__c!= null){
+                List<String> selectedItems = proj.Source_Project__c.split('~');
+                sourceToProjectMap.put(selectedItems[0], proj.Id);
+                sourceProjectIds.add(selectedItems[0]);
+                if(selectedItems.size() > 1){
+                    List<String> selectedObject = new List<String>();
+                    for(String item: selectedITems[1].split(',')){
+                        selectedObject.add(item);
+                        objectSet.add(item);
+                    }
+                    sourceObjectMap.put(selectedItems[0], selectedObject);
+                }
+            }    
+        }
+
+        ProjectTriggerHandler.sourceObjectsMap = sourceObjectMap;
+        ProjectTriggerHandler.sourceToProjectIdsMap = sourceToProjectMap;
+        ProjectTriggerHandler.sourceProjectIdsSet = sourceProjectIds;
+
+        for (String objName : objectSet) {
+            
+            if(objName == 'Purchase Order') {
+                CloneAny(objName, 'buildertek__Purchase_Order__c', 'buildertek__Purchase_Order_Item__c');
+            }
+
+            if(objName == 'Schedule') {
+                CloneAny(objName, 'buildertek__Schedule__c', 'buildertek__Project_Task__c');
+            }
+
+            if(objName == 'PunchList') {
+                CloneAny(objName, 'buildertek__Punch_List__c', 'buildertek__Punch_List_item__c');
+            }
+
+            if(objName == 'Inspections') {
+                CloneAny(objName, 'buildertek__Inspection__c', 'buildertek__Inspection_Line__c');
+            }
+
+            if(objName == 'Warranty') {
+                CloneAny(objName, 'buildertek__Warranty__c', 'buildertek__Warranty_Item__c');
+            }
+
+            if(objName == 'Contract') {
+                CloneAny(objName, 'buildertek__Contract__c', 'buildertek__Contract_Item__c');
+            }
+
+            if(objName == 'Quote') {
+                CloneAny(objName, 'buildertek__Quote__c', 'buildertek__Quote_Item__c');
+            }
+
+            if(objName == 'Budget') {
+                CloneAny(objName, 'buildertek__Budget__c', 'buildertek__Budget_Item__c');
+            }
+
+            if(objName == 'Selection') {
+                CloneAny(objName, 'buildertek__Selection__c', 'buildertek__Section__c');
+            }
+
+        }
+
+    }
+
+
+    public static void CloneAny(String objName, String objAPI, String childObjAPI){
+        
+        System.debug('CloneAny Method');
+        System.debug('objName ==> '+objName);
+
+        Set<String> sourceProjectIds = ProjectTriggerHandler.sourceProjectIdsSet;
+        Map<String, String> sourceToProjectMap = ProjectTriggerHandler.sourceToProjectIdsMap;
+        Map<String, List<String>> sourceObjectMap = ProjectTriggerHandler.sourceObjectsMap;
+
+        string qryStr = prepareQuery(objAPI, 'buildertek__Project__c', sourceProjectIds);
+        List<SObject> sobjListToClone = database.query(qryStr);
+
+        List<SObject> newSobjListToClone = database.query(qryStr);
+        for (SObject sObj : sobjListToClone) {
+            String oldProjectId = String.valueOf(sObj.get('buildertek__Project__c'));
+            if (sourceObjectMap.get(oldProjectId).contains(objName)) {
+                newSobjListToClone.add(sObj);
+            }
+        }
+
+        Map<String, SObject> cloneSObjList = new Map<String, SObject>();
+        for (SObject sObj : newSobjListToClone) {
+            String oldProjectId = String.valueOf(sObj.get('buildertek__Project__c'));
+            SObject obj = sobj.clone(false, true);
+
+            obj.put('buildertek__Project__c', sourceToProjectMap.get(oldProjectId));
+            cloneSObjList.put(sobj.Id, obj);
+        }
+
+        if (objAPI == 'buildertek__Purchase_Order__c'){
+            for (SObject sObj : cloneSObjList.values()){
+                sObj.put('buildertek__Status__c', 'Pending');
+                sObj.put('buildertek__Budget__c', null);
+                sObj.put('buildertek__Budget_Line__c', null);
+            }
+        }
+
+        // if (objAPI == 'buildertek__Warranty__c'){
+        //     for (SObject sObj : cloneSObjList.values()){
+        //         sObj.put('buildertek__Warranty__c', null);
+        //     }
+        // }
+
+        // Insert records
+        Database.SaveResult[] newObjectRecords = Database.Insert(cloneSObjList.values(), false);
+        System.debug('newObjectRecords ==> '+newObjectRecords);
+
+        String childQry = prepareQuery(childObjAPI, objAPI, cloneSObjList.keySet());
+        List<SObject> childSobjList = database.query(childQry);
+        List<SObject> cloneChildRec= new List<SObject>();
+
+        for (SObject sobj : childSobjList){
+            String oldParentId = String.valueOf(sObj.get(objAPI));
+
+            SObject obj = sobj.clone(false, true);
+            obj.put(objAPI, cloneSObjList.get(oldParentId).Id);
+
+            cloneChildRec.add(obj);
+        }
+
+        if (childObjAPI == 'buildertek__Project_Task__c') {
+            for (SObject sObj : cloneChildRec){
+                sObj.put('buildertek__Dependency__c', null);
+            }
+        }
+
+        if(cloneChildRec.size() > 0){
+            insert cloneChildRec;
+        }
+        
+    }
+
+
+    public static String prepareQuery(String sObjName, String fieldName, Set<String> recIdList){
+
+        System.debug('ProjectTriggerHandler -> prepareQuery -> '+sObjName);
+
+        Map<String, Schema.SObjectField> fieldsMap = Schema.getGlobalDescribe().get(sObjName.toLowerCase()).getDescribe().Fields.getMap();
+        String fields = '';
+        
+        for (Schema.SObjectField sf : fieldsMap.values()){
+            Schema.DescribeFieldResult fr = sf.getDescribe();
+            if (fr.isCreateable()){
+                fields += fr.getName()+',';
+            }
+        }
+
+        if (fields.endsWith(',')){
+            fields = fields.substring(0, fields.lastIndexOf(','));
+        }
+
+        parentRecordList = new List<String>();
+        for (Id recId : recIdList) {
+            parentRecordList.add(recId);
+        }
+
+        String qryString;
+        if (sObjName == 'buildertek__Purchase_Order_Item__c'){
+            qryString = 'SELECT ' + fields + ' FROM ' + sObjName + ' where buildertek__Line_Type__c = \'Master\'' + ' AND ' + fieldName + ' IN: parentRecordList';
+        } 
+        else if (sObjName == 'buildertek__Project_Task__c') {
+            qryString = 'SELECT ' + fields + ' , buildertek__Dependency__r.Name FROM ' + sObjName + ' where ' + fieldName + ' IN: parentRecordList';
+        } 
+        else{
+            qryString = 'SELECT ' + fields + ' FROM ' + sObjName + ' where ' + fieldName + ' IN: parentRecordList';
+        }
+
+        return qryString;
     }
    
 }

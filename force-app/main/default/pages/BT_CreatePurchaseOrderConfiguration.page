@@ -12,7 +12,7 @@
                  <apex:inputcheckbox value="{!CreateInvoiceApproval}" label="Create Invoice on Approval">
                 </apex:inputcheckbox>
 
-                 <apex:selectList label="Create Change Order" value="{!CreatePO}" multiselect="false" size="1">
+                 <apex:selectList label="Create Purchase Order" value="{!CreatePO}" multiselect="false" size="1">
                     <apex:selectOption itemValue="Without PO Lines	" itemLabel="Without PO Lines"/>
                     <apex:selectOption itemValue="With PO Lines	" itemLabel="With PO Lines"/>
                 </apex:selectList>

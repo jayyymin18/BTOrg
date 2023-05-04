@@ -115,7 +115,8 @@ public with sharing class ProjectTriggerHandler {
             }
 
             if(project.Source_Project__c != null){
-    
+                
+                /**
                 List<String> selectedITems = project.Source_Project__c.split('~');
                 String projectId = selectedITems[0];
                 if(selectedITems.size() > 1)
@@ -235,12 +236,13 @@ public with sharing class ProjectTriggerHandler {
                         BT_Utils.CloneAny('buildertek__Selection__c', selectionIds, 'buildertek__Selection__c', 'buildertek__Section__c', project.Id);
                     }
                 }
+                */
             }
         }
 
         // Added by Krunal
         try {
-            // dummyMethodNew(newProjects, newProjectsMap);
+            dummyMethodNew(newProjects, newProjectsMap);
         } catch (Exception e) {
             System.debug('Error Message => '+e.getMessage()); 
             System.debug('Error Line no => '+e.getLineNumber());
@@ -704,23 +706,61 @@ public with sharing class ProjectTriggerHandler {
         List<SObject> childSobjList = database.query(childQry);
         List<SObject> cloneChildRec= new List<SObject>();
 
-        for (SObject sobj : childSobjList){
-            String oldParentId = String.valueOf(sObj.get(objAPI));
-
-            SObject obj = sobj.clone(false, true);
-            obj.put(objAPI, cloneSObjList.get(oldParentId).Id);
-
-            cloneChildRec.add(obj);
-        }
-
         if (childObjAPI == 'buildertek__Project_Task__c') {
-            for (SObject sObj : cloneChildRec){
-                sObj.put('buildertek__Dependency__c', null);
-            }
-        }
 
-        if(cloneChildRec.size() > 0){
-            insert cloneChildRec;
+            Map<String, String> predecessorMap = new Map<String, String>();
+            Map<String, SObject> scheduleTaskMap = new Map<String, SObject>();
+
+            for (SObject sObj : childSobjList){
+                predecessorMap.put(String.valueOf(sObj.Id), String.valueOf(sObj.get('buildertek__Dependency__c')));
+                sObj.put('buildertek__Dependency__c', null);
+
+                String oldParentId = String.valueOf(sObj.get(objAPI));
+                SObject obj = sobj.clone(false, true);
+                obj.put(objAPI, cloneSObjList.get(oldParentId).Id);
+
+                scheduleTaskMap.put(String.valueOf(sObj.Id), obj);
+            }
+
+            if (scheduleTaskMap.size() > 0) {
+                insert scheduleTaskMap.values();
+
+                Map<String, String> newPredecessorMap = new Map<String, String>();
+                for (String taskId : predecessorMap.keySet()) {
+                    if (predecessorMap.get(taskId) != null) {
+                        String newTaskId = scheduleTaskMap.get(taskId).Id;
+                        String newParentId = scheduleTaskMap.get(predecessorMap.get(taskId)).Id;
+                        newPredecessorMap.put(newTaskId, newParentId);
+                    }
+                }
+
+                List<SObject> updateTaskList = new List<SObject>();
+                for (SObject task : scheduleTaskMap.values()) {
+                    task.put('buildertek__Dependency__c', newPredecessorMap.get(String.valueOf(task.Id)));
+                    updateTaskList.add(task);
+                }
+
+                if (updateTaskList.size() > 0) {
+                    update updateTaskList;
+                }
+            }
+
+        } else {
+
+            for (SObject sobj : childSobjList){
+                String oldParentId = String.valueOf(sObj.get(objAPI));
+    
+                SObject obj = sobj.clone(false, true);
+                System.debug('objAPI ==> '+objAPI);
+                System.debug('cloneSObjList.get(oldParentId)) ==> '+cloneSObjList.get(oldParentId));
+                obj.put(objAPI, cloneSObjList.get(oldParentId).Id);
+    
+                cloneChildRec.add(obj);
+            }
+            
+            if(cloneChildRec.size() > 0){
+                insert cloneChildRec;
+            }
         }
         
     }

@@ -162,5 +162,35 @@
             PRLineDetails.buildertek__Product__c = null;
             component.set("v.PRLineDetails", PRLineDetails);
         }
-    }
+    },
+
+    getOptions: function(component, event, helper, PRLId){
+        var action = component.get("c.getOptions");
+        action.setParams({
+            "recordId": PRLId
+        });
+        action.setCallback(this, function(response) {
+            var status = response.getState();
+            if (status === "SUCCESS") {
+                var options = response.getReturnValue();
+                var OptionList = [];
+                if(options.length > 0){
+                    for (var i = 0; i < options.length; i++) {
+                        OptionList.push({
+                            label: options[i].Name,
+                            value: options[i].Id
+                        });
+                    }
+                }else{
+                    OptionList.push({
+                        label: 'No Option Found',
+                        value: ''
+                    });
+                }
+                console.log('OptionList ==> ',{OptionList});
+                component.set("v.OptionList", OptionList);
+            }
+        });
+        $A.enqueueAction(action);            
+    },
 })

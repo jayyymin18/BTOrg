@@ -20,4 +20,10 @@ public without sharing class NewPRLineDetails {
         }
         return productList;
     }
+
+    @AuraEnabled
+    public static List<buildertek__Question__c> getOptions(String recordId){
+        List<buildertek__Question__c> questionList = [SELECT Id, Name, buildertek__Pricing_Request_Line__c FROM buildertek__Question__c WHERE buildertek__Pricing_Request_Line__c =: recordId];
+        return questionList;
+    }
 }

@@ -116,7 +116,7 @@ public with sharing class ProjectTriggerHandler {
 
             if(project.Source_Project__c != null){
                 
-                /**
+                /** 
                 List<String> selectedITems = project.Source_Project__c.split('~');
                 String projectId = selectedITems[0];
                 if(selectedITems.size() > 1)
@@ -242,11 +242,11 @@ public with sharing class ProjectTriggerHandler {
 
         // Added by Krunal
         try {
-            dummyMethodNew(newProjects, newProjectsMap);
+            projectCloneController(newProjects, newProjectsMap);
         } catch (Exception e) {
             System.debug('Error Message => '+e.getMessage()); 
             System.debug('Error Line no => '+e.getLineNumber());
-            newProjects[0].Id.addError('Dummy Method Error => '+e.getMessage());		
+            newProjects[0].Id.addError('projectCloneController Method Error => '+e.getMessage());		
         }
 
     }
@@ -585,7 +585,7 @@ public with sharing class ProjectTriggerHandler {
 
     public static List<String> parentRecordList;
 
-    public static void dummyMethodNew(List<buildertek__Project__c> projectList, Map<Id, buildertek__Project__c> projectMap){
+    public static void projectCloneController(List<buildertek__Project__c> projectList, Map<Id, buildertek__Project__c> projectMap){
 
         Set<String> sourceProjectIds = new Set<String>();
         Map<String, String> sourceToProjectMap = new  Map<String, String>();
@@ -705,9 +705,7 @@ public with sharing class ProjectTriggerHandler {
     
                 warrantyMap.put(String.valueOf(sObj.Id), obj);
             }
-
-            Database.SaveResult[] newObjectRecords = Database.Insert(warrantyMap.values(), false);
-            System.debug('newObjectRecords ==> '+newObjectRecords);
+            insert warrantyMap.values();
 
             Map<String, String> newParentMap = new Map<String, String>();
             for (String oldRecId : parentMap.keySet()) {
@@ -718,30 +716,27 @@ public with sharing class ProjectTriggerHandler {
                 }
             }
 
-            // List<SObject> updateTaskList = new List<SObject>();
-            // for (SObject warranty : warrantyMap.values()) {
-            //     warranty.put('buildertek__Warranty__c', newParentMap.get(String.valueOf(warranty.Id)));
-            //     updateTaskList.add(warranty);
-            // }
-            // update updateTaskList;
-
+            cloneSObjList = new Map<String, SObject>();
             for (String warrantyId : warrantyMap.keySet()) {
                 SObject warrantyVal = warrantyMap.get(warrantyId);
                 warrantyVal.put('buildertek__Warranty__c', newParentMap.get(String.valueOf(warrantyVal.Id)));
+
                 cloneSObjList.put(warrantyId, warrantyVal);
             }
+
             update cloneSObjList.values();
 
         } else {
-            
-            Database.SaveResult[] newObjectRecords = Database.Insert(cloneSObjList.values(), false);
-            System.debug('newObjectRecords ==> '+newObjectRecords);
 
+            insert cloneSObjList.values();
         }
 
 
         String childQry = prepareQuery(childObjAPI, objAPI, cloneSObjList.keySet());
+        System.debug('childQry ==> '+childQry);
         List<SObject> childSobjList = database.query(childQry);
+        System.debug('childSobjList ==> '+childSobjList);
+
         List<SObject> cloneChildRec= new List<SObject>();
 
         if (childObjAPI == 'buildertek__Project_Task__c') {
@@ -786,6 +781,7 @@ public with sharing class ProjectTriggerHandler {
         } else {
 
             for (SObject sobj : childSobjList){
+                System.debug('sobj ==> '+sobj);
                 String oldParentId = String.valueOf(sObj.get(objAPI));
     
                 SObject obj = sobj.clone(false, true);
@@ -795,6 +791,8 @@ public with sharing class ProjectTriggerHandler {
     
                 cloneChildRec.add(obj);
             }
+
+            System.debug('cloneChildRec ==> '+cloneChildRec);
             
             if(cloneChildRec.size() > 0){
                 insert cloneChildRec;
@@ -828,10 +826,7 @@ public with sharing class ProjectTriggerHandler {
         }
 
         String qryString;
-        if (sObjName == 'buildertek__Purchase_Order_Item__c'){
-            qryString = 'SELECT ' + fields + ' FROM ' + sObjName + ' where buildertek__Line_Type__c = \'Master\'' + ' AND ' + fieldName + ' IN: parentRecordList';
-        } 
-        else if (sObjName == 'buildertek__Project_Task__c') {
+        if (sObjName == 'buildertek__Project_Task__c') {
             qryString = 'SELECT ' + fields + ' , buildertek__Dependency__r.Name FROM ' + sObjName + ' where ' + fieldName + ' IN: parentRecordList';
         } 
         else{

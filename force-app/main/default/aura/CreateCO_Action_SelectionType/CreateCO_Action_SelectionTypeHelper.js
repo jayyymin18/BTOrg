@@ -38,12 +38,22 @@
             var result = response.getReturnValue();
                         console.log({result});
 
+
             if (state === "SUCCESS") {
                 result.forEach(element => {
                     if (element.buildertek__Manufacturer__c != null) {
                         element.ManufacturerName = element.buildertek__Manufacturer__r.Name;
-                    }                  
+
+                    }     
+                    
+                    if (element.buildertek__Markup__c != null) {
+                        console.log({element});
+                        console.log(element.buildertek__Markup__c.toFixed(2));
+                        let x= element.buildertek__Markup__c.toFixed(2)+'%';
+                        element.buildertek__Markup__c=x;
+                    }
                 });
+                console.log({result});
                 cmp.set('v.myData', result);
                 
             } else if (state === "ERROR") {

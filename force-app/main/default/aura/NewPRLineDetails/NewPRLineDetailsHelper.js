@@ -173,22 +173,8 @@
             var status = response.getState();
             if (status === "SUCCESS") {
                 var options = response.getReturnValue();
-                var OptionList = [];
-                if(options.length > 0){
-                    for (var i = 0; i < options.length; i++) {
-                        OptionList.push({
-                            label: options[i].Name,
-                            value: options[i].Id
-                        });
-                    }
-                }else{
-                    OptionList.push({
-                        label: 'No Option Found',
-                        value: ''
-                    });
-                }
-                console.log('OptionList ==> ',{OptionList});
-                component.set("v.OptionList", OptionList);
+                console.log('options ==> ',{options});
+                component.set("v.PRLineDetails.buildertek__Option__c",options);
             }
         });
         $A.enqueueAction(action);            

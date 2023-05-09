@@ -21,12 +21,17 @@
 				type: "currency",
 				cellAttributes: { alignment: "left" },
 			},
-			{
-				label: "Markup",
-				fieldName: "buildertek__Markup__c",
-				type: "percent",
-				cellAttributes: { alignment: "left" },
-			},
+			{ 
+                label: 'Markup',
+                fieldName: 'buildertek__Markup__c',
+                type: 'percent',
+                // typeAttributes: { 
+				// 	step: '.001', minimumFractionDigits: '1', maximumFractionDigits: '2'
+
+                // },
+                cellAttributes: { alignment: 'left' },
+                
+            },
 			{
 				label: "Sales Price",
 				fieldName: "buildertek__Cost__c",

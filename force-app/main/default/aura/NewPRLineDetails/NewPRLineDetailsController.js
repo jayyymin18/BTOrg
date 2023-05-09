@@ -45,12 +45,14 @@
     },
 
     changeOptions: function(component, event, helper) {
+        component.set("v.Spinner", true);
         var selectedOption = event.getParam("value");
         var PRLId = selectedOption[0];
         if(PRLId != null && PRLId != undefined && PRLId != ''){
             helper.getOptions(component, event, helper, PRLId);
             console.log('PRLId ==> '+ PRLId);
         }else{
+            component.set("v.Spinner", false);
             component.set("v.OptionList", []);
         }
     }

@@ -22,8 +22,12 @@ public without sharing class NewPRLineDetails {
     }
 
     @AuraEnabled
-    public static List<buildertek__Question__c> getOptions(String recordId){
-        List<buildertek__Question__c> questionList = [SELECT Id, Name, buildertek__Pricing_Request_Line__c FROM buildertek__Question__c WHERE buildertek__Pricing_Request_Line__c =: recordId];
-        return questionList;
+    public static String getOptions(String recordId){
+        List<buildertek__Pricing_Request_Line__c> PricingRequestLine = [SELECT Id, Name, buildertek__Pricing_Request__c FROM buildertek__Pricing_Request_Line__c WHERE Id =: recordId];
+        String PRId = PricingRequestLine[0].buildertek__Pricing_Request__c;
+        List<buildertek__Pricing_Request__c> PricingRequest = [SELECT Id, Name, buildertek__BT_Selection_Option__c  FROM buildertek__Pricing_Request__c WHERE Id =: PRId];
+        String BTSelectionOption = PricingRequest[0].buildertek__BT_Selection_Option__c;
+        return BTSelectionOption;
+        
     }
 }

@@ -47,10 +47,8 @@
                     }     
                     
                     if (element.buildertek__Markup__c != null) {
-                        console.log({element});
-                        console.log(element.buildertek__Markup__c.toFixed(2));
-                        let x= element.buildertek__Markup__c.toFixed(2)+'%';
-                        element.buildertek__Markup__c=x;
+                
+                        element.buildertek__Markup__c=element.buildertek__Markup__c.toFixed(2)+'%';
                     }
                 });
                 console.log({result});

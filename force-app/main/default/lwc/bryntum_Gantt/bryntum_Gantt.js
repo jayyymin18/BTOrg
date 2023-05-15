@@ -41,6 +41,8 @@ import saveResourceForRecord from "@salesforce/apex/BT_NewGanttChartCls.saveReso
 import updateHideGanttOnSch from "@salesforce/apex/BT_NewGanttChartCls.updateHideGanttOnSch";
 import changeOriginalDates from "@salesforce/apex/BT_NewGanttChartCls.changeOriginalDates";
 
+import PARSER from '@salesforce/resourceUrl/PapaParse';
+
 import {
   formatData,
   saveeditRecordMethod
@@ -184,6 +186,12 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   //New Toast message
   @track showToast = true;
   @track isrowchange = false;
+
+  // show export popup
+  @track showExportPopup = false;
+  @track fileName = 'gantt-chart';
+
+
 
   @wire(getRecordType) objRecordType;
 
@@ -1134,6 +1142,37 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       false
     );
   }
+  changeFileName(event){
+    this.fileName=event.target.value;
+  }
+  exportData(){
+    console.log('click export');
+    this.showExportPopup=true;
+    console.log(this.scheduleItemsDataList);
+    console.log(this.scheduleItemsData);
+    console.log(this.scheduleData);
+
+  }
+
+  exportScheduleData(){
+    var csvData = Papa.unparse(this.scheduleItemsDataList);
+    let cloneData= this.scheduleItemsDataList;
+    console.log({csvData});
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvData));
+    element.setAttribute('download', this.fileName+'.csv');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+    this.showExportPopup=false;
+
+
+  }
+
+  hideModalBox(){
+    this.showExportPopup=false;
+  }
 
   openScheduleLines() {
     const urlWithParameters =
@@ -1269,9 +1308,11 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         //loadStyle(this,  GANTT + "/gantt.stockholm.css")
         //loadStyle(this,  GANTT + "/gantt.stockholm.css")
         loadStyle(this, GanttStyle + "/gantt.stockholm.css"),
-        // /gantt.material.css GANTTStockholm GANTT + "/gantt.stockholm.css" //GANTT + "/gantt.stockholm.css"
+        // loadScript(this, Papa.unparse()), // papaparse lib..
+        loadScript(this, PARSER + '/PapaParse/papaparse.js'),
       ])
       .then(() => {
+        console.log('*******LIBRARY LOADED SUCCESSFULLY******');
         this.gettaskrecords();
         this.loadedChart = true;
       })
@@ -1284,6 +1325,11 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           })
         );
       });
+
+    
+
+
+    
   }
 
 //   disconnectedCallback() {

@@ -107,17 +107,14 @@
 
 
                 if(isCalledFromParent){
-                    // component.set('v.selectedLookUpRecord' , '');
-                    // component.set('v.UnitPrice', '');
-                    // component.set('v.PdtName', '');
-                    $A.get("e.force:closeQuickAction").fire();
-                    var createRecordEvent = $A.get("e.force:createRecord");
-                    createRecordEvent.setParams({
-                        "entityApiName": "buildertek__Purchase_Order_Item__c"
-                    });
-                    createRecordEvent.fire();
+                    component.set('v.selectedLookUpRecord' , '');
+                    component.set('v.productfamily' , '');
 
-        
+                    
+                    component.find('field').forEach(function(f) {
+                        f.reset();
+                    });
+                    
                 }
 
                 if(saveNnew){

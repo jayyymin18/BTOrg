@@ -1,0 +1,13 @@
+<aura:component  implements="force:appHostable,force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,flexipage:availableForAllPageTypes,lightning:actionOverride,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+
+
+ <aura:html tag="style">
+   .forceChatterBasePublisher :not(.PHONE) .cuf-content{
+        padding:0 !important;
+   }
+</aura:html> 
+<div class="popupHeader">
+    <h1 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Export Budget Lines</h1>
+</div>
+
+</aura:component>

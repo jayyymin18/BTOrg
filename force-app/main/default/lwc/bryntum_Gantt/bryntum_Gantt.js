@@ -843,7 +843,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   }
   ondragrow(e) {}
   callinsertUpdateTaskList(taskData) {
-    
+
     var that = this;
     this.isLoaded = true;
     console.log('============In method==========================================');
@@ -1151,20 +1151,20 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   }
 
   exportScheduleData(){
-    let getColumns=["Name" ,"buildertek__Dependency__r.Name","buildertek__Start__c" , "buildertek__Finish__c" , "buildertek__Completion__c" , "buildertek__Phase__c" , "buildertek__Notes__c" , "buildertek__Lag__c" ];    
+    let getColumns=["Name" ,"buildertek__Dependency__r.Name","buildertek__Start__c" , "buildertek__Finish__c" , "buildertek__Completion__c" , "buildertek__Phase__c" , "buildertek__Notes__c" , "buildertek__Lag__c" ];
     const convertedObject = this.scheduleItemsDataList.map(item => {
       const obj = {};
       getColumns.forEach(column => {
         if (item.hasOwnProperty(column)) {
           obj[column] = item[column];
         } else {
-          obj[column] = null; 
+          obj[column] = null;
         }
 
         if (item.hasOwnProperty("buildertek__Dependency__c")) {
           obj["buildertek__Dependency__r.Name"] = item.buildertek__Dependency__r.Name;
         } else {
-          obj["buildertek__Dependency__r.Name"] = null; 
+          obj["buildertek__Dependency__r.Name"] = null;
         }
       });
       return obj;
@@ -1340,10 +1340,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         );
       });
 
-    
 
 
-    
+
+
   }
 
 //   disconnectedCallback() {
@@ -1646,7 +1646,11 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   createGantt() {
     try {
       console.log('createGantt');
+      console.log(this.GanttVar);
       var GanttToolbar;
+
+
+
       var loc = window.location.href;
       var domName = loc.split(".lightning.force.com")[0].split("https://")[1];
       if (domName == "viewinc--bees" || domName == "viewinc") {
@@ -1817,8 +1821,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         minHeight: "80em",
         viewPreset: "weekAndDayLetter",
         dependencyIdField: "sequenceNumber",
-        //dependencyIdField: "wbsCode",
-        columns: [{
+        // dependencyIdField: "wbsCode",
+        columns: [
+          {
             type: "wbs",
             editor: false,
           },
@@ -2211,6 +2216,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             text: "Internal Resource",
             width: 100,
             editor: false,
+            hidden: true,
             renderer: function (record) {
               if (
                 record.record._data.type == "Task" &&

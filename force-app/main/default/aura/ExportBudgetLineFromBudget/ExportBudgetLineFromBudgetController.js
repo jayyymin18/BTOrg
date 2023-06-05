@@ -33,22 +33,16 @@
         const jsonArray= budggetLineList.map(function(item){
             var obj={};
             columns.forEach(function(column){
-
                 if(item.hasOwnProperty(column)){
-                    obj[column]=item[column];
+                    if (typeof item[column] === 'string') {
+                        obj[column]=item[column].replace(/[#,]/g , ';');
+                    }else{
+
+                        obj[column]=item[column];
+                    }
+
                 }else{
                     obj[column]=null;
-                }
-
-                if(item.hasOwnProperty('Name')){
-                    console.log(item.Name);
-                    console.log(item['Name']);
-
-                    console.log(item['Name'].replace(/,/g ,';'));
-                    obj['Name']=item.Name.replace(/,/g ,';');
-                }else{
-                    obj['Name']=null;
-
                 }
             });
             return obj;

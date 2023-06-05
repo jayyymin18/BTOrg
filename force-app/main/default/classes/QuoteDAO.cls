@@ -860,12 +860,13 @@ public with sharing class QuoteDAO{
         String filterConditions = ' AND buildertek__Quote__c =:quoteId';
         String fieldSetAPI = 'buildertek__BT_Related_List_View_Fields';
         String soql = 'SELECT Id, Name ';
-        soql = soql + ', Grouping__c, Description__c ';
+        soql = soql + ', buildertek__Grouping__c, buildertek__Description__c ';
 
         String namespacePrefix = BT_Utils.getNamespacePrefix();
         List<Schema.FieldSetMember> fieldSetMemberList = BT_Utils.getFieldSetMembers(fieldSetAPI, objectName);
         system.debug('fieldSetMemberList -----> ' + fieldSetMemberList);
         for (Schema.FieldSetMember fieldSetMemberObj : fieldSetMemberList){
+            System.debug('soql sakina'+ soql);
 
             if (!soql.contains(fieldSetMemberObj.getFieldPath())){
                 system.debug('fieldSetMemberObj ********' + fieldSetMemberObj.getFieldPath());
@@ -1334,6 +1335,8 @@ public with sharing class QuoteDAO{
 
             String childRecordsQuery = 'SELECT ';
             Map<String, Schema.SObjectField> childObjectFields = Schema.getGlobalDescribe().get('buildertek__Quote_Item__c').getDescribe().fields.getMap();
+            //debug the childObjectFields
+            System.debug('childObjectFields: ' + childObjectFields);
             for (String s : childObjectFields.keySet()){
                 childRecordsQuery += s + ',';
             }
@@ -1367,18 +1370,19 @@ public with sharing class QuoteDAO{
 
                     buildertek__Quote_Item__c quoteLineItems = quoteLine.clone(false, true);
                     quoteLineItems.buildertek__Quote__c = newQuote.Id;
-                    if (quoteLine.buildertek__Grouping__r.Name == groupNameMap.get(newQuote.Id)){
-                        quoteLineItems.buildertek__Grouping__c = groupMap.get(newQuote.Id);
-                    } else{
-                        quoteLineItems.buildertek__Grouping__c = groupMap.get(newQuote.Id);
-                    }
-                    quoteLineItems.buildertek__Grouping__c = groupMap.get(quoteLine.buildertek__Quote__c);
+                    // if (quoteLine.buildertek__Grouping__r.Name == groupNameMap.get(newQuote.Id)){
+                    //     quoteLineItems.buildertek__Grouping__c = groupMap.get(newQuote.Id);
+                    // } else{
+                    //     quoteLineItems.buildertek__Grouping__c = groupMap.get(newQuote.Id);
+                    // }
+                    // quoteLineItems.buildertek__Grouping__c = groupMap.get(quoteLine.buildertek__Quote__c);
                     quoteLineItemList.add(quoteLineItems);
 
                 }
 
             }
             insert quoteLineItemList;
+            system.debug('quoteLineItemList ---------> ' + quoteLineItemList);
             err.Message = 'Success';
             err.RecordId = newQuote.Id;
             return err;

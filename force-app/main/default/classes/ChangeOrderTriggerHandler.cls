@@ -143,6 +143,9 @@ public without sharing class ChangeOrderTriggerHandler {
                             buildertek__Budget_Item__c  oldBudgetLine = [SELECT Id, buildertek__Item_Name__c, Name FROM buildertek__Budget_Item__c WHERE ID =: changeOrder.buildertek__Budget_Line__c];
                             if(oldBudgetLine.Name == Name){
                                 oldBudgetLine.buildertek__CO_Total__c = changeOrder.buildertek__Total_Amount_Tax__c;
+                                // 3314 ticket
+                                oldBudgetLine.buildertek__Unit_Price__c=changeOrder.buildertek__Total_of_SubTotal__c;
+                                oldBudgetLine.buildertek__Labor__c=changeOrder.buildertek__Total_Costs__c;
                                 update oldBudgetLine;
                             }
                         }
@@ -269,6 +272,10 @@ public without sharing class ChangeOrderTriggerHandler {
                 budgetLine.Name = changeOrder.Name + ' budget line';
                 budgetLine.buildertek__Budget__c = changeOrder.buildertek__Budget__c;
                 budgetLine.buildertek__Group__c = budgetLineGroupId;
+
+                 // 3314
+                budgetLine.buildertek__Unit_Price__c=changeOrder.buildertek__Total_of_SubTotal__c;
+                budgetLine.buildertek__Labor__c=changeOrder.buildertek__Total_Costs__c;
                 budgetLineMap.put(changeOrder.Id, budgetLine);
             }
             
@@ -359,6 +366,7 @@ public without sharing class ChangeOrderTriggerHandler {
             for (Id key : budgetLineMap.keySet()) {
                 if (changeOrder.Id == key) {
                     changeOrder.buildertek__Budget_Line__c = budgetLineMap.get(changeOrder.Id).Id;
+                   
                     newCOList.add(changeOrder);
                 }
             }

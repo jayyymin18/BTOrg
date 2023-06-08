@@ -622,32 +622,41 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         if (objectAPIName.contains('buildertek__Quote__c')){
             buildertek__Quote__c quoterec;
 
+            
+
             quoterec = [select id, Name, buildertek__Status__c, buildertek__Customer_Accepted_Date__c, buildertek__To_Emails__c,buildertek__Opportunity__c,buildertek__Opportunity__r.OwnerId
                         from buildertek__Quote__c
                         where Id = :recordId
                         limit 1];
+                        templateId = apexpages.currentPage().getParameters().get('templateId');
             if (quoterec != null){
                 quoterec.buildertek__Customer_Accepted_Date__c = nowDT;
                 quoterec.buildertek__Status__c = 'Customer Accepted';
                 quoterec.buildertek__Date_Accepted_by_Customer__c = system.now();
                 quoterec.buildertek__Date_Sent_To_Customer__c = System.today();
+                quoterec.buildertek__Description__c = templateId+'Jaimin'+ConVer.Id;
                 update quoterec;
 
-                templateId = apexpages.currentPage().getParameters().get('templateId');
                 
-                Blob b = setAttachmentBody(recordId, templateId, conVer.Id );
-                system.debug('Blob ---> ' + b);
+                System.debug('imageContent: ' + imageContent);
+                // Blob b = setAttachmentBody(recordId, templateId, ConVer.Id );
+                // Blob b = setAttachmentBody('a081K00000ykCe5QAE','00X1K000000wkgwUAA', '0681K00000e3DMhQAM' );
 
-                ContentVersion conVer1 = new ContentVersion();
-                conVer1.PathOnClient = 'Quote.pdf'; // The files name, extension is very important here which will help the file in preview.
-                conVer1.VersionData = b; // converting your binary string to Blog
-                insert conVer1;    //Insert ContentVersion
 
-                ContentDocumentLink conDocLink1 = New ContentDocumentLink();
-                conDocLink1.LinkedEntityId = recordId; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
-                conDocLink1.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer1.Id].ContentDocumentId;  //ContentDocumentId Id from ContentVersion
-                conDocLink1.Visibility = 'AllUsers';
-                insert conDocLink1; 
+                // system.debug('Blob ---> ' + b);
+
+                // ContentVersion conVer1 = new ContentVersion();
+                // conVer1.PathOnClient = 'Quote.pdf'; // The files name, extension is very important here which will help the file in preview.
+                // conVer1.VersionData = b; // converting your binary string to Blog
+                // insert conVer1;    //Insert ContentVersion
+
+                // ContentDocumentLink conDocLink1 = New ContentDocumentLink();
+                // conDocLink1.LinkedEntityId = recordId; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+                // conDocLink1.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer1.Id].ContentDocumentId;  //ContentDocumentId Id from ContentVersion
+                // conDocLink1.Visibility = 'AllUsers';
+                // insert conDocLink1; 
+
+                
 
                 
                 /*if(quoterec.buildertek__Status__c == 'Customer Accepted' && Checkcustomerview == null){
@@ -750,7 +759,8 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         public Boolean isRejected{ get; set; }
     }
 
-    private static Blob setAttachmentBody(String recordId, String templateId, String fileid){
+    @future(callout = true)
+    public static  void setAttachmentBody(String recordId, String templateId, String fileid){
         System.debug(recordId);
         System.debug(templateId);
         System.debug(fileid);
@@ -759,14 +769,27 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
 
 
         pagereference pdf;
-        pdf = Page.buildertek__BT_GenerateQuotePDF;
+        pdf = Page.buildertek__BT_GenerateQuotePDFSignature;
         system.debug('*********'+pdf);
         pdf.getParameters().put('recordId', recordId);
         pdf.getParameters().put('templateId', templateId);
-        pdf.getParameters().put('fileId', fileId);
+        pdf.getParameters().put('fileId', fileid);
+        // pdf.getParameters().put('fileId', 'background-image:url("data:image/png;base64,'+fileid+'");');
+        System.debug('fileId: ' + fileId);
         pdf.setRedirect(true);
 
         Blob blobbody = !Test.isRunningTest() ? pdf.getContent() : Blob.ValueOf('dummy text');
-        return blobbody;
+        system.debug('Blob ---> ' + blobbody);
+
+                ContentVersion conVer1 = new ContentVersion();
+                conVer1.PathOnClient = 'Quote.pdf'; // The files name, extension is very important here which will help the file in preview.
+                conVer1.VersionData = blobbody; // converting your binary string to Blog
+                insert conVer1;    //Insert ContentVersion
+
+                ContentDocumentLink conDocLink1 = New ContentDocumentLink();
+                conDocLink1.LinkedEntityId = recordId; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+                conDocLink1.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:fileid].ContentDocumentId;  //ContentDocumentId Id from ContentVersion
+                conDocLink1.Visibility = 'AllUsers';
+                insert conDocLink1; 
     }
 }

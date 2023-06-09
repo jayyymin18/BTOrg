@@ -61,6 +61,8 @@ public without sharing class ConfirmationController{
     public String Result{ get; set; }
     public String RejectResult{ get; set; }
 
+    public String MainData{get; set;}
+
     //public ApexPages.StandardController std;
     public transient string imageContent{ get; set; }
      public string imageContentforReject{ get; set; }
@@ -531,6 +533,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         system.debug('templateBody 2 ----------> ' + templateBody2);
         templateBody = templateBody1 + templateBody2;
         strBody = templateBody;
+        MainData = strBody;
         system.debug('strBody -----> ' + strBody);
 
         try{
@@ -543,6 +546,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
             string imageid = doc.id;
             imageid = imageid.substring(0, 15);
             strBody = strBody.replace('###############', imageid);
+            MainData = strBody;
         } catch (exception ex){
             System.debug('Error Mesage::' + ex.getMessage());
             System.debug('Error Line::' + ex.getLineNumber());
@@ -622,8 +626,6 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         if (objectAPIName.contains('buildertek__Quote__c')){
             buildertek__Quote__c quoterec;
 
-            
-
             quoterec = [select id, Name, buildertek__Status__c, buildertek__Customer_Accepted_Date__c, buildertek__To_Emails__c,buildertek__Opportunity__c,buildertek__Opportunity__r.OwnerId
                         from buildertek__Quote__c
                         where Id = :recordId
@@ -700,6 +702,35 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
             }
         }
         customSignature = true;
+
+
+        System.debug('strBody ==> '+MainData);
+        System.debug('imageContent ==> '+imageContent);
+
+        String Data = MainData + imageContent;
+
+        System.debug('Data ==> '+Data);
+
+        // Blob blobbody = Blob.valueof(Data);
+        Blob blobbody = EncodingUtil.base64Decode(imageContent);
+
+        System.debug('blobbody ==> '+blobbody);
+
+        Messaging.Emailfileattachment efa = new Messaging.Emailfileattachment();
+        efa.setFileName('Contract.png');
+        efa.setBody(blobbody);
+        
+        System.debug('efa ==> '+efa);
+
+
+        //Apex Single email message
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setToAddresses(new String[] { 'krunal.l@mvclouds.com' });//Set To Email Address
+        mail.setSubject('Test Email With Attachment');//Set Subject
+        mail.setHtmlBody('Please find the attachment.');//Set HTML Body
+        mail.setFileAttachments(new Messaging.EmailFileAttachment[] { efa });//Set File Attachment
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });//Send Email
+
         return null;
     }
 
@@ -759,8 +790,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         public Boolean isRejected{ get; set; }
     }
 
-    @future(callout = true)
-    public static  void setAttachmentBody(String recordId, String templateId, String fileid){
+    public static Blob setAttachmentBody(String recordId, String templateId, String fileid){
         System.debug(recordId);
         System.debug(templateId);
         System.debug(fileid);
@@ -773,23 +803,11 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         system.debug('*********'+pdf);
         pdf.getParameters().put('recordId', recordId);
         pdf.getParameters().put('templateId', templateId);
-        pdf.getParameters().put('fileId', fileid);
         // pdf.getParameters().put('fileId', 'background-image:url("data:image/png;base64,'+fileid+'");');
-        System.debug('fileId: ' + fileId);
+        pdf.getParameters().put('fileId', fileid);
         pdf.setRedirect(true);
 
         Blob blobbody = !Test.isRunningTest() ? pdf.getContent() : Blob.ValueOf('dummy text');
-        system.debug('Blob ---> ' + blobbody);
-
-                ContentVersion conVer1 = new ContentVersion();
-                conVer1.PathOnClient = 'Quote.pdf'; // The files name, extension is very important here which will help the file in preview.
-                conVer1.VersionData = blobbody; // converting your binary string to Blog
-                insert conVer1;    //Insert ContentVersion
-
-                ContentDocumentLink conDocLink1 = New ContentDocumentLink();
-                conDocLink1.LinkedEntityId = recordId; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
-                conDocLink1.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:fileid].ContentDocumentId;  //ContentDocumentId Id from ContentVersion
-                conDocLink1.Visibility = 'AllUsers';
-                insert conDocLink1; 
+        return blobbody;
     }
 }

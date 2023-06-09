@@ -60,9 +60,9 @@ public without sharing class BT_GenerateQuotePDFSignature {
             if(objectAPIName.contains('buildertek__Quote__c')){
                 filerecid = apexpages.currentPage().getParameters().get('fileId').escapeHtml4();
                 // String Signature = [Select buildertek__Description__c from buildertek__Quote__c where id =: recordID].buildertek__Description__c;
-                // System.debug('Signature'+Signature);
-                // base64 = EncodingUtil.base64Encode(EncodingUtil.base64Decode(filerecid));
-                // System.debug('@base64: ' + base64);
+                // System.debug('@Signature :-  '+Signature);
+                // base64 = EncodingUtil.base64Encode(EncodingUtil.base64Decode(Signature));
+            //     System.debug('fileId: ' + filerecid);
             //  Blob b = [SELECT VersionData FROM ContentVersion WHERE Id =: filerecid][0].VersionData;
             //  base64 = 'background-image:url("data:image/png;base64,'+EncodingUtil.base64Encode(b)+'");';
 
@@ -146,5 +146,10 @@ public without sharing class BT_GenerateQuotePDFSignature {
             
         }
     
+    }
+
+    public static string getbase64(Id recordId){
+        String Signature = [Select buildertek__Description__c from buildertek__Quote__c where id =: recordID].buildertek__Description__c;
+        return Signature;
     }
 }

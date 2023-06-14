@@ -173,6 +173,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   @track contractorname;
   @track showOriginalDateModal = false;
   @track blankPredecessor = false;
+  @track boolList;
 
   //New Toast message
   @track showToast = true;
@@ -217,6 +218,12 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   }
 
   errorCallback(error, stack) {}
+
+  @wire (AdminSettings)
+  relatedMedia({data,error}) {
+    console.log('data in wire ',data);
+    this.boolList = data;
+  };
 
   get acceptedFormats() {
     return [".pdf", ".png", ".jpg", ".jpeg", ".csv", ".docx", ".doc"];
@@ -1715,10 +1722,14 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         }
       }
       this.scheduleItemsDataList = scheduleDataList;
+      console.log('boolList:- ', this.boolList);
+      var doNotShiftSchedule = this.boolList[3];
+      console.log('manuallyScheduledList:- ', doNotShiftSchedule);
       var formatedSchData = formatData(
         this.scheduleData,
         this.scheduleItemsData,
-        this.scheduleItemsDataList
+        this.scheduleItemsDataList,
+        doNotShiftSchedule
       );
       console.log("=== formatedSchData ===");
       console.log({
@@ -1826,6 +1837,8 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         calendarsData: holiday,
       });
       console.log("calendar rows to  ==>", Array.isArray(data.calendars.rows));
+      let hideInternalRes, hideContractor, hideContratorRes;
+      [hideInternalRes, hideContractor, hideContratorRes] = this.boolList;
       const gantt = new bryntum.gantt.Gantt({
         project,
         appendTo: this.template.querySelector(".container"),
@@ -1987,34 +2000,93 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                 record.value &&
                 record.record._data.name == "Milestone Complete"
               ) {
-                var endDate;
-                var endDate1 = new Date(record.record.startDate);
-                endDate1.setDate(
-                  endDate1.getDate() + record.record._data.durationMile
-                );
-                if (record.record._parent._data.endDate != undefined) {
-                  endDate = new Date(record.record._parent._data.endDate);
-                  endDate.setDate(endDate.getDate() - 1);
-                  endDate = new Date(endDate);
-                  //return record.value;
+                if (doNotShiftSchedule) {
+
+                  var sdate = new Date(record.record.startDate);
+                  let childRecList = record.record._parent.children;
+                  if (childRecList.length > 0) {
+                    let maxDate = new Date(childRecList[0].endDate);
+                    let maxDateTime = maxDate.getTime();
+
+                    for (let i = 1; i < childRecList.length - 1; i++) {
+                      let newDate = new Date(childRecList[i].endDate);
+                      let newDateTime = newDate.getTime();
+
+                      if (maxDateTime < newDateTime) {
+                        maxDate = newDate;
+                        maxDateTime = newDateTime;
+                      }
+                    }
+                    maxDate.setDate(maxDate.getDate() - 1);
+                    sdate = maxDate;
+                  }
 
                   return (
-                    months[endDate.getMonth()] +
+                    months[sdate.getMonth()] +
                     " " +
-                    Number(endDate.getDate()) +
+                    Number(sdate.getDate()) +
                     ", " +
-                    endDate.getFullYear()
+                    sdate.getFullYear()
+                  );
+
+                } else{
+                  var endDate;
+
+                  if (record.record._parent._data.endDate != undefined) {
+                    endDate = new Date(record.record._parent._data.endDate);
+                    endDate.setDate(endDate.getDate() - 1);
+                    endDate = new Date(endDate);
+                    //return record.value;
+
+                    return (
+                      months[endDate.getMonth()] +
+                      " " +
+                      Number(endDate.getDate()) +
+                      ", " +
+                      endDate.getFullYear()
+                    );
+                  }
+                }
+                
+              } else {
+                if (doNotShiftSchedule && record.record.type == 'Phase'){
+
+                  var sdate = new Date(record.record.startDate);
+                  let childRecList = record.record.children;
+                  if (childRecList.length > 0) {
+                    let minDate = new Date(childRecList[0].startDate);
+                    let minDateTime = minDate.getTime();
+
+                    for (let i = 1; i < childRecList.length - 1; i++) {
+                      let newDate = new Date(childRecList[i].startDate);
+                      let newDateTime = newDate.getTime();
+
+                      if (minDateTime > newDateTime) {
+                        minDate = newDate;
+                        minDateTime = newDateTime;
+                      }
+                    }
+                    sdate = minDate;
+                  }
+
+                  return (
+                    months[sdate.getMonth()] +
+                    " " +
+                    Number(sdate.getDate()) +
+                    ", " +
+                    sdate.getFullYear()
+                  );
+                  
+                } else{
+                  var sdate = new Date(record.record.startDate);
+                  return (
+                    months[sdate.getMonth()] +
+                    " " +
+                    Number(sdate.getDate()) +
+                    ", " +
+                    sdate.getFullYear()
                   );
                 }
-              } else {
-                var sdate = new Date(record.record.startDate);
-                return (
-                  months[sdate.getMonth()] +
-                  " " +
-                  Number(sdate.getDate()) +
-                  ", " +
-                  sdate.getFullYear()
-                );
               }
             },
           },
@@ -2044,11 +2116,12 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                 "Nov",
                 "Dec",
               ];
+              // console.log('*** **** *** *** ***');
+              // console.log('Type >>> '+ record.record._data.type);
+              // console.log('Name >>> '+ record.record._data.name);
+              // console.log('Duration >>> '+ record.record._data.duration);
+              // console.log('Record Data => ',record.record);
               if (record.value) {
-                // console.log('Record of endDate =>',{record});
-                // console.log('duration>>>', record.record._data.duration);
-                // console.log('type>>>', record.record._data.type);
-                // console.log('name>>>', record.record._data.name);
                 if (
                   record.record._data.duration >= 1 &&
                   record.record._data.type == "Task" &&
@@ -2140,67 +2213,74 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                     endDate.getFullYear()
                   );
                 } else {
-                  // console.log('start Date',record.record.startDate);
-                  //   console.log('MileStone EndDate');
-                  //   console.log({record});
-                  // console.log('-->'+record.record._data.name);
+                  if (doNotShiftSchedule) {
+                    var sdate = new Date(record.record.startDate);
+                    let childRecList = record.record._parent.children;
+                    if (childRecList.length > 0) {
+                      let maxDate = new Date(childRecList[0].endDate);
+                      let maxDateTime = maxDate.getTime();
 
-                  //COMMENTED
-                  //endDate = new Date(record.value);
+                      for (let i = 1; i < childRecList.length - 1; i++) {
+                        let newDate = new Date(childRecList[i].endDate);
+                        let newDateTime = newDate.getTime();
 
-                  // console.log('Milestone endDate *** ===>' + endDate);
-                  // console.log({record});
-                  // console.log('Milestone endDate *** ===>' + JSON.parse(JSON.stringify(record.value)));
+                        if (maxDateTime < newDateTime) {
+                          maxDate = newDate;
+                          maxDateTime = newDateTime;
+                        }
+                      }
+                      maxDate.setDate(maxDate.getDate() - 1);
+                      sdate = maxDate;
+                    }
 
-                  // console.log('Milestone End Date *** ===>' + months[endDate.getMonth()] +" " +Number(endDate.getDate()) +", " +endDate.getFullYear());
-                  // endDate = map1.get(count);
-
-                  // if(record.record._data.duration == 0){
-                  //   endDate = new Date(record.record.startDate);
-                  //   endDate.setDate(endDate.getDate() + record.record._data.durationMile);
-                  // }else{
-                  // console.log('--'+record.record._parent._data.endDate);
-                  // endDate = new Date(record.record._parent._data.endDate);
-                  if (record.record._parent._data.endDate != undefined)
-                    console.log(
-                      "-|-" +
-                        record.record._parent._data.endDate
-                          .toString()
-                          .substring(8, 10)
+                    return (
+                      months[sdate.getMonth()] +
+                      " " +
+                      Number(sdate.getDate()) +
+                      ", " +
+                      sdate.getFullYear()
                     );
-                  // console.log({endDate});
-
-                  // if(endDate != undefined && record.record._parent._data.endDate != undefined && record.record._parent._data.endDate.toString().substring(8,10) == endDate.getDate().toString()){
-                  //   endDate.setDate(endDate.getDate() - 1);
-                  // }else if(endDate != undefined && record.record._parent._data.endDate != undefined && record.record._parent._data.endDate.toString().substring(8,10) != endDate.getDate().toString()){
-                  //   endDate.setDate(endDate.getDate() + 1);
-                  // }
-                  // console.log({endDate});
-
-                  var endDate1 = new Date(record.record.startDate);
-                  endDate1.setDate(
-                    endDate1.getDate() + record.record._data.durationMile
-                  );
-                  // console.log({endDate1});
-
-                  endDate = new Date(record.record._parent._data.endDate);
-                  // console.log('1-'+endDate);
-                  endDate.setDate(endDate.getDate() - 1);
-                  // console.log('2-'+endDate);
-                  endDate = new Date(endDate);
-                  // console.log('3-'+endDate);
-
-                  // endDate.setDate(endDate.getDate() + record.record._parent._data.duration);
-                  // }
-
-                  return (
-                    months[endDate.getMonth()] +
-                    " " +
-                    Number(endDate.getDate()) +
-                    ", " +
-                    endDate.getFullYear()
-                  );
+                  } else{
+                    endDate = new Date(record.record._parent._data.endDate);
+                    endDate.setDate(endDate.getDate() - 1);
+                    endDate = new Date(endDate);
+  
+                    return (
+                      months[endDate.getMonth()] +
+                      " " +
+                      Number(endDate.getDate()) +
+                      ", " +
+                      endDate.getFullYear()
+                    );
+                  }
                 }
+              } else if (doNotShiftSchedule && record.record.type == 'Phase') {
+                var sdate = new Date(record.record.endDate);
+                let childRecList = record.record.children;
+                if (childRecList.length > 0) {
+                  let maxDate = new Date(childRecList[0].endDate);
+                  let maxDateTime = maxDate.getTime();
+
+                  for (let i = 1; i < childRecList.length - 1; i++) {
+                    let newDate = new Date(childRecList[i].endDate);
+                    let newDateTime = newDate.getTime();
+
+                    if (maxDateTime < newDateTime) {
+                      maxDate = newDate;
+                      maxDateTime = newDateTime;
+                    }
+                  }
+                  maxDate.setDate(maxDate.getDate() - 1);
+                  sdate = maxDate;
+                }
+
+                return (
+                  months[sdate.getMonth()] +
+                  " " +
+                  Number(sdate.getDate()) +
+                  ", " +
+                  sdate.getFullYear()
+                );
               }
             },
           },
@@ -2235,6 +2315,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             text: "Internal Resource",
             width: 100,
             editor: false,
+            hidden: hideInternalRes,
             renderer: function (record) {
               if (
                 record.record._data.type == "Task" &&
@@ -2274,6 +2355,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             text: "Contractor",
             width: 110,
             editor: false,
+            hidden: hideContractor,
             renderer: function (record) {
               if (
                 record.record._data.type == "Task" &&
@@ -2312,6 +2394,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             text: "Contractor Resource",
             width: 110,
             editor: false,
+            hidden: hideContratorRes,
             renderer: function (record) {
               if (
                 record.record._data.type == "Task" &&
@@ -2553,6 +2636,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         },
         listeners: {
           beforeCellEditStart: ({ editorContext }) => {
+            console.log('beforeCellEditStart');
             if (
               editorContext.column.field !== "percentDone" ||
               editorContext.record.isLeaf

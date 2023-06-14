@@ -363,7 +363,7 @@
 
 	orderPO: function (component, event, helper) {
 		// debugger;
-
+        console.log('orderpo is called');
 		var record = component.get("v.recordId");
 		var select = component.get("v.selectedobjInfo");
 		var budgetsList = component.get("v.masterBudgetsList");
@@ -487,7 +487,8 @@
 
 		component.find("checkContractors").set("v.value", false);
 
-
+        var a = component.get('c.cancleadd');
+        $A.enqueueAction(a);
 
 
 	},
@@ -787,6 +788,89 @@
 		isExpanded = !isExpanded;
 		component.set("v.isExpanded", isExpanded);
 	},
+
+	onclicknun: function(component, event, helper) {
+		component.set("v.emailnun", false);
+		component.set("v.emailwrite", true);
+	},
+	
+	cancleadd: function(component, event, helper) {
+		component.set("v.emailnun", true);
+		component.set("v.emailwrite", false);
+		component.set("v.emailid", "");
+	},
+
+	addemail: function(component, event, helper) {
+		component.set("v.Spinner2", true);
+		console.log('add email call');
+		var email = component.get("v.emailid");
+	    console.log('email',email);
+		var POId = event.currentTarget.dataset.index;
+	    console.log('POId',POId);
+		// Regular expression pattern to validate email format
+		var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+	
+		// Check if the email is valid
+		if (emailPattern.test(email)) {
+			console.log('in if condition');
+			// Call the Apex method with the email ID and record ID as parameters
+			var action = component.get("c.addEmail");
+			action.setParams({
+				emailId: email,
+				recordId: POId
+			});
+	
+			action.setCallback(this, function(response) {
+				var state = response.getState();
+				if (state === "SUCCESS") {
+                    // var a = component.get('c.orderPO');
+                    // $A.enqueueAction(a);
+					component.set("v.selectedPOList", false);
+					var a = component.get('c.orderPO');
+                    $A.enqueueAction(a);
+					component.set("v.Spinner2", false);
+					// component.set("v.emailnun", false);
+					// component.set("v.emailwrite", false);
+					// component.set("v.emailid", "");
+					// var a = component.get('c.orderPO');
+                    // $A.enqueueAction(a);
+					
+					console.log("Email processed successfully");
+				} else if (state === "ERROR") {
+					component.set("v.Spinner2", false);
+					var errors = response.getError();
+					if (errors) {
+						for (var i = 0; i < errors.length; i++) {
+							console.error("Error: " + errors[i].message);
+						}
+					}
+				}
+			});
+	
+			$A.enqueueAction(action);
+	
+			// Clear any previous error message, if any
+			component.set("v.errorMessage", "");
+		} else {
+			console.log('in else condition');
+			// Display an error message for invalid email
+			component.set("v.errorMessage", "Invalid email format");
+		}
+	},
+	// refreshPopupContent: function(component, event, helper) {
+	// 	// Perform the necessary logic to update the popup content
+		
+	// 	// Refresh the popup content
+	// 	var popupContent = component.find("popupContent");
+	// 	popupContent.rerender();
+	// },
+	// rerender : function(cmp, helper){
+	// 	var a = component.get('c.orderPO');
+    //     $A.enqueueAction(a);
+	// 	// do custom rerendering here
+	// },
+	
+	
 
 
 })

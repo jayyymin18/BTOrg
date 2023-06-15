@@ -551,6 +551,25 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
 
     public PageReference uploadSignature(){
 
+        // List<String> too = new List<String>();
+        // // to.add(quoterec.OwnerId);
+        // too.add('jaimin.s@mvclouds.com');
+        // Messaging.SingleEmailMessage e = new Messaging.SingleEmailMessage();
+        // e.setSubject('Quote Accepted by Customer');
+        // e.setToAddresses(too);
+        // e.setHtmlBody('Quote Accepted by Customer');
+        // Messaging.sendEmail(new Messaging.SingleEmailMessage[] { e });
+        // System.debug('Jaimin: Check Debug log ==> ' + e);
+
+        Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
+        mail.setToAddresses(new String[]{ 'krunal.l@mvclouds.com' });//Set To Email Address
+        mail.setSubject('Test Email With Attachment');//Set Subject
+        mail.setHtmlBody('Please find the attachment.');//Set HTML Body
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[]{ mail });//Send Email
+
+
+
+
         transient Date nowDT = Date.today();
         System.debug('Check Debug log ==> '+nowDT);
         customerAcceptedDate = String.valueOf(DateTime.now());
@@ -630,21 +649,15 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
                 quoterec.buildertek__Date_Sent_To_Customer__c = System.today();
                 update quoterec;
 
-                List<String> to = new List<String>();
-                // to.add(quoterec.OwnerId);
-                to.add('jaimin.s@mvclouds.com');
-                List<String> cc = new List<String>();
-                cc.add('');
-                List<String> bcc = new List<String>();
-                bcc.add('');
-                Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-                email.setSubject('Quote Accepted by Customer');
-                email.setToAddresses(to);
-                email.setCcAddresses(cc);
-                email.setBccAddresses(bcc);
-                email.setHtmlBody('Quote Accepted by Customer');
-                Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });
-                System.debug('Jaimin: Check Debug log ==> ' + email);
+                // List<String> to = new List<String>();
+                // // to.add(quoterec.OwnerId);
+                // to.add('jaimin.s@mvclouds.com');
+                // Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+                // email.setSubject('Quote Accepted by Customer');
+                // email.setToAddresses(to);
+                // email.setHtmlBody('Quote Accepted by Customer');
+                // Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });
+                // System.debug('Jaimin: Check Debug log ==> ' + email);
 
                 /*if(quoterec.buildertek__Status__c == 'Customer Accepted' && Checkcustomerview == null){
                  string theTemplate;

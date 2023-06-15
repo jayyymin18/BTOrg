@@ -790,30 +790,35 @@
 	},
 
 	onclicknun: function(component, event, helper) {
-		component.set("v.emailnun", false);
-		component.set("v.emailwrite", true);
+		// component.set("v.emailnun", false);
+		// component.set("v.emailwrite", true);
+		var POId = event.currentTarget.dataset.index;
+		var vendorList = component.get("v.SelectedPurchaseOrders");
+		for (var i = 0; i < vendorList.length; i++) {
+			if (vendorList[i].Id === POId) {
+				component.set("v.emailnun", false);
+		        // component.set("v.emailwrite", true);
+			}
+		}
 	},
 	
 	cancleadd: function(component, event, helper) {
 		component.set("v.emailnun", true);
-		component.set("v.emailwrite", false);
+		// component.set("v.emailwrite", false);
 		component.set("v.emailid", "");
+		component.set("v.errorMessage", "");
 	},
 
 	addemail: function(component, event, helper) {
-		component.set("v.Spinner2", true);
-		console.log('add email call');
 		var email = component.get("v.emailid");
-	    console.log('email',email);
 		var POId = event.currentTarget.dataset.index;
-	    console.log('POId',POId);
-		// Regular expression pattern to validate email format
+
 		var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-	
-		// Check if the email is valid
+
 		if (emailPattern.test(email)) {
-			console.log('in if condition');
-			// Call the Apex method with the email ID and record ID as parameters
+			component.set("v.Spinner2", true);
+			component.set("v.errorMessage", "");
+
 			var action = component.get("c.addEmail");
 			action.setParams({
 				emailId: email,
@@ -823,17 +828,21 @@
 			action.setCallback(this, function(response) {
 				var state = response.getState();
 				if (state === "SUCCESS") {
-                    // var a = component.get('c.orderPO');
-                    // $A.enqueueAction(a);
-					component.set("v.selectedPOList", false);
-					var a = component.get('c.orderPO');
+                    var a = component.get('c.orderPO');
                     $A.enqueueAction(a);
-					component.set("v.Spinner2", false);
+					// component.set("v.selectedPOList", false);
 					// component.set("v.emailnun", false);
 					// component.set("v.emailwrite", false);
 					// component.set("v.emailid", "");
 					// var a = component.get('c.orderPO');
                     // $A.enqueueAction(a);
+                    var vendorList = component.get("v.SelectedPurchaseOrders");
+					for (var i = 0; i < vendorList.length; i++) {
+						if (vendorList[i].buildertek__Vendor__c === POId) {
+							vendorList[i].buildertek__Vendor__r.buildertek__Email_Address__c = email;
+						}
+					}
+					component.set("v.Spinner2", false);
 					
 					console.log("Email processed successfully");
 				} else if (state === "ERROR") {
@@ -848,27 +857,39 @@
 			});
 	
 			$A.enqueueAction(action);
-	
-			// Clear any previous error message, if any
-			component.set("v.errorMessage", "");
+			
 		} else {
 			console.log('in else condition');
-			// Display an error message for invalid email
 			component.set("v.errorMessage", "Invalid email format");
 		}
 	},
-	// refreshPopupContent: function(component, event, helper) {
-	// 	// Perform the necessary logic to update the popup content
-		
-	// 	// Refresh the popup content
-	// 	var popupContent = component.find("popupContent");
-	// 	popupContent.rerender();
-	// },
-	// rerender : function(cmp, helper){
-	// 	var a = component.get('c.orderPO');
-    //     $A.enqueueAction(a);
-	// 	// do custom rerendering here
-	// },
+	removePO: function(component, event, helper) {
+		var POId = event.currentTarget.dataset.index;
+		var vendorList = component.get("v.SelectedPurchaseOrders");
+		console.log('vendorList',vendorList);
+		var updatedVendorList = [];
+
+		for (var i = 0; i < vendorList.length; i++) {
+			if (vendorList[i].Id != POId) {
+				updatedVendorList.push(vendorList[i]);
+			}
+		}
+        component.set("v.SelectedPurchaseOrders", updatedVendorList);
+		var disableBtn = false;
+		updatedVendorList.forEach(element => {
+			console.log('element.buildertek__Vendor__c ==> '+element.buildertek__Vendor__c);
+			if (element.buildertek__Vendor__c != null && element.buildertek__Vendor__c != '') {
+				if (element.buildertek__Vendor__r.buildertek__Email_Address__c == null || element.buildertek__Vendor__r.buildertek__Email_Address__c == '') {
+					disableBtn = true;
+				}
+			} else{
+				disableBtn = true;
+			}
+		});
+
+		component.set("v.disableOrder", disableBtn);
+
+	},
 	
 	
 

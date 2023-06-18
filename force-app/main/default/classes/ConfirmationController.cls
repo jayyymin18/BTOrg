@@ -439,16 +439,6 @@ public without sharing class ConfirmationController{
         //     quote.buildertek__Date_Proposal_Opened_Last__c = System.now();
         //     update quote;
         // }
-        //just for testing right now
-        if (objectAPIName.contains('buildertek__Quote__c')){
-            Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-            String[] toAddresses = new String[] {'jaimin.s@mvclouds.com'};
-            mail.setToAddresses(toAddresses);
-            mail.setSubject('Test Email');
-            mail.setPlainTextBody('Test Email');
-            Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
-            System.debug('Email sent successfully');
-        }
         string vendorID;
         // Pick a dummy Contact
         if (vendorID == null){

@@ -883,16 +883,7 @@
 			// disableBtn = false;
 			component.set("v.selectedPOList", false);
 			var a = component.get('c.closePOListPopUp');
-                    $A.enqueueAction(a);
-			var toastEvent = $A.get("e.force:showToast");
-			toastEvent.setParams({
-				title: 'Error',
-				message: 'There must be atleast 1 Purchase Order.',
-				duration: "5000",
-				key: "info_alt",
-				type: "error",
-			});
-			toastEvent.fire();
+            $A.enqueueAction(a);
 		  }
 		  
         console.log('disableBtn',disableBtn);

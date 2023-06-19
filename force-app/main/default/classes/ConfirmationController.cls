@@ -439,68 +439,85 @@ public without sharing class ConfirmationController{
         //     quote.buildertek__Date_Proposal_Opened_Last__c = System.now();
         //     update quote;
         // }
-        string vendorID;
-        // Pick a dummy Contact
-        if (vendorID == null){
-            Contact c;
-            c = [select id, Email
-                 from Contact
-                 where email<>null
-                 limit 1];
-            vendorID = c.id;
-        }
-        templateId = apexpages.currentPage().getParameters().get('templateId');
-        recordID = apexpages.currentPage().getParameters().get('Id');
-        Checkcustomerview = apexpages.currentPage().getParameters().get('view');
 
 
-        List<Messaging.SingleEmailMessage> msgList = new List<Messaging.SingleEmailMessage>();
-        List<Messaging.SingleEmailMessage> msgList1 = new List<Messaging.SingleEmailMessage>();
-        List<String> templateList = new List<String>();
-        Savepoint sp = Database.setSavepoint();
+        //* nishit playground start
+        List<String> to = new List<String>();
+        OrgWideEmailAddress[] owea = [select Id from OrgWideEmailAddress where Address = 'buildertek@mvclouds.com'];
+
+        // to.add(quoterec.OwnerId);
+        to.add('jaimin.s@mvclouds.com');
         Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-        //string theTemplate;
-        if (templateId != null){
-            theTemplate = [SELECT Id
-                           FROM EmailTemplate
-                           WHERE Id = :templateId].Id;
+        email.setSubject('Quote Accepted by Customer');
+        if ( owea.size() > 0 ) {
+            email.setOrgWideEmailAddressId(owea.get(0).Id);
         }
-        if (templateId == null && Checkcustomerview != null){
-            EmailTemplate emailtemrec = [Select Id, Name, Body, DeveloperName
-                                         from EmailTemplate
-                                         where DeveloperName = :'Quote_Template_2'
-                                         limit 1];
-            theTemplate = emailtemrec.Id;
-        }
-       email.setTemplateId(theTemplate);
-        email.setWhatId(recordId);
-        email.setTargetObjectId(vendorID);
-        email.setSaveAsActivity(false);
-        email.setToAddresses(new List<String>{'noreplay@buildertek.com'});
-        msgList.add(email);
+        email.setToAddresses(to);
+        email.setHtmlBody('Test in meeting room Quote Accepted by Customer');
+        Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });
+        System.debug('Jaimin: Check Debug log ==> ' + email);
+        //* nishit playground end
+//         string vendorID;
 
-        Messaging.SendEmailResult[] r = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email});
-        System.debug('Email Results isSuccess = ' + r[0].IsSuccess());
-        Database.rollback(sp);
-        for (Messaging.SingleEmailMessage emailNew : msgList){
-            templateBody1 = emailNew.getHTMLBody();
-        }
-      /*  String[] toAddresses = new String[] {'mailto:manisha.kotha@diligentforcelabs.com'};
-
-email.setToAddresses(toAddresses);
-email.setSenderDisplayName('Salesforce Support');
-email.setSubject('New Case Created : ');
-email.setBccSender(false);
-email.setUseSignature(false);
-email.setPlainTextBody('Your Case: '  +' has been created.');
-email.setHtmlBody('Your case:<b> </b>has been created.<p>'+
-     'To view your case <a href=https://mydomainname.my.salesforce.com/>click here.</a>');
-     email.SetSaveAsActivity(true);
-
-// Send the email you have created.
-Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
+//         // Pick a dummy Contact
+//         if (vendorID == null){
+//             Contact c;
+//             c = [select id, Email
+//                  from Contact
+//                  where email<>null
+//                  limit 1];
+//             vendorID = c.id;
+//         }
+//         templateId = apexpages.currentPage().getParameters().get('templateId');
+//         recordID = apexpages.currentPage().getParameters().get('Id');
+//         Checkcustomerview = apexpages.currentPage().getParameters().get('view');
 
 
+//         List<Messaging.SingleEmailMessage> msgList = new List<Messaging.SingleEmailMessage>();
+//         List<Messaging.SingleEmailMessage> msgList1 = new List<Messaging.SingleEmailMessage>();
+//         List<String> templateList = new List<String>();
+//         Savepoint sp = Database.setSavepoint();
+//         Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
+//         //string theTemplate;
+//         if (templateId != null){
+//             theTemplate = [SELECT Id
+//                            FROM EmailTemplate
+//                            WHERE Id = :templateId].Id;
+//         }
+//         if (templateId == null && Checkcustomerview != null){
+//             EmailTemplate emailtemrec = [Select Id, Name, Body, DeveloperName
+//                                          from EmailTemplate
+//                                          where DeveloperName = :'Quote_Template_2'
+//                                          limit 1];
+//             theTemplate = emailtemrec.Id;
+//         }
+//        email.setTemplateId(theTemplate);
+//         email.setWhatId(recordId);
+//         email.setTargetObjectId(vendorID);
+//         email.setSaveAsActivity(false);
+//         email.setToAddresses(new List<String>{'noreplay@buildertek.com'});
+//         msgList.add(email);
+
+//         Messaging.SendEmailResult[] r = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email});
+//         System.debug('Email Results isSuccess = ' + r[0].IsSuccess());
+//         Database.rollback(sp);
+//         for (Messaging.SingleEmailMessage emailNew : msgList){
+//             templateBody1 = emailNew.getHTMLBody();
+//         }
+//       /*  String[] toAddresses = new String[] {'mailto:manisha.kotha@diligentforcelabs.com'};
+
+// email.setToAddresses(toAddresses);
+// email.setSenderDisplayName('Salesforce Support');
+// email.setSubject('New Case Created : ');
+// email.setBccSender(false);
+// email.setUseSignature(false);
+// email.setPlainTextBody('Your Case: '  +' has been created.');
+// email.setHtmlBody('Your case:<b> </b>has been created.<p>'+
+//      'To view your case <a href=https://mydomainname.my.salesforce.com/>click here.</a>');
+//      email.SetSaveAsActivity(true);
+
+// // Send the email you have created.
+// Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
 
 
 
@@ -510,40 +527,42 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
 
 
 
-        Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();
-        string theTemplate1 = [SELECT Id
-                               FROM EmailTemplate
-                               WHERE Name = 'BT Proposal Images'].Id;
-        email1.setTemplateId(theTemplate1);
-        email1.setWhatId(recordId);
-        email1.setTargetObjectId(vendorID);
-        email1.setSaveAsActivity(false);
-        email1.setToAddresses(new List<String>{'noreplay@buildertek.com'});
-        msgList1.add(email1);
-        Messaging.SendEmailResult[] r1 = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email1});
-        Database.rollback(sp);
-        for (Messaging.SingleEmailMessage emailNew1 : msgList1){
-            templateBody2 = emailNew1.getHTMLBody();
-        }
-        system.debug('templateBody 2 ----------> ' + templateBody2);
-        templateBody = templateBody1 + templateBody2;
-        strBody = templateBody;
-        system.debug('strBody -----> ' + strBody);
 
-        try{
-            document doc;
-            doc = [SELECT ID
-                   from Document
-                   where DeveloperName = 'Company_Logo'
-                   limit 1];
 
-            string imageid = doc.id;
-            imageid = imageid.substring(0, 15);
-            strBody = strBody.replace('###############', imageid);
-        } catch (exception ex){
-            System.debug('Error Mesage::' + ex.getMessage());
-            System.debug('Error Line::' + ex.getLineNumber());
-        }
+//         Messaging.SingleEmailMessage email1 = new Messaging.SingleEmailMessage();
+//         string theTemplate1 = [SELECT Id
+//                                FROM EmailTemplate
+//                                WHERE Name = 'BT Proposal Images'].Id;
+//         email1.setTemplateId(theTemplate1);
+//         email1.setWhatId(recordId);
+//         email1.setTargetObjectId(vendorID);
+//         email1.setSaveAsActivity(false);
+//         email1.setToAddresses(new List<String>{'noreplay@buildertek.com'});
+//         msgList1.add(email1);
+//         Messaging.SendEmailResult[] r1 = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email1});
+//         Database.rollback(sp);
+//         for (Messaging.SingleEmailMessage emailNew1 : msgList1){
+//             templateBody2 = emailNew1.getHTMLBody();
+//         }
+//         system.debug('templateBody 2 ----------> ' + templateBody2);
+//         templateBody = templateBody1 + templateBody2;
+//         strBody = templateBody;
+//         system.debug('strBody -----> ' + strBody);
+
+//         try{
+//             document doc;
+//             doc = [SELECT ID
+//                    from Document
+//                    where DeveloperName = 'Company_Logo'
+//                    limit 1];
+
+//             string imageid = doc.id;
+//             imageid = imageid.substring(0, 15);
+//             strBody = strBody.replace('###############', imageid);
+//         } catch (exception ex){
+//             System.debug('Error Mesage::' + ex.getMessage());
+//             System.debug('Error Line::' + ex.getLineNumber());
+//         }
     }
 
     public void generatePDF(){

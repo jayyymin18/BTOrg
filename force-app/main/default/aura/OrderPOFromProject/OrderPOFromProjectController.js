@@ -123,11 +123,8 @@
 	selectAll: function (component, event, helper) {
 		// debugger;
 		var selectedHeaderCheck = event.getSource().get("v.value");
-		console.log('selectedHeaderCheck',selectedHeaderCheck);
 		var Submittals = component.get("v.masterBudgetsList");
-		console.log('Submittals',Submittals);
 		var getAllId = component.find("checkContractor");
-		console.log('getAllId',getAllId);
 		if (getAllId != undefined && Submittals != undefined) {
 			if (Submittals.length > 0) {
 				if (!Array.isArray(getAllId)) {
@@ -283,18 +280,10 @@
 
 			console.log(JSON.stringify(component.get("v.fileData2")))
 			component.set("v.selectedobjInfo", budgetIds);
-			var emailMap = {};
-			var vendorList = component.get("v.SelectedPurchaseOrders");
-			for (var i = 0; i < vendorList.length; i++) {
-				var purchaseOrder = vendorList[i];
-				emailMap[purchaseOrder.Id] = purchaseOrder.buildertek__Vendor__r.buildertek__Email_Address__c;
-			}
-			console.log('emailMap',emailMap);
 			var action = component.get("c.sendMail");
 			action.setParams({
 				budgetIds: budgetIds,
-				filedata: JSON.stringify(component.get("v.fileData2")),
-				emailMap: emailMap
+				filedata: JSON.stringify(component.get("v.fileData2"))
 			});
 
 			action.setCallback(this, function (response) {
@@ -497,9 +486,6 @@
 		component.set("v.masterBudgetsList", Submittals)
 
 		component.find("checkContractors").set("v.value", false);
-
-        var a = component.get('c.cancleadd');
-        $A.enqueueAction(a);
 
 
 	},
@@ -800,47 +786,11 @@
 		component.set("v.isExpanded", isExpanded);
 	},
 
-	onclicknun: function (component, event, helper) {
+	
+	removePO: function(component, event, helper) {
 		var POId = event.currentTarget.dataset.index;
 		var vendorList = component.get("v.SelectedPurchaseOrders");
-		for (var i = 0; i < vendorList.length; i++) {
-			if (vendorList[i].Id === POId) {
-				component.set("v.selectedRowId", POId);
-			}
-		}
-	},
-
-	cancleadd: function (component, event, helper) {
-		component.set("v.selectedRowId", null);
-		// component.set("v.emailid", "");
-		// component.set("v.errorMessage", "");
-		component.set("v.selectRecordName", "");
-	},
-
-	addemail: function (component, event, helper) {
-		var emailname = event.currentTarget.dataset.name;
-		console.log('email', emailname);
-		var POID = event.currentTarget.dataset.index;
-		console.log('id', POID);
-		component.set("v.Spinner2", true);
-
-		var vendorList = component.get("v.SelectedPurchaseOrders");
-		for (var i = 0; i < vendorList.length; i++) {
-			if (vendorList[i].Id === POID) {
-				vendorList[i].buildertek__Vendor__r.buildertek__Email_Address__c = emailname;
-			}
-		}
-		var a = component.get('c.orderPO');
-		$A.enqueueAction(a);
-		component.set("v.selectRecordName", "");
-		component.set("v.Spinner2", false);
-		console.log("Email processed successfully");
-	},
-
-	removePO: function (component, event, helper) {
-		var POId = event.currentTarget.dataset.index;
-		var vendorList = component.get("v.SelectedPurchaseOrders");
-		console.log('vendorList', vendorList);
+		console.log('vendorList',vendorList);
 		var updatedVendorList = [];
 
 		for (var i = 0; i < vendorList.length; i++) {
@@ -848,102 +798,33 @@
 				updatedVendorList.push(vendorList[i]);
 			}
 		}
-		component.set("v.SelectedPurchaseOrders", updatedVendorList);
+        component.set("v.SelectedPurchaseOrders", updatedVendorList);
 		var disableBtn = false;
 		if (updatedVendorList.length > 0) {
 			console.log('in if');
 			updatedVendorList.forEach(element => {
-				console.log('element.buildertek__Vendor__c ==> ' + element.buildertek__Vendor__c);
-				if (element.buildertek__Vendor__c != null && element.buildertek__Vendor__c != '') {
-					if (element.buildertek__Vendor__r.buildertek__Email_Address__c == null || element.buildertek__Vendor__r.buildertek__Email_Address__c == '') {
-						disableBtn = true;
-					}
-				} else {
-					disableBtn = true;
+			  console.log('element.buildertek__Vendor__c ==> ' + element.buildertek__Vendor__c);
+			  if (element.buildertek__Vendor__c != null && element.buildertek__Vendor__c != '') {
+				if (element.buildertek__Vendor__r.buildertek__Email_Address__c == null || element.buildertek__Vendor__r.buildertek__Email_Address__c == '') {
+				  disableBtn = true;
 				}
+			  } else {
+				disableBtn = true;
+			  }
 			});
-		} else {
+		  } else {
+			// disableBtn = false;
 			component.set("v.selectedPOList", false);
 			var a = component.get('c.closePOListPopUp');
-			$A.enqueueAction(a);
-		}
-
-		console.log('disableBtn', disableBtn);
+            $A.enqueueAction(a);
+		  }
+		  
+        console.log('disableBtn',disableBtn);
 		component.set("v.disableOrder", disableBtn);
 
 	},
-
-	searchField: function (component, event, helper) {
-		var searchText = component.find("userinput").get("v.value").toLowerCase();
-		var contacts = component.get("v.contacts");
-		var listBox = component.find("listbox-id-1");
-		var options = listBox.getElement().querySelectorAll(".slds-listbox__option-text");
-
-		var newList = [];
-		if (searchText.length > 0) {
-			for (var i = 0; i < contacts.length; i++) {
-				var contactName = contacts[i].Name.toLowerCase();
-				var option = options[i];
-
-				if (contactName.includes(searchText)) {
-					newList.push(contacts[i]);
-					
-				}
-			}
-			component.set("v.contacts", newList);
-		} else {
-			var a = component.get('c.getPickListValues');
-			$A.enqueueAction(a);
-		}
-	},
-
-
-
-	setSelectedRecord: function (component, event, helper) {
-		var selectedRecord = event.currentTarget.dataset.name;
-		var emailname = event.currentTarget.dataset.index;
-		component.set("v.selectRecordName", selectedRecord);
-		component.set("v.emailname", emailname);
-	},
-
-	getPickListValues: function (component, event, helper) {
-		var newList = [];
-		var action = component.get("c.getContacts");
-
-		action.setCallback(this, function (response) {
-			var state = response.getState();
-			if (state === "SUCCESS") {
-				var contacts = response.getReturnValue();
-				component.set("v.contacts", contacts);
-				console.log(component.get("v.contacts", contacts));
-			}
-		});
-		$A.enqueueAction(action);
-		var resultBox = component.find('resultBox');
-		if (component.get("v.currentText") != undefined) {
-			for (var i = 0; i < list.length; i++) {
-				var iterator = list[i];
-				if (iterator.toLowerCase().includes(component.get("v.currentText").toLowerCase())) {
-					newList.push(iterator);
-				}
-			}
-			component.set("v.contacts", newList);
-			if (component.get("v.contacts").length == 0) {
-				$A.util.removeClass(resultBox, 'slds-is-open');
-			} else {
-				$A.util.addClass(resultBox, 'slds-is-open');
-			}
-		} else {
-			$A.util.addClass(resultBox, 'slds-is-open');
-		}
-		
-	},
-
-	closeDropDown: function (component, event, helper) {
-		var resultBox = component.find('resultBox');
-		$A.util.removeClass(resultBox, 'slds-is-open');
-	},
-
+	
+	
 
 
 })

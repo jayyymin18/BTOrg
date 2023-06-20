@@ -324,17 +324,17 @@
 
                                     <lightning:button iconName="utility:close" iconPosition="left" onclick="{!c.onClickMassUpdateCancel}" label="Cancel" class="sldsButtonGroup" />
                                     <aura:set attribute="else">
-                                        <lightning:button label="Add CO" onclick="{!c.addCO}" class="sldsButtonGroup" />
                                         <lightning:button iconName="utility:edit" iconPosition="left" onclick="{!c.onClickMassUpdate}" label="Mass Update" class="sldsButtonGroup" />
                                         <!--  <lightning:button iconName="utility:copy" iconPosition="left"
-                                                          onclick="{!c.onClickMassDuplicate}" label="Duplicate Lines" class="sldsButtonGroup" />-->
-                                        <!--  <lightning:button onclick="{!c.newbudgetGroup}" label="Add Group" class="sldsButtonGroup" /> -->
-                                        <!-- <lightning:button onclick="{!c.newBudgetSubGroup}" label="Add Sub Group"
-                            class="sldsButtonGroup" /> -->
-                                        <!-- commented on 26thmay DFL <lightning:button iconName="utility:add" iconPosition="left" onclick="{!c.newGroup}" label="Add Group" class="sldsButtonGroup"/>-->
-                                        <!--<aura:if isTrue="{!v.groupListSize > 0}">-->
-                                        <lightning:button label="Add Expense" onclick="{!c.addExpense}" class="sldsButtonGroup" />
-                                        <lightning:button label="Add PO" onclick="{!c.addPO}" class="sldsButtonGroup" />
+                                            onclick="{!c.onClickMassDuplicate}" label="Duplicate Lines" class="sldsButtonGroup" />-->
+                                            <!--  <lightning:button onclick="{!c.newbudgetGroup}" label="Add Group" class="sldsButtonGroup" /> -->
+                                            <!-- <lightning:button onclick="{!c.newBudgetSubGroup}" label="Add Sub Group"
+                                                class="sldsButtonGroup" /> -->
+                                                <!-- commented on 26thmay DFL <lightning:button iconName="utility:add" iconPosition="left" onclick="{!c.newGroup}" label="Add Group" class="sldsButtonGroup"/>-->
+                                                <!--<aura:if isTrue="{!v.groupListSize > 0}">-->
+                                                    <lightning:button label="Add Expense" onclick="{!c.addExpense}" class="sldsButtonGroup" />
+                                                    <lightning:button label="Add PO" onclick="{!c.addPO}" class="sldsButtonGroup" />
+                                                    <lightning:button label="Add CO" onclick="{!c.addCO}" class="sldsButtonGroup" />
                                         <lightning:button label="Add Invoice" onclick="{!c.addInvoice}" class="sldsButtonGroup" />
                                         <lightning:button label="Add Labor" onclick="{!c.addTimeCard}" class="sldsButtonGroup" />
                                         <lightning:button iconPosition="left" onclick="{!c.onClickAddlines}" label="New Budget Lines" class="sldsButtonGroup" />
@@ -1785,10 +1785,16 @@
                                                 <lightning:input aura:id="selectAllChangeOrder" type="checkbox" name="checkAll" onchange="{!c.checkAllChangeOrder}" />
                                             </th>
                                             <th scope="col">
+                                                <div class="slds-truncate">CO#</div>
+                                            </th>
+                                            <th scope="col">
                                                 <div class="slds-truncate">CO Name</div>
                                             </th>
                                             <th scope="col">
-                                                <div class="slds-truncate">CO Amountr</div>
+                                                <div class="slds-truncate">CO Total Cost</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate">CO Amount</div>
                                             </th>
                                             <th scope="col">
                                                 <div class="slds-truncate">Vendor</div>
@@ -1802,7 +1808,13 @@
                                                     <lightning:input type="checkbox" name="input1" checked="{!item.Selected}" id="{!item.Id}" onchange="{!c.checkChangeOrder}" />
                                                 </td>
                                                 <td class="slds-truncate coFildData">
+                                                    {!item.buildertek__CO_Number__c}
+                                                </td>
+                                                <td class="slds-truncate coFildData">
                                                     {!item.Name}
+                                                </td>
+                                                <td>
+                                                    <lightning:formattedNumber value="{!item.buildertek__Total_Costs__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />
                                                 </td>
                                                 <td>
                                                     <lightning:formattedNumber value="{!item.buildertek__Total_Amount__c}" style="currency" currencyCode="{!v.currencycode}" currencyDisplayAs="code" />

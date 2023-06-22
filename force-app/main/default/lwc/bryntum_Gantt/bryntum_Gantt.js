@@ -3102,6 +3102,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             if (event.target.dataset.resource) {
               this.taskRecordId = event.record._data.id;
               this.showEditResourcePopup = true;
+              console.log('taskReocrdId:=- '+this.taskRecordId);
               this.selectedContactApiName = "buildertek__Resource__c";
               this.selectedResourceContact =
                 event.record._data.internalresource;
@@ -3134,6 +3135,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             if (event.target.dataset.resource) {
               this.taskRecordId = event.record._data.id;
               this.showEditResourcePopup = true;
+              console.log('taskReocrdId:=- '+this.taskRecordId);
               this.selectedContactApiName =
                 "buildertek__Contractor_Resource__c";
               this.selectedResourceContact =
@@ -3145,6 +3147,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             }
           } else if (event.target.classList.contains("addcontractorresource")) {
             this.taskRecordId = event.record._data.id;
+            console.log('taskReocrdId:=- '+this.taskRecordId);
             this.showEditResourcePopup = true;
             this.selectedContactApiName = "buildertek__Contractor_Resource__c";
             this.selectedResourceContact = "";

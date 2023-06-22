@@ -242,6 +242,8 @@
                 
                 component.set("v.Spinner", false);
                 console.log(response.getReturnValue());
+                console.log('TESTING');
+
 				component.set("v.listofproductfamily",response.getReturnValue());
                 if (component.get("v.listofproductfamily").length > 0) {
                     if(component.get("v.listofproductfamily").length == 1){

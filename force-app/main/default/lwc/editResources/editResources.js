@@ -25,7 +25,11 @@ export default class LwcRadioGroup extends LightningElement {
     @api showCreateContactPopup;
     @api disableAddContactSave;
     @api selectedConrecord;
+    //CHB-64
+    @api recordId;
+
     connectedCallback(){
+        console.log('RecordID---->'+this.recordId);
         if(!this.isnotFirst){
             this.getContactsList();
         }

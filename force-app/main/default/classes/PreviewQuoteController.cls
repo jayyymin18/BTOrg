@@ -12,21 +12,34 @@ public without sharing class PreviewQuoteController{
     }
 
     @AuraEnabled
-    public static Contact getObjectContact(String recordId){
-        Contact con;
+    public static List<Contact> getObjectContact(String recordId){
+        List<Contact> con;
         buildertek__Quote__c qut;
-        if (Schema.sObjectType.buildertek__Quote__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Quote__c.fields.buildertek__Primary_Contact__c.isAccessible()){
+        Set<Id> projectAccId= new Set<Id>();
+        // if (Schema.sObjectType.buildertek__Quote__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Quote__c.fields.buildertek__Primary_Contact__c.isAccessible()){
 
-            qut = [SELECT Id, buildertek__Primary_Contact__c
-                   FROM buildertek__Quote__c
-                   WHERE Id = :recordId];
+        //     qut = [SELECT Id, buildertek__Primary_Contact__c FROM buildertek__Quote__c WHERE Id = :recordId];
+        // }
+
+
+        // if (qut.buildertek__Primary_Contact__c != null){
+        //     con = [SELECT Id, Name, Email FROM Contact   WHERE Id = :qut.buildertek__Primary_Contact__c];
+        // }
+        qut = [SELECT Id, Name, buildertek__Project__c , buildertek__Project__r.buildertek__Customer__c FROM buildertek__Quote__c WHERE Id = :recordId];
+
+        System.debug('qut.buildertek__Project__c' + qut.buildertek__Project__c);
+        System.debug('qut.buildertek__Project__c' + qut.buildertek__Project__r.buildertek__Customer__c);
+
+        if (qut.buildertek__Project__c != null && qut.buildertek__Project__r.buildertek__Customer__c != null){
+            if(qut.buildertek__Project__r.buildertek__Customer__c != null){
+                projectAccId.add(qut.buildertek__Project__r.buildertek__Customer__c);
+            }
+            
         }
 
-
-        if (qut.buildertek__Primary_Contact__c != null){
-            con = [SELECT Id, Name, Email
-                   FROM Contact
-                   WHERE Id = :qut.buildertek__Primary_Contact__c];
+        System.debug('projectAccId' + projectAccId);
+        if(!projectAccId.isEmpty()){
+            con = [SELECT Id, Name, Email , buildertek__Primary_Contact__c, AccountId FROM Contact WHERE AccountId IN: projectAccId];
         }
         return con;
     }
@@ -61,7 +74,8 @@ public without sharing class PreviewQuoteController{
         email.setTemplateId(theTemplate.Id);
         email.setWhatId(recordId);
         email.setTargetObjectId(con.Id);
-        email.setSaveAsActivity(true);
+        // email.setSaveAsActivity(true);
+        email.setSaveAsActivity(false);
         email.setToAddresses(toaddres);
         msgList.add(email);
 
@@ -81,7 +95,8 @@ public without sharing class PreviewQuoteController{
             System.debug(theTemplate1);
             email1.setWhatId(recordId);
             email1.setTargetObjectId(con.Id);
-            email1.setSaveAsActivity(true);
+            // email1.setSaveAsActivity(true);
+            email1.setSaveAsActivity(false);
             email1.setToAddresses(toaddres);
             msgList1.add(email1);
             Messaging.SendEmailResult[] r1 = Messaging.sendEmail(new Messaging.SingleEmailMessage[]{email1});
@@ -202,7 +217,8 @@ public without sharing class PreviewQuoteController{
                                         WHERE DeveloperName = 'QuoteTemplateBody'].Id;
             email.setTemplateId(theTemplatebodyid);
             email.setTargetObjectId(conList[0].Id);
-            email.setSaveAsActivity(true);
+            // email.setSaveAsActivity(true);
+            email.setSaveAsActivity(false);
             email.setWhatId(recordId);
             email.setToAddresses(new List<String>{'noreplay@buildertek.com'});
             msgList.add(email);
@@ -299,7 +315,8 @@ public without sharing class PreviewQuoteController{
             mail.setSubject(subject);
             mail.setHTMLBody(templateBody1);
             //mail.setTargetObjectId(conrec.Id);
-            mail.setSaveAsActivity(true);
+            mail.setSaveAsActivity(false);
+            // mail.setSaveAsActivity(true);
             mail.setWhatId(recordId);
 
             List<Messaging.Emailfileattachment> fileAttachments = new List<Messaging.Emailfileattachment>();
@@ -327,6 +344,7 @@ public without sharing class PreviewQuoteController{
             mail.setFileAttachments(fileAttachments);
             mails.add(mail);
             Messaging.SendEmailResult[] results = Messaging.sendEmail(mails);
+
             String message = 'Success';
             if (results.size() > 0){
                 if (results[0].isSuccess()){
@@ -349,33 +367,61 @@ public without sharing class PreviewQuoteController{
                         j++;
 
                     }
+
+
+                    String anchorTagRegex = '<a href=\"(.*?)">(.*?)</a>';
+                    String plainText = templateBody1.replaceAll(anchorTagRegex, ' ');
+                    String plainText2 = plainText.stripHtmlTags();
+
+                    // Print the plain text.
+                    System.debug('Plain text: ' + plainText);
+
                     system.debug('CCaddresses ----------> ' + CCaddresses);
                     system.debug('Toaddresses ----------> ' + Toaddresses);
                     EmailMessage caseEmailMessage = new EmailMessage();
                     caseEmailMessage.fromAddress = UserInfo.getUserEmail();
                     caseEmailMessage.ToAddress = Toaddresses;
-                    caseEmailMessage.FromName = UserInfo.getUserName();
+                    caseEmailMessage.FromName = UserInfo.getName();
                     caseEmailMessage.CcAddress = CCaddresses;
                     caseEmailMessage.Subject = subject;
-                    caseEmailMessage.HtmlBody = body;
+                    caseEmailMessage.HtmlBody = templateBody1;
                     caseEmailMessage.Incoming = False;
+                    caseEmailMessage.RelatedToId = recordId;
                     caseEmailMessage.buildertek__Is_Incoming_Email__c = false;
                     caseEmailMessage.MessageDate = system.now();
-                    caseEmailMessage.TextBody = body.replaceAll('<br/>', '\n');
+                    caseEmailMessage.TextBody = plainText2;
                     system.debug('Content length ---------> ' + body.length());
-                    caseEmailMessage.status = '5';
+                    caseEmailMessage.status = '3';
                     caseEmailMessage.RelatedToId = recordId;
                     caseEmailMessage.buildertek__Subject__c = 'Re: ' + subject;
+                    System.debug('before caseEmailMessage:- '+caseEmailMessage);
 
                     insert caseEmailMessage;
 
-
+                    System.debug('caseEmailMessage:- '+caseEmailMessage);
+                    
+                    ContentVersion conVer = new ContentVersion();
+                    conVer.PathOnClient = 'Quote.pdf'; // The files name, extension is very important here which will help the file in preview.
+                    conVer.Title = quoterecbody[0].Name; // Display name of the files
+                    conVer.VersionData = b; // converting your binary string to Blog
+                    insert conVer;    //Insert ContentVersion
+                    
+                    ContentDocumentLink conDocLink = New ContentDocumentLink();
+                    conDocLink.LinkedEntityId = caseEmailMessage.Id; // Specify RECORD ID here i.e Any Object ID (Standard Object/Custom Object)
+                    conDocLink.ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id =:conVer.Id].ContentDocumentId;  //ContentDocumentId Id from ContentVersion
+                    conDocLink.Visibility = 'AllUsers';
+                    insert conDocLink;
+                    
+                    
                     EmailMessageRelation emr = new EmailMessageRelation();
                     emr.emailMessageId = caseEmailMessage.id;
                     emr.relationId = UserInfo.getUserId(); // user id / contact Id of the sender
                     emr.relationType = 'FromAddress';
                     emr.relationAddress = caseEmailMessage.fromAddress;
                     insert emr;
+                    
+                    System.debug('emrid+- '+ emr);
+                    System.debug('caseEmailMessage id :- '+emr.EmailMessageId);
 
                 }
             }

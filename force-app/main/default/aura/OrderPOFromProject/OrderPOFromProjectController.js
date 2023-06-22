@@ -363,7 +363,7 @@
 
 	orderPO: function (component, event, helper) {
 		// debugger;
-        console.log('orderpo is called');
+
 		var record = component.get("v.recordId");
 		var select = component.get("v.selectedobjInfo");
 		var budgetsList = component.get("v.masterBudgetsList");
@@ -486,6 +486,8 @@
 		component.set("v.masterBudgetsList", Submittals)
 
 		component.find("checkContractors").set("v.value", false);
+
+
 
 
 	},

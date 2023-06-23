@@ -27,9 +27,10 @@ export default class LwcRadioGroup extends LightningElement {
     @api selectedConrecord;
     //CHB-64
     @api recordId;
+    @api taskid
 
     connectedCallback(){
-        console.log('RecordID---->'+this.recordId);
+        console.log('RecordID---->'+this.taskid);
         if(!this.isnotFirst){
             this.getContactsList();
         }
@@ -63,8 +64,10 @@ export default class LwcRadioGroup extends LightningElement {
         //this.isLoadedResources = true
         var that = this;
         var selectedId = ''
+        var str = this.taskid;
+        console.log('task id js:--->',str);
         selectedId = this.selectedResourceid ? this.selectedResourceid : ''
-        getContactsDup({pageNumber: this.pageNumber, pageSize: this.pageSize,selected: selectedId, searchname: this.searchVal, searchaccount: this.searchAccVal}).then(function(response){
+        getContactsDup({taskid: str, pageNumber: this.pageNumber, pageSize: this.pageSize,selected: selectedId, searchname: this.searchVal, searchaccount: this.searchAccVal}).then(function(response){
             that.isnotFirst = true;
             console.log(response);
             that.isLoadedResources = false;

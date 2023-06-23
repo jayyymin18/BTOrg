@@ -3105,10 +3105,11 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               console.log('taskReocrdId:=- '+this.taskRecordId);
               this.selectedContactApiName = "buildertek__Resource__c";
               this.selectedResourceContact =
-                event.record._data.internalresource;
+              event.record._data.internalresource;
             }
           } else if (event.target.classList.contains("addinternalresource")) {
             this.taskRecordId = event.record._data.id;
+            console.log('taskReocrdId:=- '+this.taskRecordId);
             this.showEditResourcePopup = true;
             this.selectedContactApiName = "buildertek__Resource__c";
             this.selectedResourceContact = "";
@@ -3147,8 +3148,8 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             }
           } else if (event.target.classList.contains("addcontractorresource")) {
             this.taskRecordId = event.record._data.id;
-            console.log('taskReocrdId:=- '+this.taskRecordId);
             this.showEditResourcePopup = true;
+            console.log('taskReocrdId:=- '+this.taskRecordId);
             this.selectedContactApiName = "buildertek__Contractor_Resource__c";
             this.selectedResourceContact = "";
           }

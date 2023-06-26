@@ -3278,9 +3278,27 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       }, 5000);
     }
   }
-  // saveWbsData(wbsValue){
-  //   console.log({wbsValue});
 
-  // }
+  onDrop({ context }) {
+    const
+        { gantt, grid }                                        = this,
+        { valid, highlightRow, parent, insertBefore, grabbed } = context;
+
+    // If drop was done in a valid location, add the task to Gantt's task store
+    if (valid) {
+        const unplannedTask = grid.getRecordFromElement(grabbed);
+
+        // Remove unplanned task from its current store
+        grid.store.remove(unplannedTask);
+
+        // Insert it to Gantt's task store
+        parent.insertChild(unplannedTask, insertBefore);
+    }
+
+    gantt.disableScrollingCloseToEdges(gantt.timeAxisSubGrid);
+
+    highlightRow?.removeCls('drag-from-grid-target-task-before');
+    gantt.features.taskTooltip.disabled = false;
+}
 
 }

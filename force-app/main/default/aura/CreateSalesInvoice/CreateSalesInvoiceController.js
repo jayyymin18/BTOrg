@@ -1,4 +1,4 @@
-({
+({  
     doInit: function (component, event, helper) {
         component.set('v.Spinner', true);
         var value = helper.getParameterByName(component, event, 'inContextOfRef');
@@ -7,7 +7,6 @@
         component.set("v.parentRecordId", parentRecordId);
 
         var action = component.get("c.getFieldSet");
-        console.log('action ==>',action);
         action.setParams({
             objectName: "buildertek__Billings__c",
             fieldSetName: "buildertek__New_InvoiceAR_ComponentFields",
@@ -28,29 +27,22 @@
 
         var recordId = component.get("v.recordId");
         console.log('recordID ==>' + recordId);
-        // context = JSON.parse(window.atob(value));
-        // parentRecordId = context.attributes.recordId;
-        // console.log('parentRecordId ==>' + parentRecordId);
-        // if (recordId != undefined & recordId != null) {
-        //     console.log('1');
-        //     component.set('v.SalesInvoice.buildertek__Project__c', recordId);
-        //     component.set('v.desableProjectSelection', true);
-        //     console.log('2');
-        // } else {
-        //     component.set('v.desableProjectSelection', false);
-        //     console.log('else');
-        // }
+        if (recordId != undefined & recordId != null) {
+            console.log('1');
+            component.set('v.SalesInvoice.buildertek__Project__c', recordId);
+            component.set('v.desableProjectSelection', true);
+            console.log('2');
+        } else {
+            component.set('v.desableProjectSelection', false);
+        }
 
         if (value != null) {
             context = JSON.parse(window.atob(value));
-            console.log('context ==>',context);
             parentRecordId = context.attributes.recordId;
             component.set("v.parentRecordId", parentRecordId);
-            console.log('parentRecordId ==>' + parentRecordId);
             console.log('parentRecordId---->>', { parentRecordId });
             // component.set("v.Spinner", false);
         } else {
-            console.log('Value is null');
             var relatedList = window.location.pathname;
             var stringList = relatedList.split("/");
             parentRecordId = stringList[4];
@@ -59,7 +51,7 @@
                 parentRecordId = stringList[3];
             } else {
                 parentRecordId = '';
-            }
+        }
             component.set("v.parentRecordId", parentRecordId);
             console.log('parentRecordId-->>', { parentRecordId });
         }
@@ -80,7 +72,6 @@
                     var objName = response.getReturnValue();
                     if (objName == 'buildertek__Project__c') {
                         component.set("v.parentprojectRecordId", parentRecordId);
-                        // component.set('v.SalesInvoice.buildertek__Project__c', recordId);
                     }
                     if (objName == 'buildertek__Change_Order__c') {
                         component.set("v.parentChangeOrderRecordId", parentRecordId);
@@ -151,7 +142,7 @@
 
                     if (saveNnew) {
                         $A.get('e.force:refreshView').fire();
-                    }
+        }
                     else {
                         console.log('---Else---');
                         console.log('saveAndClose');

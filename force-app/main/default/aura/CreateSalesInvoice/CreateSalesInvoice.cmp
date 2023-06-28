@@ -7,8 +7,8 @@
     <aura:attribute name="parentChangeOrderRecordId" type="String" default="" />
     <aura:attribute name="buildertek__Contract__c" type="String" default="" />
     <aura:attribute name="desableProjectSelection" type="boolean" default="false" />
-    <aura:attribute name="recordId" type="String" />
     <aura:attribute name="SalesInvoice" type="Billings__c" default="{'sobjectType':'Billings__c'}" />
+    <aura:attribute name="recordId" type="String" />
 
 
     <lightning:notificationsLibrary aura:id="notifLib"/>
@@ -59,8 +59,8 @@
                                         <aura:set attribute="else">
                                             <aura:if isTrue="{!field.name=='buildertek__Project__c'}" > 
                                                 <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
-                                                    <!-- <label for="salesInvoice"><span style="color: red;">*</span> &nbsp;Project</label> -->
-                                                    <!-- <lightning:inputField disabled="{!v.desableProjectSelection}" fieldName="{!field.name}" value="{!v.SalesInvoice.buildertek__Project__c}" variant="label-hidden" required="true" /> -->
+                                                    <!-- <lightning:inputField fieldName="{!field.name}" value="{!v.parentprojectRecordId}" /> -->
+                                                    <lightning:inputField aura:id="checkInProject" disabled="{!v.desableProjectSelection}" fieldName="{!field.name}" value="{!v.SalesInvoice.buildertek__Project__c}" variant="label-hidden" required="true" />
                                                 </lightning:layoutItem>
                                             </aura:if>
 
@@ -69,26 +69,26 @@
                                                     <lightning:inputField fieldName="{!field.name}" value="{!v.parentChangeOrderRecordId}" />
                                                 </lightning:layoutItem>
                                             </aura:if>
-
+                                
                                             <aura:if isTrue="{!field.name=='buildertek__Contract__c'}" > 
                                                 <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
                                                     <lightning:inputField fieldName="{!field.name}" value="{!v.parentContractRecordId}" />
                                                 </lightning:layoutItem>
                                             </aura:if>
                                         </aura:set>
-
+                                
                                     </aura:if>
-
+                            
                                 </aura:iteration>
                             </lightning:layout>
                         </div>
-                    </lightning:recordEditForm>
-                </div>
+               
+                <!-- </div> -->
                 <div class="slds-col modal-footer slds-modal__footer slds-buttoncustom" >
-                    <lightning:button label="Cancel" title="Cancel" onclick="{!c.Cancel}" class="myBtn"/>
-                    <!-- <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.handlesaveNnew}" class="myBtn2"/> -->
-                    <lightning:button variant="neutral" type="submit" title="Save &amp; New" label="Save &amp; New" onclick="{!c.handlesaveNnew}" />
-                    <lightning:button variant="brand" type="submit" label="Save" />
+                    <lightning:button label="Cancel" title="Cancel" onclick="{!c.closePopup}" class="myBtn"/>
+                    <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.createRecord}" class="myBtn2"/>
+                </div>
+                </lightning:recordEditForm>
                 </div>
             </div>
         </div>

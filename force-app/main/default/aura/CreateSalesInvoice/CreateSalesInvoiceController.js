@@ -88,14 +88,6 @@
 
     },
     Cancel: function (component, event, helper) {
-        var workspaceAPI = component.find("workspace");
-        workspaceAPI.getFocusedTabInfo().then(function (response) {
-            var focusedTabId = response.tabId;
-            workspaceAPI.closeTab({ tabId: focusedTabId });
-        })
-            .catch(function (error) {
-                console.log(error);
-            });
         $A.get("e.force:closeQuickAction").fire();
     },
     handleSubmit: function (component, event, helper) {
@@ -141,8 +133,12 @@
                     console.log('saveNnew: ' + saveNnew);
 
                     if (saveNnew) {
-                        $A.get('e.force:refreshView').fire();
-        }
+                        console.log('saveNnew ==>',saveNnew);
+                        // $A.get('e.force:refreshView').fire();
+                        component.find('field').forEach(function(f) {
+                            f.reset();
+                        });
+                    }
                     else {
                         console.log('---Else---');
                         console.log('saveAndClose');
@@ -166,6 +162,7 @@
                             }), 1000
                         );
                     }
+                    
                 }
                 else if (state === "ERROR") {
                     var toastEvent = $A.get("e.force:showToast");
@@ -199,5 +196,6 @@
     saveNnew: function (component, event, helper) {
         component.set("v.isSaveAndNew", true);
         console.log('saveNnew');
-    }
+    },
+ 
 })

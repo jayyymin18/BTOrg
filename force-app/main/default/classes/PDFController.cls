@@ -1,36 +1,24 @@
 public with sharing class PDFController {
     @AuraEnabled(cacheable=true)
-    public static void convertBlobToHTML(String pdfBlob) {
-        System.debug('method called' + pdfBlob);
-        // try {
-        //     String pdfContent = EncodingUtil.base64Encode(pdfBlob);
-        //     String hexChars = '0123456789ABCDEF';
-        //     String htmlBody = '';
-            
-        //     for (Integer i = 0; i < pdfContent.length(); i++) {
-        //         String currentChar = pdfContent.substring(i, i + 1);
-        //         Integer decimalValue = hexChars.indexOf(currentChar.toUpperCase());
+    public static String convertBlobToHTML() {
+                // Retrieve the PDF file from a static resource
+                StaticResource pdfResource = [SELECT Id, Body FROM StaticResource WHERE Name = 'Releasenote'];
+        
+                // Convert the PDF Blob to HTML body
+                String pdfContent ='';
+                String htmlBody = '';
+                Blob pdfBlob;
+                String pdfUrl = '';
+                if (pdfResource != null && pdfResource.Body != null) {
                 
-        //         if (decimalValue >= 0 && decimalValue <= 15) {
-        //             htmlBody += String.fromCharArray(new Integer[] { decimalValue + 32 });
-        //         }
-        //     }
-        //     System.debug('htmlBody ==>  ' + htmlBody);
-        //     return htmlBody;
-        // } catch (Exception ex) {
-        //     // Handle any exceptions
-        //     System.debug('Error converting Blob to HTML: ' + ex.getMessage());
-        //     return '';
-        // }
+                        pdfBlob = pdfResource.Body;
+                        System.debug('pdfblob' + pdfBlob);
+                        pdfContent = EncodingUtil.base64Encode(pdfBlob);
+                         pdfUrl = 'data:application/pdf;base64,' + pdfContent;
+                        //  htmlBody = '<html><body><img src="' + pdfUrl + '" width="100%" height="100%"></body></html>';
 
-        // String pdfString = pdfBlob.toString();
-
-        // // Perform any necessary operations with the Blob value
-        // System.debug('PDF Blob Value: ' + pdfString);
-
-        // // Return the HTML body
-        // String htmlBody = '<html><body>PDF Blob Value: ' + pdfString + '</body></html>';
-        // System.debug('html' + htmlBody);
-        // return htmlBody;
-    }
+                        htmlBody = '<html><body><embed src="data:application/pdf;base64,' + pdfContent + '" type="application/pdf" width="100%" height="100%"></embed></body></html>';
+                }
+                return pdfUrl;
+            }
 }

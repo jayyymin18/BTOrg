@@ -2056,15 +2056,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                   record.record._data.type == "Task" &&
                   record.record._data.name != "Milestone Complete"
                   ) {
-                    var syear = record.record.orignaldata.startDate.split('-')[0]; 
-                    var smonth = record.record.orignaldata.startDate.split('-')[1]; 
-                    var sday = record.record.orignaldata.startDate.split('-')[2]; 
                     // console.log('In if conditon for enddate');
                     var start;
                     var endDate = new Date(record.value);
-                    console.log('record.record.startDate.getTime() >>>'+record.record.startDate.getTime());
-                  var start = new Date(parseInt(syear),parseInt(smonth)-1,parseInt(sday));
-                  console.log('>>>'+typeof(start));
+                  var start = new Date(record.record.startDate.getTime());
                   var duration = record.record.duration;
                   var eDate = new Date(start);
                   var eDatebefore = endDate;
@@ -3285,9 +3280,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       }, 5000);
     }
   }
-  // saveWbsData(wbsValue){
-  //   console.log({wbsValue});
+
  
-  // }
 
 }

@@ -49,7 +49,7 @@
 
 .tab-menu ul li a.active-tab {
     color: white;
-    background-color: #6699CC;
+    background-color: #2596be;
     border-radius: 28px;
     font-style: normal;
     font-weight: 700;
@@ -485,12 +485,23 @@ lightning-input {
 }
 
 .slds-m-left_large {
-    color: gray;
+    color: rgb(0, 0, 0);
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+    
 }
 .slds-m-left_x-large {
-    color: gray;
+    color: rgb(0, 0, 0);
+    display: list-item;
+    list-style-type: circle;
+    list-style-position: inside;
+    padding-left: 60px;
 }
-
+.slds-m-left_xx-large {
+    color: rgb(0, 0, 0);
+    padding-left: 120px;
+}
 .resourcediv {
     border-left: 1px solid gray;
     background-color: #3E77AE;
@@ -1948,4 +1959,12 @@ body {
 }
 .pdfcont::-webkit-scrollbar {
     display: none;
+}
+.k21{
+    background-color: rgba(37, 150, 190, 0.1);
+    padding-left: 30px;   
+    border-radius: 40px;
+    padding-top: 5px;
+    padding-bottom: 17px;
+    padding-right: 30px;
 }

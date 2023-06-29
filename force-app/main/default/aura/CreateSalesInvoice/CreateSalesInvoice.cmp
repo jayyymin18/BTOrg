@@ -10,7 +10,6 @@
     <aura:attribute name="SalesInvoice" type="Billings__c" default="{'sobjectType':'Billings__c'}" />
     <aura:attribute name="recordId" type="String" />
 
-
     <lightning:notificationsLibrary aura:id="notifLib"/>
     <lightning:workspaceAPI aura:id="workspace"/>
     <aura:attribute name="isSaveAndNew" type="Boolean" default="false" />
@@ -34,6 +33,10 @@
         .slds-modal__content{
             overflow: hidden !important;
         }
+        .slds-docked-form-footer{
+            bottom: auto !important;
+            Display: block !important;
+        }
     </aura:html>
 
     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}"/>
@@ -52,45 +55,35 @@
                             <lightning:layout multipleRows="true">
                                 <!-- Display fields -->
                                 <aura:iteration items="{!v.allFieldsLabel}" var="field">
-                                    <aura:if isTrue="{!and(field.name != 'buildertek__Project__c' , field.name != 'buildertek__Change_Order__c', field.name != 'buildertek__Contract__c')}">
+                                    <aura:if isTrue="{!field.name == 'buildertek__Project__c'}">
                                         <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
-                                            <lightning:inputField fieldName="{!field.name}"/>
+                                            <lightning:inputField  disabled="true" fieldName="{!field.name}" value="{!v.recordId}"/>
                                         </lightning:layoutItem>
                                         <aura:set attribute="else">
-                                            <aura:if isTrue="{!field.name=='buildertek__Project__c'}" > 
-                                                <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
-                                                    <!-- <lightning:inputField fieldName="{!field.name}" value="{!v.parentprojectRecordId}" /> -->
-                                                    <lightning:inputField aura:id="checkInProject" disabled="{!v.desableProjectSelection}" fieldName="{!field.name}" value="{!v.SalesInvoice.buildertek__Project__c}" variant="label-hidden" required="true" />
-                                                </lightning:layoutItem>
-                                            </aura:if>
-
-                                            <aura:if isTrue="{!field.name=='buildertek__Change_Order__c'}" > 
-                                                <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
-                                                    <lightning:inputField fieldName="{!field.name}" value="{!v.parentChangeOrderRecordId}" />
-                                                </lightning:layoutItem>
-                                            </aura:if>
-                                
-                                            <aura:if isTrue="{!field.name=='buildertek__Contract__c'}" > 
-                                                <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
-                                                    <lightning:inputField fieldName="{!field.name}" value="{!v.parentContractRecordId}" />
-                                                </lightning:layoutItem>
-                                            </aura:if>
+                                            <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small"> 
+                                                <lightning:inputField aura:id="field" fieldName="{!field.name}"/>
+                                            </lightning:layoutItem>
                                         </aura:set>
-                                
                                     </aura:if>
-                            
                                 </aura:iteration>
                             </lightning:layout>
                         </div>
                
-                <!-- </div> -->
-                <div class="slds-col modal-footer slds-modal__footer slds-buttoncustom" >
-                    <lightning:button label="Cancel" title="Cancel" onclick="{!c.closePopup}" class="myBtn"/>
-                    <lightning:button variant="brand" label="Save" title="Save" onclick="{!c.createRecord}" class="myBtn2"/>
-                </div>
-                </lightning:recordEditForm>
+                        <div class="slds-m-top_medium">    
+                            <div class="slds-docked-form-footer slds-modal__footer customFooter" style="height:55px;">
+                                <div style="float:right !important;">
+                                    <lightning:button label="Cancel" title="Cancel" onclick="{!c.Cancel}" class="myBtn"/>
+                                    <lightning:button variant="neutral" type="submit" title="Save &amp; New" label="Save &amp; New" onclick="{!c.handlesaveNnew}" />
+                                    <lightning:button variant="brand" label="Save" title="Save"  type="submit" class="myBtn2"/>
+                                </div>
+                            </div>    
+                        </div>
+                
+                    </lightning:recordEditForm>
+                
                 </div>
             </div>
+            
         </div>
 
     </div>

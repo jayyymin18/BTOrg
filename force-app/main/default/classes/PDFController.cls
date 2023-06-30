@@ -15,10 +15,10 @@ public with sharing class PDFController {
                         System.debug('pdfblob' + pdfBlob);
                         pdfContent = EncodingUtil.base64Encode(pdfBlob);
                          pdfUrl = 'data:application/pdf;base64,' + pdfContent;
-                        //  htmlBody = '<html><body><img src="' + pdfUrl + '" width="100%" height="100%"></body></html>';
 
                         htmlBody = '<html><body><embed src="data:application/pdf;base64,' + pdfContent + '" type="application/pdf" width="100%" height="100%"></embed></body></html>';
                 }
-                return pdfUrl;
+                return htmlBody;
             }
+
 }

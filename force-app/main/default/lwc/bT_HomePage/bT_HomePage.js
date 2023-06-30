@@ -1,32 +1,37 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track, wire } from 'lwc';
 import { loadStyle, loadScript } from 'lightning/platformResourceLoader';
 import PDF_Resource from '@salesforce/resourceUrl/Releasenote';
-import designcss from '@salesforce/resourceUrl/designcss'
+import Resource from '@salesforce/resourceUrl/Release';
+
+import convertBlobToHTML from '@salesforce/apex/PDFController.convertBlobToHTML';
 
 export default class Qf_guide2 extends LightningElement {
   @track spinnerdatatable = false;
   error_toast = true;
   pdfUrl;
-  activeSections = ['A'];
-  activeSectionsMessage = '';
-    
+  img;
+  pdfBlob;
+  htmlBody;
 
-    handleSectionToggle(event) {
-        const openSections = event.detail.openSections;
-
-        if (openSections.length === 0) {
-            this.activeSectionsMessage = 'All sections are closed';
-        } else {
-            this.activeSectionsMessage =
-                'Open sections: ' + openSections.join(', ');
-        }
-    }
-
-    connectedCallback() {
-        this.pdfUrl = PDF_Resource;
-        loadStyle(this, designcss);
-    }
-
+  connectedCallback() {
+    this.img = Resource;
+    this.pdfUrl = PDF_Resource;
+    document.title = 'BT Admin Configuration';
+  }
+openPDF() {
+  window.open(this.pdfUrl);
+}
+  // @wire(convertBlobToHTML)
+  // wiredConvertBlobToHTML({ error, data }) {
+  //   if (data) {
+  //     this.pdfUrl = data;
+  //     console.log("HTML Body:", this.pdfUrl);
+  //     // this.createPdfUrl();
+  //     // Perform any additional operations with the HTML body
+  //   } else if (error) {
+  //     console.error('Error converting Blob to HTML:', error);
+  //   }
+  // }
   renderedCallback() {
     this.template.querySelectorAll("a").forEach(element => {
       element.addEventListener("click", evt => {
@@ -47,7 +52,6 @@ export default class Qf_guide2 extends LightningElement {
     });
   }
 
-
   tabing() {
     const target = "tab1";
     this.template.querySelectorAll("a").forEach(tabel => {
@@ -59,7 +63,4 @@ export default class Qf_guide2 extends LightningElement {
     this.template.querySelector('[data-tab-id="' + target + '"]').classList.add("active-tab");
     this.template.querySelector('[data-id="' + target + '"]').classList.add("active-tab-content");
   }
-
-
-  
 }

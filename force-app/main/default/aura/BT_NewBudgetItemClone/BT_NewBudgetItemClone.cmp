@@ -270,7 +270,7 @@
     <c:BT_Spinner />
     <div style="background: white;border-radius: 5px;height: 100%;" class="slds-scrollable">
         <aura:if isTrue="{!v.isbudget}">
-            <div class="slds-modal__header" style="font-size:17px;">
+            <div class="slds-modal__header" style="font-size:17px; text-align: left;">
                 <a href="{!'/'+v.budgetId}" onclick="{!c.closetab}">{!v.budgetName} </a>
             </div>
         </aura:if>

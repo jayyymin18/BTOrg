@@ -232,3 +232,9 @@
     max-height: 43vh;
     }
 }    */
+@media (min-width: 1900px) {
+    .THIS .divcont{
+        max-height: 38vh;
+        overflow: auto;
+    }
+  }

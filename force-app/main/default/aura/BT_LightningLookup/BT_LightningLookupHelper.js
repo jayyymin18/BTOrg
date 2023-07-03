@@ -21,6 +21,8 @@
       // set a callBack  
       console.log( component.get("v.filter"));  
       console.log( component.get("v.prodctfamly"));
+      console.log( component.get("v.parentId"));
+
 
      
 

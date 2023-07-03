@@ -495,9 +495,10 @@ public with sharing class QuoteDAO{
             }
             if (filter != null){
                 filter = filter + ' AND Id IN: ProdIds';
-            } else{
-                filter = 'Id IN: ProdIds';
             }
+            //  else{
+            //     filter = 'Id IN: ProdIds';
+            // }
         }
         if (filter != null){
             sQuery = 'select id, Name from ' + ObjectName + ' where Name LIKE: searchKey AND ' + filter + ' order by Name ASC limit 5';
@@ -508,15 +509,7 @@ public with sharing class QuoteDAO{
         system.debug('searchKey --------> ' + searchKey);
         system.debug('sQuery --------> ' + sQuery);
         List<sObject> lstOfRecords;
-        /*if(ObjectName == 'Product2'){
-         if(Schema.sObjectType.Product2.fields.Id.isAccessible() &&
-         Schema.sObjectType.Product2.fields.Name.isAccessible() ){
-
-         lstOfRecords = Database.query(String.escapeSingleQuotes(sQuery));
-         }
-         }else{*/
         lstOfRecords = Database.query(sQuery);
-        /*}*/
         for (sObject obj : lstOfRecords){
             returnList.add(obj);
         }

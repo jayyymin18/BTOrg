@@ -10,6 +10,9 @@
             recordId : recordId //component.get("v.recordId")    
         });
         action.setCallback(this, function(response){
+            console.log(response.getError());
+            console.log({state});
+
             var state = response.getState();
             if(state === "SUCCESS"){
                 //  alert(state);

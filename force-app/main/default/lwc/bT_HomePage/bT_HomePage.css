@@ -300,6 +300,10 @@ lightning-input {
     width: 50%;
     min-height: 70vh;
     margin-top: 15px;
+    overflow: auto;
+}
+.Wel_message::-webkit-scrollbar {
+    display: none;
 }
 
 .Wel_message p {

@@ -10,6 +10,9 @@
             component.set("v.additionalUrl", additionalUrl);
         }
 
+        console.log({additionalUrl});
+        var fromWhereBudgetIsOpen=component.get('v.fromWhereBudgetIsOpen');
+        console.log({fromWhereBudgetIsOpen});
 
         var workspaceAPI = component.find("workspace");
         workspaceAPI.getEnclosingTabId().then((response) => {
@@ -155,6 +158,7 @@
 
         });
         $A.enqueueAction(btadminaction);
+        helper.applyCSSBasedOnURL(component);
 
     },
 
@@ -246,10 +250,18 @@
         workspaceAPI.getFocusedTabInfo().then(function (response) {
             var focusedTabId = response.tabId;
             workspaceAPI.closeTab({ tabId: focusedTabId });
+            $A.get("e.c:BT_SpinnerEvent").setParams({
+                "action": "SHOW"
+            }).fire();
         })
-            .catch(function (error) {
-                console.log(error);
-            });
+        .catch(function (error) {
+            console.log(error);
+        });
+
+       
+
+        
+       
     },
 
 

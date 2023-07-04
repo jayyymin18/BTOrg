@@ -1164,29 +1164,28 @@ budgetGroup = Database.query('Select Id, Name,('+soql+') from budget_line_group_
         @AuraEnabled
         public pricebook2 defaultValue;
     }
+
+   
     @AuraEnabled
-    public static List<pricebook2> getpricebooks(){
+    public static List<pricebookWrapper> getpricebooks(String recordId){
+                
+        List<pricebookWrapper> priceWrapper = new List<pricebookWrapper>();
+
+        pricebookWrapper priceWrap = new pricebookWrapper();
+        priceWrap.defaultValue= new pricebook2();
+        priceWrap.priceWrapList = new List<pricebook2>();
         List<pricebook2> PriceList = [select Id, Name from pricebook2 Where buildertek__BT_Visible__c = true AND isActive = true ORDER BY Name ASC];
+        priceWrap.priceWrapList=PriceList;
 
-        return PriceList;
-        
-        // List<pricebookWrapper> priceWrapper = new List<pricebookWrapper>();
-
-        // pricebookWrapper priceWrap = new pricebookWrapper();
-        // priceWrap.defaultValue= new pricebook2();
-        // priceWrap.priceWrapList = new List<pricebook2>();
-        // List<pricebook2> PriceList = [select Id, Name from pricebook2 Where buildertek__BT_Visible__c = true AND isActive = true ORDER BY Name ASC];
-        // priceWrap.priceWrapList=PriceList;
-
-        // if(recordId != null){
-        //     buildertek__Budget__c budgetRecord = [Select Id, Name , buildertek__Project__c , buildertek__Project__r.buildertek__Price_Book__c , buildertek__Project__r.buildertek__Price_Book__r.Name From buildertek__Budget__c  WHERE Id = :recordId];
-        //     if(budgetRecord.buildertek__Project__c != null && budgetRecord.buildertek__Project__r.buildertek__Price_Book__c !=null){
-        //         pricebook2 selectedPriceList = [SELECT Id, Name FROM pricebook2 where Id=:budgetRecord.buildertek__Project__r.buildertek__Price_Book__c LIMIT 1];
-        //         priceWrap.defaultValue= selectedPriceList;
-        //     }
-        // }
-        // priceWrapper.add(priceWrap);
-        // return priceWrapper;
+        if(recordId != null){
+            buildertek__Budget__c budgetRecord = [Select Id, Name , buildertek__Project__c , buildertek__Project__r.buildertek__Price_Book__c , buildertek__Project__r.buildertek__Price_Book__r.Name From buildertek__Budget__c  WHERE Id = :recordId];
+            if(budgetRecord.buildertek__Project__c != null && budgetRecord.buildertek__Project__r.buildertek__Price_Book__c !=null){
+                pricebook2 selectedPriceList = [SELECT Id, Name FROM pricebook2 where Id=:budgetRecord.buildertek__Project__r.buildertek__Price_Book__c LIMIT 1];
+                priceWrap.defaultValue= selectedPriceList;
+            }
+        }
+        priceWrapper.add(priceWrap);
+        return priceWrapper;
     }
 
 

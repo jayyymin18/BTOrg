@@ -1,0 +1,18 @@
+<aura:component implements="force:appHostable,force:hasSObjectName,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:actionOverride,force:lightningQuickActionWithoutHeader" access="global" >
+    <!-- <c:BT_NewVendorReview /> -->
+    <aura:html tag="style">
+    .slds-modal__container{
+        margin:auto !important;
+        max-width:40rem !importnat;
+        width:100% !important;
+        height:100% !important;
+
+
+    }
+       
+    </aura:html>
+
+    <c:BT_NewVendorReview />
+     
+    
+</aura:component>

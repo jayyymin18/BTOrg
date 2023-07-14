@@ -6,16 +6,16 @@ function populateIcons(record) {
                 record.record._data.type == "Project" &&
                 record.row._allCells[5].innerHTML
             ) {
-                var iconElement = `<span class="slds-icon_container slds-icon-custom-custom63" >
+                var iconElement = `<span class="slds-icon_container slds-icon-custom-custom" >
                                             <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
-                                                <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom63">
+                                                <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom70">
                                                 </use>
                                             </svg>
                                         </span>`;
                 if (record.row._allCells[5].children[0]) {
                     if (
                         record.row._allCells[5].children[0].innerHTML.indexOf(
-                            "custom63"
+                            "custom70"
                         ) == -1
                     ) {
                         record.row._allCells[5].children[0].innerHTML =
@@ -27,16 +27,16 @@ function populateIcons(record) {
                 record.record._data.type == "Phase" &&
                 record.row._allCells[5].innerHTML
             ) {
-                var iconElement = `<span class="slds-icon_container slds-icon-custom-custom63" >
-            <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
-                <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom63">
-                </use>
-            </svg>
-        </span>`;
+                var iconElement = `<span class="slds-icon_container slds-icon-standard-task" >
+                                            <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
+                                                <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#task">
+                                                </use>
+                                            </svg>
+                                        </span>`;
                 if (record.row._allCells[5].children[0]) {
                     if (
                         record.row._allCells[5].children[0].innerHTML.indexOf(
-                            "custom63"
+                            "slds-icon-standard-task"
                         ) == -1
                     ) {
                         record.row._allCells[5].children[0].innerHTML =
@@ -125,7 +125,7 @@ function populateIcons(record) {
                             }
                         }
                     } else {
-                        var iconElement = `<span class="slds-icon_container slds-icon-custom-custom83" style="background:orange;">
+                        var iconElement = `<span class="slds-icon_container slds-icon-standard-task2" style="background:orange;">
                                                     <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
                                                         <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#task2">
                                                         </use>
@@ -134,7 +134,7 @@ function populateIcons(record) {
                         if (record.row._allCells[5].children[0]) {
                             if (
                                 record.row._allCells[5].children[0].innerHTML.indexOf(
-                                    "slds-icon-custom-custom83"
+                                    "slds-icon-standard-task2"
                                 ) == -1
                             ) {
                                 record.row._allCells[5].children[0].innerHTML =
@@ -155,14 +155,14 @@ function populateIconsOnExpandCollapse(source) {
     if (rowPhaseElement && rowPhaseElement.innerHTML) {
         var iconElement = "";
         if (source.record.type == "Phase") {
-            iconElement = `<span class="slds-icon_container slds-icon-custom-custom63" >
+            iconElement = `<span class="slds-icon_container slds-icon-standard-task" >
                                     <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
-                                    <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom63">
+                                        <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#task">
                                         </use>
                                     </svg>
                                 </span>`;
             if (
-                rowPhaseElement.innerHTML.indexOf("slds-icon-custom-custom63") == -1
+                rowPhaseElement.innerHTML.indexOf("slds-icon-standard-task") == -1
             ) {
                 if (rowPhaseElement.children.length) {
                     if (rowPhaseElement.children[5].children.length) {
@@ -172,14 +172,14 @@ function populateIconsOnExpandCollapse(source) {
                 }
             }
         } else if (source.record.type == "Project") {
-            iconElement = `<span class="slds-icon_container slds-icon-custom-custom63" >
+            iconElement = `<span class="slds-icon_container slds-icon-custom-custom70" >
                                     <svg aria-hidden="true" class="slds-icon slds-icon-text-default" style="fill: white !important;height:1.2rem;width:1.2rem;">
-                                    <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom63">
+                                    <use xmlns:xlink=" http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/custom-sprite/svg/symbols.svg#custom70">
                                         </use>
                                     </svg>
                                 </span>`;
             if (
-                rowPhaseElement.innerHTML.indexOf("slds-icon-custom-custom63") == -1
+                rowPhaseElement.innerHTML.indexOf("slds-icon-custom-custom70") == -1
             ) {
                 if (rowPhaseElement.children.length) {
                     if (rowPhaseElement.children[5].children.length) {

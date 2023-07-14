@@ -63,7 +63,7 @@ public with sharing class InvoiceTrigger_HDL {
        for(buildertek__Billings__c inv : newInvoiceList){ 
            if(!ReceiptList.isEmpty()){
                 // if(inv.buildertek__Status__c != oldInvoiceMap.get(inv.Id).buildertek__Status__c || inv.buildertek__Tax_Rate__c != oldInvoiceMap.get(inv.Id).buildertek__Tax_Rate__c || inv.buildertek__Terms__c != oldInvoiceMap.get(inv.Id).buildertek__Terms__c || inv.buildertek__Due_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Due_Date__c || inv.buildertek__Invoiced_Date__c != oldInvoiceMap.get(inv.Id).buildertek__Invoiced_Date__c ) {
-                    inv.addError('Cannot update Sales Invoice after receipt creation.');
+                    inv.addError('You cannot update this Sales Invoice because there is a Receipt associated with it.  If you would like to change this Sales Invoice, please remove the Receipt first.');
                 // }
             }
         }

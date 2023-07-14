@@ -1,4 +1,5 @@
 /* globals bryntum : true */
+import { formatJSDatatoApexData } from "../gantt_componentHelper";
 export default base => class GanttToolbar extends base {
     static get $name() {
         return 'GanttToolbar';
@@ -497,8 +498,6 @@ export default base => class GanttToolbar extends base {
     }
 
     onSaveClick(){
-        // let temp2 = this.gantt.__data;
-        // console.log('gantt :- ',temp2);
         try {
             var libraryDataList = [];
             for (let i = 0; i < this.gantt.data.length; i++) {
@@ -506,10 +505,8 @@ export default base => class GanttToolbar extends base {
                 libraryDataList.push(data);
             }
             console.log('new data lib ',libraryDataList);
-            // let temp = this.gantt.tasks;
-            let temp = this.gantt.data;
-            console.log('gantt data:- ',JSON.parse(JSON.stringify(temp)));
-            console.log('gantt project data:- ',this.gantt.project);
+            let dataForApexController = formatJSDatatoApexData(libraryDataList);
+            console.log('check new data here ',dataForApexController);
 
         } catch (error) {
             console.log('Error-->'+error+' message-->'+error.message);

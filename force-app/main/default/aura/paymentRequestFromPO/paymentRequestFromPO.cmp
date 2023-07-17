@@ -45,6 +45,15 @@
             bottom: auto !important;
             Display: block !important;
         }
+        <!-- lightning-timepicker{
+            width: 100% !important;
+        }
+        lightning-datepicker{
+            width: 100% !important;
+        }
+        .slds-medium-size_6-of-12 .classbyrk{
+            width: 100% !important;
+        } -->
        
        
     </aura:html>
@@ -68,25 +77,21 @@
                                 <aura:iteration items="{!v.listOfFields}" var="field">
                                     <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                                         <div style="">
-                                            <!-- <aura:if  isTrue="{!and(and( and (  and ( field.name !='buildertek__Purchase_Order__c',field.name !='buildertek__Contractor__c'), field.name != 'Name' ),field.name != 'buildertek__Contractor__c' ), field.name != 'buildertek__Project__c'  )}" >                                  -->
+                                            <aura:if  isTrue="{!and(field.name != 'buildertek__Account__c', field.name != 'buildertek__Effective_Date__c')}" >                                 
                                                 <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"   />  
-                                                <!-- <aura:set attribute="else"> 
-                                                    <aura:if  isTrue="{!and(field.name =='buildertek__Purchase_Order__c')}" >                                            
-                                                        <lightning:inputField fieldName="{! field.name }" aura:id="purchaseorder"  value = "{!v.parentpurchaseRecordId}" disabled="true"/>
-                                                    </aura:if>
-                                                    <aura:if  isTrue="{!and(field.name =='buildertek__Contractor__c')}" >                                            
-                                                        <lightning:inputField fieldName="{! field.name }" aura:id="vendor" required="{!field.Required}" value = "{!v.NameOfVendor}" disabled="true"/>
-                                                    </aura:if>
-                                                    <aura:if  isTrue="{!and(field.name =='Name')}" >                                            
-                                                        <lightning:inputField fieldName="{! field.name }" label = "Vendor Review Name" aura:id="Name"  required="true" type="text" value = "{!v.NameOfVendorReview}" autocomplete="off" />
-            
-                                                    </aura:if>
-                                                    <aura:if  isTrue="{!and(field.name =='buildertek__Project__c')}" >   
-                                                        <lightning:inputField fieldName="{! field.name }" value = "{!v.NameOfProject}" disabled="true"/>
-            
-                                                    </aura:if>
-                                                </aura:set> -->
-                                            <!-- </aura:if> -->
+                                                
+                                                    
+                                                    <aura:set attribute="else"> 
+                                                        <aura:if  isTrue="{!and(field.name =='buildertek__Account__c')}" >                                            
+                                                            <lightning:inputField fieldName="{! field.name }" aura:id="purchaseorder"  value = "{!v.NameOfVendor}" disabled="true"/>
+                                                        </aura:if>
+                                                        <aura:if  isTrue="{!and(field.name =='buildertek__Effective_Date__c')}" >   
+                                                            <div class="classbyrk">                                         
+                                                                <lightning:inputField fieldName="{!field.name}" required="{!field.Required}" aura:id="inputFields"   />
+                                                            </div>
+                                                        </aura:if>
+                                                </aura:set>
+                                            </aura:if>
                             
                                         </div>
                                     </lightning:layoutItem>

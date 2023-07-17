@@ -143,7 +143,7 @@ public with sharing class AccountPayableHelper {
 
         List<buildertek__Payment__c> cashDisbursementList= [Select Id , Name , buildertek__Payable__c From buildertek__Payment__c WHERE buildertek__Payable__c=:newInvoiceMap.keySet()];
         for(buildertek__Account_Payable__c invoice : invoiceList){ 
-            if(!cashDisbursementList.isEmpty()){
+            if(!cashDisbursementList.isEmpty() && invoice.buildertek__Payments__c == oldInvoiceMap.get(invoice.Id).buildertek__Payments__c){
                 invoice.addError('You cannot update this Contractor Invoice because there is a Cash Disbursement associated with it.  If you would like to change this Contractor Invoice, please remove the Cash Disbursement first.');
             }
         }

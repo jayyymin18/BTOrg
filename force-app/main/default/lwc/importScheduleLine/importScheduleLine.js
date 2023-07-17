@@ -1,5 +1,6 @@
-import { LightningElement, track } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { LightningElement, track } from "lwc";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import insertData from "@salesforce/apex/importScheduleLineController.insertData";
 export default class FileUploadComponent extends LightningElement {
     fileName;
     fileContent;
@@ -7,9 +8,13 @@ export default class FileUploadComponent extends LightningElement {
     Spinner;
     showMessage;
     @track files;
+    @track isOpen;
+    @track RecordId;
+    // @track BaseURLs;
+    // @track isNewGantt;
 
     get acceptedFormats() {
-        return ['.csv'];
+        return [".csv"];
     }
 
     handleFileChange(event) {
@@ -19,18 +24,18 @@ export default class FileUploadComponent extends LightningElement {
             const file = this.files[0];
             const reader = new FileReader();
             reader.onload = () => {
-                const contents = reader.result.split(',')[1];
+                const contents = reader.result.split(",")[1];
                 this.fileName = file.name;
                 this.fileContent = contents;
                 this.showError = false;
 
-                console.log('fileContent:', this.fileContent);
+                console.log("fileContent:", this.fileContent);
             };
             reader.readAsDataURL(file);
         } else {
             this.showError = true;
-            this.fileName = '';
-            this.fileContent = '';
+            this.fileName = "";
+            this.fileContent = "";
         }
     }
 
@@ -40,38 +45,60 @@ export default class FileUploadComponent extends LightningElement {
         if (csv == null) {
             return;
         }
-        const hiddenElement = document.createElement('a');
-        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-        hiddenElement.target = '_self';
-        hiddenElement.download = 'Import Schedules.csv';
+        const hiddenElement = document.createElement("a");
+        hiddenElement.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+        hiddenElement.target = "_self";
+        hiddenElement.download = "Import Schedules.csv";
         document.body.appendChild(hiddenElement);
         hiddenElement.click();
     }
 
     convertArrayOfObjectsToCSV() {
-        const keys = ['Name', 'Dependency', 'StartDate', 'Duration', '% Complete', 'Phase', 'Notes', 'Lag'];
-        const columnDivider = ',';
-        let csvStringResult = '';
+        const keys = [
+            "Name",
+            "Dependency",
+            "StartDate",
+            "Duration",
+            "% Complete",
+            "Phase",
+            "Notes",
+            "Lag",
+        ];
+        const columnDivider = ",";
+        let csvStringResult = "";
         csvStringResult += keys.join(columnDivider);
         return csvStringResult;
     }
 
     CSV2JSON(csv) {
         let arr = [];
-        arr = csv.split('\n');
+        arr = csv.split("\n");
 
-        if (arr[arr.length - 1] === '' || arr[arr.length - 1] === undefined || arr[arr.length - 1] === null) {
+        if (
+            arr[arr.length - 1] === "" ||
+            arr[arr.length - 1] === undefined ||
+            arr[arr.length - 1] === null
+        ) {
             arr.pop();
         }
 
         let jsonObj = [];
-        let headers = arr[0].split(',');
-        console.log('headers:', headers);
-        if (headers[0] !== 'Name' || headers[1] !== 'Dependency' || headers[2] !== 'StartDate' || headers[3] !== 'Duration' || headers[4] !== '% Complete' || headers[5] !== 'Phase' || headers[6] !== 'Notes' || headers[7] !== 'Lag\r') {
+        let headers = arr[0].split(",");
+        console.log("headers:", headers);
+        if (
+            headers[0] !== "Name" ||
+            headers[1] !== "Dependency" ||
+            headers[2] !== "StartDate" ||
+            headers[3] !== "Duration" ||
+            headers[4] !== "% Complete" ||
+            headers[5] !== "Phase" ||
+            headers[6] !== "Notes" ||
+            headers[7] !== "Lag\r"
+        ) {
             this.Spinner = false;
             this.isErrorOccured = true;
-            this.errorMessage = 'File Header Format is Invalid!';
-            return '';
+            this.errorMessage = "File Header Format is Invalid!";
+            return "";
         }
 
         let startIndex;
@@ -82,111 +109,124 @@ export default class FileUploadComponent extends LightningElement {
                 while (arr[i].indexOf('"') > -1) {
                     if (startIndex === null) {
                         startIndex = arr[i].indexOf('"');
-                        arr[i] = arr[i].substring(0, startIndex) + ':quotes:' + arr[i].substring(startIndex + 1, arr[i].length);
+                        arr[i] =
+                            arr[i].substring(0, startIndex) +
+                            ":quotes:" +
+                            arr[i].substring(startIndex + 1, arr[i].length);
                     } else {
                         if (endIndex === null) {
                             endIndex = arr[i].indexOf('"');
-                            arr[i] = arr[i].substring(0, endIndex) + ':quotes:' + arr[i].substring(endIndex + 1, arr[i].length);
+                            arr[i] =
+                                arr[i].substring(0, endIndex) +
+                                ":quotes:" +
+                                arr[i].substring(endIndex + 1, arr[i].length);
                         }
                     }
 
                     if (startIndex !== null && endIndex !== null) {
                         let sub = arr[i].substring(startIndex, endIndex);
-                        sub = sub.replaceAll(',', ':comma:');
+                        sub = sub.replaceAll(",", ":comma:");
                         arr[i] = arr[i].substring(0, startIndex) + sub + arr[i].substring(endIndex, arr[i].length);
                         startIndex = null;
                         endIndex = null;
                     }
                 }
 
-                let data = arr[i].split(',');
+                let data = arr[i].split(",");
                 let obj = {};
-                let month = '';
-                let day = '';
+                let month = "";
+                let day = "";
                 for (let j = 0; j < data.length; j++) {
                     let myStr = data[j];
-                    let newStr = myStr.replace(/:comma:/g, ',');
-                    newStr = newStr.replace(/:quotes:/g, '');
+                    let newStr = myStr.replace(/:comma:/g, ",");
+                    newStr = newStr.replace(/:quotes:/g, "");
                     data[j] = newStr;
                     // console.log('newStr:', newStr);
-                    if (headers[j].trim() === 'StartDate' && data[j].trim() !== '') {
+                    if (headers[j].trim() === "StartDate" && data[j].trim() !== "") {
                         let date = data[j].trim();
-                        let splitDate = date.split('/');
-                        if (parseInt(splitDate[0]) < 10 && String(parseInt(splitDate[0])).length < 2) {
-                            month = '0' + splitDate[0];
+                        let splitDate = date.split("/");
+                        if (
+                            parseInt(splitDate[0]) < 10 &&
+                            String(parseInt(splitDate[0])).length < 2
+                        ) {
+                            month = "0" + splitDate[0];
                         } else {
                             month = splitDate[0];
                         }
-                        if (parseInt(splitDate[1]) < 10 && String(parseInt(splitDate[1])).length < 2) {
-                            day = '0' + splitDate[1];
+                        if (
+                            parseInt(splitDate[1]) < 10 &&
+                            String(parseInt(splitDate[1])).length < 2
+                        ) {
+                            day = "0" + splitDate[1];
                         } else {
                             day = splitDate[1];
                         }
 
-                        obj[headers[j].trim()] = month.split('-').reverse().join('-');
+                        obj[headers[j].trim()] = month.split("-").reverse().join("-");
                     } else {
-                        if (headers[j].trim() === '% Complete') {
-                            obj['percentComplete'] = data[j].trim();
+                        if (headers[j].trim() === "% Complete") {
+                            obj["percentComplete"] = data[j].trim();
                         } else {
                             obj[headers[j].trim()] = data[j].trim();
                         }
                     }
                 }
 
-                if (obj.StartDate !== undefined && obj.StartDate !== '') {
+                if (obj.StartDate !== undefined && obj.StartDate !== "") {
                     jsonObj.push(obj);
                 } else {
                     let today = new Date();
-                    let dd = String(today.getDate()).padStart(2, '0');
-                    let mm = String(today.getMonth() + 1).padStart(2, '0');
+                    let dd = String(today.getDate()).padStart(2, "0");
+                    let mm = String(today.getMonth() + 1).padStart(2, "0");
                     let yyyy = today.getFullYear();
 
-                    today = yyyy + '-' + mm + '-' + dd;
+                    today = yyyy + "-" + mm + "-" + dd;
                     obj.StartDate = today;
                     // console.log('today:', today);
                     // console.log('obj.StartDate:', obj.StartDate);
                     jsonObj.push(obj);
 
                     const toastEvent = new ShowToastEvent({
-                        title: 'Error',
-                        message: 'StartDate should not be null',
-                        duration: '10000',
-                        key: 'info_alt',
-                        variant: 'error',
-                        mode: 'dismissible'
+                        title: "Error",
+                        message: "StartDate should not be null",
+                        duration: "10000",
+                        key: "info_alt",
+                        variant: "error",
+                        mode: "dismissible",
                     });
                     this.dispatchEvent(toastEvent);
                     this.startdateError = true;
                     this.Spinner = false;
                 }
-                if (obj.percentComplete !== '' && obj.percentComplete !== undefined) {
+                if (obj.percentComplete !== "" && obj.percentComplete !== undefined) {
                     // Perform necessary operations
                 } else {
-                    const toastEvent = new ShowToastEvent({
-                        title: 'Error',
-                        message: 'Percent Complete should not be null',
-                        duration: '10000',
-                        key: 'info_alt',
-                        variant: 'error',
-                        mode: 'dismissible'
-                    });
-                    this.dispatchEvent(toastEvent);
-                    this.startdateError = true;
-                    this.Spinner = false;
+                    // const toastEvent = new ShowToastEvent({
+                    //     title: 'Error',
+                    //     message: 'Percent Complete should not be null',
+                    //     duration: '10000',
+                    //     key: 'info_alt',
+                    //     variant: 'error',
+                    //     mode: 'dismissible'
+                    // });
+                    // this.dispatchEvent(toastEvent);
+                    // this.startdateError = true;
+                    // this.Spinner = false;
+                    obj.percentComplete = 0;
                 }
             }
         }
 
-        console.log('jsonObj:', jsonObj);
+        console.log("jsonObj:", jsonObj);
         const taskMap = new Map();
         for (let i = 0; i < jsonObj.length; i++) {
             let element = jsonObj[i];
-            taskMap.set('PT - ' + i, element.Name);
+            taskMap.set("PT - " + i, element.Name);
         }
 
         for (let i = 0; i < jsonObj.length; i++) {
             let e = jsonObj[i];
-            e.ID = 'PT - ' + i;
+            e.ID = "PT - " + i;
         }
 
         jsonObj.forEach((ele) => {
@@ -201,7 +241,7 @@ export default class FileUploadComponent extends LightningElement {
         jsonObj.forEach((element) => {
             parentMap.set(element.ID, element.parentID);
         });
-        console.log('parentMap:', parentMap);
+        console.log("parentMap:", parentMap);
 
         let circularDependency = false;
         let totalLoop = 0;
@@ -214,7 +254,7 @@ export default class FileUploadComponent extends LightningElement {
                     currentId = parentMap.get(currentId);
                     if (index > jsonObj.length) {
                         circularDependency = true;
-                        console.log('ele.Name:', ele.Name);
+                        console.log("ele.Name:", ele.Name);
                         this.CircularDependencyName = ele.Name;
                         dependentRecord = ele;
                         break;
@@ -226,11 +266,11 @@ export default class FileUploadComponent extends LightningElement {
             return !circularDependency;
         });
 
-        console.log('Total Loop:', totalLoop);
+        console.log("Total Loop:", totalLoop);
         if (circularDependency) {
-            console.log('dependentRecord:', dependentRecord);
-            console.log('Circular Dependency');
-            return '';
+            console.log("dependentRecord:", dependentRecord);
+            console.log("Circular Dependency");
+            return "";
         } else {
             let json = JSON.stringify(jsonObj);
             return json;
@@ -240,67 +280,76 @@ export default class FileUploadComponent extends LightningElement {
     CreateAccount(jsonstr) {
         const jsonData = JSON.parse(jsonstr);
         const recordId = this.RecordId;
-        const action = this.insertData;
-        console.log('CSV FIle:', JSON.stringify(jsonData));
+        // const action = this.insertData;
+        console.log("CSV FIle:", JSON.stringify(jsonData));
 
-        action({
-            recordId: this.RecordId,
-            strFileData: JSON.stringify(jsonData)
+        insertData({
+            // recordId: this.RecordId,
+            recordId: "a101K00000GodXbQAJ",
+            strFileData: JSON.stringify(jsonData),
         })
             .then((response) => {
-                const state = response.getState();
+                const state = response;
                 console.log({ state });
-                if (state === 'SUCCESS') {
-                    if (response.getReturnValue() === 'SUCCESS') {
+                if (state === "SUCCESS") {
+                    if (response === "SUCCESS") {
                         this.Spinner = false;
                         this.showMessage = false;
                         this.isOpen = false;
 
-                        const baseURL = this.BaseURLs;
-                        const url = location.href;
-                        baseURL = url.substring(0, url.indexOf('--', 0));
+                        // const baseURL = this.BaseURLs;
+                        // const url = location.href;
+                        // baseURL = url.substring(0, url.indexOf('--', 0));
 
                         const toastEvent = new ShowToastEvent({
-                            title: 'Success',
-                            message: 'Schedule lines Imported Successfully.',
-                            duration: '10000',
-                            key: 'info_alt',
-                            variant: 'success',
-                            mode: 'dismissible'
+                            title: "Success",
+                            message: "Schedule lines Imported Successfully.",
+                            duration: "10000",
+                            key: "info_alt",
+                            variant: "success",
+                            mode: "dismissible",
                         });
                         this.dispatchEvent(toastEvent);
 
                         if (this.isNewGantt) {
-                            const workspaceAPI = this.template.querySelector("lightning-navigation");
+                            const workspaceAPI = this.template.querySelector(
+                                "lightning-navigation"
+                            );
                             if (workspaceAPI) {
-                                workspaceAPI.getFocusedTabInfo().then((response) => {
-                                    const focusedTabId = response.tabId;
-                                    workspaceAPI.closeTab({ tabId: focusedTabId }).then((res) => {
-                                        window.setTimeout(() => {
-                                            window.open('/' + recordId, '_top');
-                                            location.reload();
-                                        }, 2000);
-                                        if (workspaceAPI.getFocusedTabInfo()) {
-                                            workspaceAPI.getFocusedTabInfo().then((response) => {
-                                                const focusedTabId = response.tabId;
+                                workspaceAPI
+                                    .getFocusedTabInfo()
+                                    .then((response) => {
+                                        const focusedTabId = response.tabId;
+                                        workspaceAPI
+                                            .closeTab({ tabId: focusedTabId })
+                                            .then((res) => {
                                                 window.setTimeout(() => {
-                                                    window.open('/' + recordId, '_top');
+                                                    window.open("/" + recordId, "_top");
                                                     location.reload();
                                                 }, 2000);
-                                            })
-                                                .catch((error) => {
-                                                    console.log(error);
-                                                });
-                                        }
-                                    });
-                                })
+                                                if (workspaceAPI.getFocusedTabInfo()) {
+                                                    workspaceAPI
+                                                        .getFocusedTabInfo()
+                                                        .then((response) => {
+                                                            const focusedTabId = response.tabId;
+                                                            window.setTimeout(() => {
+                                                                window.open("/" + recordId, "_top");
+                                                                location.reload();
+                                                            }, 2000);
+                                                        })
+                                                        .catch((error) => {
+                                                            console.log(error);
+                                                        });
+                                                }
+                                            });
+                                    })
                                     .catch((error) => {
                                         console.log(error);
-                                        const navEvt = new CustomEvent('navigate', {
+                                        const navEvt = new CustomEvent("navigate", {
                                             detail: {
                                                 recordId: recordId,
-                                                slideDevName: 'detail'
-                                            }
+                                                slideDevName: "detail",
+                                            },
                                         });
                                         window.setTimeout(() => {
                                             location.reload();
@@ -308,22 +357,24 @@ export default class FileUploadComponent extends LightningElement {
                                         this.dispatchEvent(navEvt);
                                     });
                             } else {
-                                window.open('/' + recordId, "_top");
+                                window.open("/" + recordId, "_top");
                             }
                         } else {
-                            window.open('/apex/BT_Task_Manager?recordId=' + escape(recordId), '_self');
+                            // window.open('/apex/BT_Task_Manager?recordId=' + escape(recordId), '_self');
+                            window.open("/a101K00000GodXbQAJ", "_self");
                         }
                     } else {
                         this.Spinner = false;
                         this.showMessage = false;
-                        console.log('error--->', response.getReturnValue());
+                        console.log("error--->", response);
                         const toastEvent = new ShowToastEvent({
-                            title: 'Error',
-                            message: 'There was an error uploading your file. Please Contact your Administrator for assistance',
-                            duration: '10000',
-                            key: 'info_alt',
-                            variant: 'error',
-                            mode: 'dismissible'
+                            title: "Error",
+                            message:
+                                "There was an error uploading your file. Please Contact your Administrator for assistance",
+                            duration: "10000",
+                            key: "info_alt",
+                            variant: "error",
+                            mode: "dismissible",
                         });
                         this.dispatchEvent(toastEvent);
                     }
@@ -352,41 +403,37 @@ export default class FileUploadComponent extends LightningElement {
 
         if (du && nam) {
             const toastEvent = new ShowToastEvent({
-                title: 'Error',
-                message: 'You are missing Name, Duration in your CSV file.',
-                duration: '10000',
-                key: 'info_alt',
-                variant: 'error',
-                mode: 'dismissible'
+                title: "Error",
+                message: "You are missing Name, Duration in your CSV file.",
+                duration: "10000",
+                key: "info_alt",
+                variant: "error",
+                mode: "dismissible",
             });
             this.dispatchEvent(toastEvent);
             this.Spinner = false;
         } else if (du && !nam) {
             const toastEvent = new ShowToastEvent({
-                title: 'Error',
-                message: 'You are missing the Duration value in your CSV file.',
-                duration: '10000',
-                key: 'info_alt',
-                variant: 'error',
-                mode: 'dismissible'
+                title: "Error",
+                message: "You are missing the Duration value in your CSV file.",
+                duration: "10000",
+                key: "info_alt",
+                variant: "error",
+                mode: "dismissible",
             });
             this.dispatchEvent(toastEvent);
             this.Spinner = false;
         } else if (!du && nam) {
             const toastEvent = new ShowToastEvent({
-                title: 'Error',
-                message: 'You must have a Name value on all records.',
-                duration: '10000',
-                key: 'info_alt',
-                variant: 'error',
-                mode: 'dismissible'
+                title: "Error",
+                message: "You must have a Name value on all records.",
+                duration: "10000",
+                key: "info_alt",
+                variant: "error",
+                mode: "dismissible",
             });
             this.dispatchEvent(toastEvent);
             this.Spinner = false;
-        } else if (this.startdateError) {
-            // Handle specific error condition
-        } else {
-            action();
         }
     }
 
@@ -395,7 +442,7 @@ export default class FileUploadComponent extends LightningElement {
         this.showMessage = true;
         const fileInput = this.files;
 
-        console.log('fileInput', fileInput);
+        console.log("fileInput", fileInput);
         if (!fileInput || fileInput.length === 0) {
             this.Spinner = false;
             this.showMessage = false;
@@ -408,21 +455,21 @@ export default class FileUploadComponent extends LightningElement {
                 reader.readAsText(file, "UTF-8");
                 reader.onload = (evt) => {
                     const csv = evt.target.result;
-                    console.log('csv ----> ' + csv);
+                    console.log("csv ----> " + csv);
                     const result = this.CSV2JSON(csv);
-                    if (result !== undefined && result !== '') {
+                    if (result !== undefined && result !== "") {
                         window.setTimeout(() => {
                             this.CreateAccount(result);
                         }, 100);
                     } else {
                         const CircularDependencyName = this.CircularDependencyName;
                         const toastEvent = new ShowToastEvent({
-                            title: 'Error',
+                            title: "Error",
                             message: `Circular Dependency due to '${CircularDependencyName}' Record`,
-                            duration: '5000',
-                            key: 'info_alt',
-                            variant: 'error',
-                            mode: 'dismissible'
+                            duration: "5000",
+                            key: "info_alt",
+                            variant: "error",
+                            mode: "dismissible",
                         });
                         this.dispatchEvent(toastEvent);
                         this.Spinner = false;
@@ -434,7 +481,4 @@ export default class FileUploadComponent extends LightningElement {
             }
         }
     }
-
-
-
 }

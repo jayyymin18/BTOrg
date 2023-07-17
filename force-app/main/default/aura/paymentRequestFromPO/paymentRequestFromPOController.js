@@ -63,7 +63,8 @@
         var action = component.get("c.saveRecord");
         console.log('-----');
         action.setParams({
-            "vendorReviewData": data
+            "paymentRequestData": data,
+            poid: component.get("v.recordId")
         });
         action.setCallback(this, function (response) {
             var state = response.getState();
@@ -105,12 +106,24 @@
                     $A.get("e.force:closeQuickAction").fire();
                     console.log('---Else---');
                     console.log('saveAndClose');
-                    var navEvt = $A.get("e.force:navigateToSObject");
-                    navEvt.setParams({
-                        "recordId": recordId,
-                        "slideDevName": "Detail"
+                    // var navEvt = $A.get("e.force:navigateToSObject");
+                    // navEvt.setParams({
+                    //     "recordId": recordId,
+                    //     "slideDevName": "Detail"
+                    // });
+                    // navEvt.fire();
+                    var workspaceAPI = component.find("workspace");
+                    workspaceAPI.getFocusedTabInfo().then(function(tabResponse) {
+            
+                        var parentTabId = tabResponse.tabId;
+                        var isSubtab = tabResponse.isSubtab;
+                        
+                        workspaceAPI.openSubtab({
+                            parentTabId: parentTabId,
+                            recordId:recordId,
+                            focus: true
+                        });
                     });
-                    navEvt.fire();
                   
                     
                 

@@ -151,7 +151,26 @@ export default base => class GanttToolbar extends base {
                             onAction : 'up.onShiftNextClick'
                         }
                     ]
-                },
+                }
+                ,{
+                  type                 : 'textfield',
+                  ref                  : 'filterByName',
+                  cls                  : 'filter-by-name',
+                  // flex                 : '1 1 12.5em',
+                  width: '17em',
+                  // Label used for material, hidden in other themes
+                  // Placeholder for others
+                  placeholder          : 'Name',
+                  clearable            : true,
+                  keyStrokeChangeDelay : 100,
+                  triggers             : {
+                      filter : {
+                          align : 'end',
+                          cls   : 'b-fa b-fa-filter'
+                      }
+                  },
+                  onChange : 'up.onFilterChange'
+              },
                 {
                     type  : 'buttonGroup',
                     items : [
@@ -303,25 +322,6 @@ export default base => class GanttToolbar extends base {
                         change : 'up.onStartDateChange'
                     }
                 },
-                {
-                    type                 : 'textfield',
-                    ref                  : 'filterByName',
-                    cls                  : 'filter-by-name',
-                    flex                 : '1 1 12.5em',
-                    // Label used for material, hidden in other themes
-                    label                : 'Find tasks by name',
-                    // Placeholder for others
-                    placeholder          : 'Find tasks by name',
-                    clearable            : true,
-                    keyStrokeChangeDelay : 100,
-                    triggers             : {
-                        filter : {
-                            align : 'end',
-                            cls   : 'b-fa b-fa-filter'
-                        }
-                    },
-                    onChange : 'up.onFilterChange'
-                }
             ]
         };
     }
@@ -353,10 +353,12 @@ export default base => class GanttToolbar extends base {
     // region controller methods
 
     async onAddTaskClick() {
+
         const
             { gantt } = this,
-            added = gantt.taskStore.rootNode.appendChild({ name : 'New task', duration : 1 });
-
+            added = gantt.taskStore.rootNode.children[0].appendChild({ name : 'New task', duration : 1, startDate: gantt.taskStore.rootNode.children[0].startDate, predecessorName: '' });
+            let see = gantt.taskStore;
+            console.log('see ',JSON.parse(JSON.stringify(see)));
         // run propagation to calculate new task fields
         await gantt.project.propagate();
 
@@ -376,7 +378,8 @@ export default base => class GanttToolbar extends base {
             gantt.editTask(gantt.selectedRecord);
         }
         else {
-            bryntum.gantt.Toast.show('First select the task you want to edit');
+            // bryntum.gantt.Toast.show('First select the task you want to edit');
+            this.gantt.callGanttComponent.showToastMessage('First select the task you want to edit');
         }
     }
 
@@ -520,6 +523,7 @@ export default base => class GanttToolbar extends base {
 
         } catch (error) {
             console.log('Error-->' + error + ' message-->' + error.message);
+            this.gantt.callGanttComponent.showToastMessage('Dates cannot be null or empty');
         }
     }
 

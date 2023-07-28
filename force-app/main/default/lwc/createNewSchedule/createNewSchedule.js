@@ -25,6 +25,7 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
     @track isLoading = false;
     @track description = '';
     @track type = 'Standard';
+    @track url = '';
 
     connectedCallback(event) {
         document.addEventListener('click', this.handleDocumentEvent.bind(this));
@@ -116,6 +117,7 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
             .then((result) => {
                 this.masterId = result;
                 console.log('masterId', this.masterId);
+                console.log('Type masterId', typeof (this.masterId));
             })
             .catch((error) => {
                 console.log('error', JSON.stringify(error));
@@ -164,7 +166,7 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
                             objectApiName: 'buildertek__Schedule__c',
                             actionName: 'view'
                         },
-                    },true);
+                    }, true);
                     this.isLoading = false;
                 })
                 .catch((error) => {
@@ -201,8 +203,25 @@ export default class CreateNewSchedule extends NavigationMixin(LightningElement)
     }
 
     onCancelHandle() {
-        console.log('Reload the page');
-        location.reload();
+        console.log('Redirect the page');
+        this[NavigationMixin.Navigate]({
+            type: 'standard__objectPage',
+            attributes: {
+                objectApiName: 'buildertek__Schedule__c',
+                actionName: 'list'
+            },
+            state: {
+                filterName: 'Recent'
+            },
+        })
+    }
+
+    getLink(event) {
+        let scheduleName = event.currentTarget.dataset.id;
+        let val = this.masterId.find((schId) => schId.Name == scheduleName);
+        console.log('ScheduleName:', scheduleName);
+        this.url = `/${val.Id}`
+        console.log('Url:', this.url);
     }
 
     disconnectedCallback() {

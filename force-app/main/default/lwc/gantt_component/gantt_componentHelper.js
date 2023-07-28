@@ -540,16 +540,16 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
                 var endDate
                 if (rowData[i]['name'] != 'Milestone Complete') {
                     endDate = new Date(rowData[i].endDate);
-                    endDate.setDate(endDate.getDate() - 1)
+                    endDate.setDate(endDate.getDate())
                 } else {
                     endDate = new Date(rowData[i].endDate);
                     //endDate.setDate(endDate.getDate() + 1)
                 }
 
                 rowData[i].endDate = endDate;
-                if (rowData[i]['id'].indexOf('_generate') == -1) {
+                // if (rowData[i]['id'].indexOf('_generate') == -1) {
                     updateData['Id'] = rowData[i]['id']
-                }
+                // }
                 updateData['buildertek__Schedule__c'] = taskData[0].id;
                 updateData['Name'] = rowData[i]['name'];
 
@@ -619,10 +619,10 @@ function convertJSONtoApexData(data, taskData, dependenciesData, resourceData) {
                 }
                 const keys = phasedatamap.keys();
                 for (const key of keys) {
-                    if(updateData.Id == undefined){
-                        updateData['Id'] = 'DemoGenretedId';
-                        updateData['buildertek__Phase__c'] = phasedatamap.get(key);
-                    }
+                    // if(updateData.Id == undefined){
+                    //     updateData['Id'] = 'DemoGenretedId';
+                    //     updateData['buildertek__Phase__c'] = phasedatamap.get(key);
+                    // }
                 }
 
                 console.log('DemoGenretedId updateData:- ',{updateData});
@@ -670,10 +670,10 @@ function recordsTobeDeleted(oldListOfTaskRecords, newListOfTaskRecords) {
     const listOfRecordIdToBeDeleted = [];
     newListOfTaskRecords.forEach(newTaskRecord => {
         // console.log('newTaskRecord in recordtobedeleted :- ',newTaskRecord);
-        // if(newTaskRecord.Id == "DemoGenretedId"){
-        //     delete newTaskRecord.Id;
-        // }
-        setOfNewRecordId.add(newTaskRecord.Id);
+        var taskId = newTaskRecord.Id
+        if(!(taskId.includes('_generatedt_'))){
+            setOfNewRecordId.add(newTaskRecord.Id);
+        }
     });
 
     oldListOfTaskRecords.forEach(oldTaskRecord => {

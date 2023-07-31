@@ -23,8 +23,13 @@
     <aura:attribute name="fileimageId" type="string" />
     <aura:attribute name="memoquote" type="string" />
 
+    <!-- <ltng:require scripts="{!$Resource.jsPDF}" afterScriptsLoaded="{!c.afterScriptsLoaded}" /> -->
 
-    <ltng:require styles="{!$Resource.ModalPreviewCSS}" />
+
+
+    <!-- <ltng:require styles="{!$Resource.ModalPreviewCSS}" /> -->
+
+    <ltng:require scripts="{!$Resource.jsPDF+ '/unpkg/jspdf.umd.min.js'}"  />
 
     <aura:html tag="style">
         .slds-modal__container { width:80% !important; max-width: 80% !important; overflow: hidden !important; } .slds-modal__content { overflow: hidden !important; } .slds-modal__close{ display:block !important; }
@@ -52,29 +57,15 @@
                                  </div>
                              </div>
                          </aura:if>
-                         <!-- <aura:if isTrue="{!!v.isTemplateSelected}">
-                             <aura:html tag="style">
-                                 .slds-modal__container { width:70% !important; max-width: 70% !important; height: 320px !important; top:20% !important; } .slds-modal__content { padding: 0 0rem !important; height:97% !important; max-height:97% !important; } .cuf-content { padding: 0
-                                 0rem !important; } .slds-p-around-medium { padding: 0rem !important; }
-                             </aura:html>
-                             <lightning:select name="templates" label="Select Template" aura:id="template" value="{!v.selectedTemplate}" onchange="{!c.preiewEmailTemplate}">
-                                 <option text="None" value="-None-" />
-                                 <aura:iteration items="{!v.templates}" var="temp">
-                                     <option text="{!temp.Name}" value="{!temp.Id}" />
-                                 </aura:iteration>
-                             </lightning:select>
-                         </aura:if> -->
-                         <!-- <aura:if isTrue="{!v.isTemplateSelected}"> -->
                              <aura:html tag="style">
                                  .slds-modal__container { width:70% !important; max-width: 70% !important; height: 99% !important; } .slds-modal__content { padding: 0 0rem !important; height:97% !important; max-height:97% !important; } .cuf-content { padding: 0 0rem !important; } .slds-p-around--medium
                                  { padding: 0rem !important; }
                              </aura:html>
  
-                             <p class="slds-text-longform tile__title red-txt">
+                             <p class="slds-text-longform tile__title red-txt" id="contnet">
                                  <aura:unescapedHtml value="{!v.quoteLines}" />
                              </p>  
                              <br />
-                          <!-- </aura:if> -->
                      </div>
                  </div>
              </div>

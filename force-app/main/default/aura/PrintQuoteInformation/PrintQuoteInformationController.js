@@ -16,7 +16,7 @@
                     console.log(value);
                     if(value.Name === 'Quote'){
                         component.set("v.selectedTemplate" ,value.Id);
-                         helper.getTemplateBody(component, event, helper);
+                        helper.getTemplateBody(component, event, helper);
                     }
                 })
                 // component.set("v.templates", response.getReturnValue());
@@ -38,64 +38,32 @@
         document.getElementById('header').scrollIntoView(true);
 
     },
-    preiewEmailTemplate: function(component, event, helper) {
-        console.log('Preview email template');
+    // preiewEmailTemplate: function(component, event, helper) {
+    //     console.log('Preview email template');
 
-        var selectedTemplate = component.get("v.selectedTemplate");
-        console.log(selectedTemplate);
-        if (selectedTemplate != undefined) {
-            component.set("v.isTemplateSelected", true);
-            // helper.getTemplateBody(component, event, helper);
-            var recordId = component.get("v.recordId");
-            var action = component.get("c.getQuoteLines");
-            action.setParams({
-                recordId: recordId,
-                templateId: component.get("v.selectedTemplate")
-            });
-            action.setCallback(this, function(response) {
-                var state = response.getState();
-                if (state === "SUCCESS") {
-                    var result = response.getReturnValue();
-                    console.log('get template body');
-                    console.log({ result });
-                    component.set("v.quoteLines", result);
-                }
-            });
-            $A.enqueueAction(action);
-            // helper.getProposalImagesList(component, event, helper);
-            // setTimeout(function() {
-            //     var wrapper = document.getElementById("signature-pad");
-            //     if (wrapper != undefined) {
-            //         var canvas = wrapper.querySelector("canvas");
-            //         var signaturePad;
-
-            //         // Adjust canvas coordinate space taking into account pixel ratio,
-            //         // to make it look crisp on mobile devices.
-            //         // This also causes canvas to be cleared.
-            //         function resizeCanvas() {
-            //             // When zoomed out to less than 100%, for some very strange reason,
-            //             // some browsers report devicePixelRatio as less than 1
-            //             // and only part of the canvas is cleared then.
-            //             var ratio = Math.max(window.devicePixelRatio || 1, 1);
-            //             canvas.width = canvas.offsetWidth * ratio;
-            //             canvas.height = canvas.offsetHeight * ratio;
-            //             canvas.getContext("2d").scale(ratio, ratio);
-            //         }
-
-            //         window.onresize = resizeCanvas;
-            //         resizeCanvas();
-
-            //         window.signaturePad = new SignaturePad(canvas);
-
-            //         document.getElementById("btnClear").onclick = function(event) {
-            //             event.preventDefault();
-            //             console.log(window.signaturePad);
-            //             window.signaturePad.clear();
-            //         }
-            //     }
-            // }, 3000);
-        }
-    },
+    //     var selectedTemplate = component.get("v.selectedTemplate");
+    //     console.log(selectedTemplate);
+    //     if (selectedTemplate != undefined) {
+    //         component.set("v.isTemplateSelected", true);
+    //         // helper.getTemplateBody(component, event, helper);
+    //         var recordId = component.get("v.recordId");
+    //         var action = component.get("c.getQuoteLines");
+    //         action.setParams({
+    //             recordId: recordId,
+    //             templateId: component.get("v.selectedTemplate")
+    //         });
+    //         action.setCallback(this, function(response) {
+    //             var state = response.getState();
+    //             if (state === "SUCCESS") {
+    //                 var result = response.getReturnValue();
+    //                 console.log('get template body');
+    //                 console.log({ result });
+    //                 component.set("v.quoteLines", result);
+    //             }
+    //         });
+    //         $A.enqueueAction(action);
+    //     }
+    // },
 
     closeModel: function(component, event, helper) {
         // location.reload(); 
@@ -104,9 +72,78 @@
     },
     downloadFile:function(component, event, helper) {
         var data= component.get("v.quoteLines");
-        let link = event.target;
-        link.setAttribute("href", URL.createObjectURL(data.blob));
-        link.setAttribute("download", 'fileName');
-        link.click();
+        console.log(data);
+
+        // var action = component.get('c.setAttachmentBody2');
+        // action.setParams({
+        //     recordId: component.get("v.recordId"),
+        //     templateId:component.get("v.selectedTemplate"),
+        //     fileid:'',
+
+        // });
+
+        // action.setCallback(this, function(response) {
+        //     var state = response.getState();
+        //     var error = response.getError();
+
+        //     console.log({state});
+        //     console.log({error});
+        //     console.log(response.getReturnValue());
+
+        //     if (state === "SUCCESS") {
+        //         const blobUrl = URL.createObjectURL(response.getReturnValue());
+
+        //         // Create a download link and trigger the download
+        //         const downloadLink = document.createElement('a');
+        //         downloadLink.href = blobUrl;
+        //         downloadLink.download = 'OUTPUTfILE.pdf';
+        //         downloadLink.click();
+          
+        //         // Clean up the Blob URL after the download is triggered
+        //         URL.revokeObjectURL(blobUrl);
+
+                
+          
+    
+
+               
+        //     }
+        // });
+        // $A.enqueueAction(action);
+        
+        // // Create a new jsPDF instance
+        // var doc = new jsPDF();
+
+        // // Add content to the PDF
+        // doc.text("Hello, this is a sample PDF generated using jsPDF in Aura component!", 10, 10);
+
+        // // Save the PDF
+        // doc.save("sample.pdf");
+        // const blob = new Blob([data], { type: "application/pdf" });
+
+        // // Create a new anchor element.
+        // const link = document.createElement("a");
+        
+        // // Set the href attribute of the anchor element to the blob data.
+        // link.href = window.URL.createObjectURL(blob);
+        
+        // // Set the download attribute of the anchor element to the filename.
+        // link.download = 'TestFile.pdf';
+        
+        // // Click the anchor element to download the PDF file.
+        // link.click();
+		const { jsPDF } = window.jspdf;
+        var pdf = new jsPDF();
+        pdf.setFont("Times");
+        pdf.html(20, 20, data);
+        pdf.save("quote.pdf");
+          
+
+    },
+
+    scriptsLoaded:function(component, event, helper) {
+        console.log('SCRIPT LOADED SUCCESFULLY::');
+
+
     }
 })

@@ -216,11 +216,13 @@
     <aura:attribute name="parentAttribute" type="Boolean" default="false" />
     <c:BT_Spinner />
     <aura:attribute name="parentValue" type="String" />
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> -->
 
 
 
 
-    <div style="background: white;border-radius: 5px;height: 100%;" class="slds">
+
+    <div style="background: white;border-radius: 5px;height: 100%;" class="slds" id="slds">
 
 
     <aura:if isTrue="{!v.isproject}">
@@ -654,7 +656,7 @@
 
             <div aura:id="quoteItem" />
             <!-- <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:50vh;padding:0px !important;"> -->
-            <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:54vh;padding:0px !important;">
+            <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:54vh;padding:0px !important;" aura:id="av">
                 <div>
                     <aura:if isTrue="{!!v.removeSingleQuoteLineOption}">
                         <div id='Tablebox' style="margin-top: -5px;padding-inline: 10px;padding-block: 0px;">
@@ -1023,7 +1025,7 @@
                                                 </td>
 
                                             </tr>
-                                            <tr class="slds-text-heading--label" style="line-height: 2;font-size: 12px;">
+                                            <tr class="slds-text-heading--label" style="line-height: 1.7;font-size: 12px;">
                                                 <th></th>
                                                 <th class="slds-is-sortable tabletitle" scope="col" width="5px">
                                                     <div class="slds-form-element">
@@ -1071,7 +1073,7 @@
                                             </tr>
                                             <aura:iteration items="{!v.TotalRecords.tarTable.ListOfEachRecord}"
                                                 var="tar" indexVar="quoteIndex">
-                                                <tr style="line-height: 2.5;display:table-row;"
+                                                <tr style="line-height: 1.7;display:table-row;"
                                                     class="{!v.quoteId+' slds-hint-parent groupRows_'+groupIndex}">
                                                     <!-- quoteId -->
 
@@ -1125,7 +1127,7 @@
                                                                     change="{!c.updateQuoteData}" blur="{!c.onblur}" />
                                                                 <aura:set attribute="else">
                                                                     <div class="slds-truncate"
-                                                                        title="{!tar.recordName}" style="white-space: normal; word-wrap: break-word;">
+                                                                        title="{!tar.recordName}" style="white-space: nowrap; word-wrap: break-word;">
                                                                         <a href="javascript:void(0);" role="menuitem"
                                                                             tabindex="-1" data-record="{!tar.recordId}"
                                                                             onclick="{!c.doView}">
@@ -1391,7 +1393,7 @@
                                                     </aura:if>
                                                 </aura:iteration>
                                             </tr>
-                                            <br />
+                                            <!-- <br /> -->
 
                                             <!--<br />
                                     <br />-->

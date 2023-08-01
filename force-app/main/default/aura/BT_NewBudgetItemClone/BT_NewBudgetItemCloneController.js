@@ -1898,6 +1898,9 @@
         component.set("v.expenseNote", null);
         component.set('v.budgetItemId', '');
 
+        component.set('v.addInvoicePOSection', false);
+
+
         // $A.get('e.force:refreshView').fire();
     },
     importCSV: function (component, event, helper) {
@@ -4244,6 +4247,47 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             helper.AddNewSalesInvoicesHelper(component, event, SLlist)
         }
     },
+
+    addInvoicePO:function (component, event, helper) {
+
+        component.set('v.addInvoicePOSection' , true);
+        console.log('add Invoice po button click......');
+
+        var action = component.get("c.getInvoicePOData");
+        action.setParams({
+            "RecId": component.get("v.recordId")
+        });
+        action.setCallback(this, function (response) {
+            var state= response.getState();
+            var error= response.getError();
+            console.log(state);
+            console.log(error);
+
+            if(state === 'SUCCESS'){
+                console.log(response.getReturnValue());
+                var result=response.getReturnValue();
+                component.set('v.invoicePORecordList', result);
+            }
+
+        });
+        $A.enqueueAction(action);
+
+    },
+
+    checkAllInvoicePO:function (component, event, helper) {
+        console.log('click all invoice po checkboxes');
+        var invoicePoList=component.get('v.invoicePORecordList');
+        console.log({invoicePoList});
+
+        var value = event.getSource().get("v.checked");
+        console.log({value});
+
+        var listOfUpdateInvoicePO= invoicePoList.map(function(elements){
+            elements.Selected=value;
+            return elements;
+        })
+        component.set('v.invoicePORecordList' , listOfUpdateInvoicePO);
+    }
 
 
 

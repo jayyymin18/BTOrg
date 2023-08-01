@@ -46,6 +46,7 @@ public with sharing class AssestManagerHandler{
                                FROM buildertek__Asset_Manager__c
                                WHERE Id IN :assetManagerId];
         }
+
         for (buildertek__Asset_Manager__c assetmanagerRec: assetManagerList){
             for (buildertek__Asset_History__c assethistoryRec : newAssetHistory){
                 assetmanagerRec.buildertek__Current_Project__c = assethistoryRec.buildertek__Project__c;
@@ -53,5 +54,13 @@ public with sharing class AssestManagerHandler{
             }
         }
         update assetManagerList;
-    }
+}
+
+ public static void afterUpdate(buildertek__Asset_History__c[] newAssetHistory, buildertek__Asset_History__c[] oldAssetHistry, buildertek__Asset_History__c[] NewAssHisMap, buildertek__Asset_History__c[] oldAssHisMap){
+	try {
+		
+	} catch (Exception e) {
+		System.debug('Error in After Update =::: '+ e.getMessage() +' -- '+ e.getStackTraceString());
+	}
+ }
 }

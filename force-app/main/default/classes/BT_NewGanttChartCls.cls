@@ -9,6 +9,16 @@ public class BT_NewGanttChartCls{
     }
 
     @AuraEnabled
+    public static Boolean chekIsOldGantt(){
+        Boolean oldGanttRenderer;
+        List<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id, buildertek__Old_Gantt_Chart__c from buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Schedule Configuration'];
+        if (adminInterfaceNodeConfigurations.size() > 0) {
+            oldGanttRenderer = adminInterfaceNodeConfigurations[0].buildertek__Old_Gantt_Chart__c;
+        }
+        return oldGanttRenderer;
+    }
+
+    @AuraEnabled
     public static String getObjectTypeName(Id recorId){
         String objectName = String.valueOf(recorId.getSObjectType());
         return objectName;

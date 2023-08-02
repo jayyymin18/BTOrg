@@ -294,20 +294,20 @@
                 });
             }) 
          
-            // .catch(function (error) {
-            //     var navEvt = $A.get("e.force:navigateToSObject");
-            //     navEvt.setParams({
-            //         "recordId": component.get('v.recordId'),
-            //         "slideDevName": "related"
-            //     });
-            //     navEvt.fire();
-            // });
-            // $A.get("e.force:closeQuickAction").fire();
+            .catch(function (error) {
+                var navEvt = $A.get("e.force:navigateToSObject");
+                navEvt.setParams({
+                    "recordId": component.get('v.recordId'),
+                    "slideDevName": "related"
+                });
+                navEvt.fire();
+            });
+            $A.get("e.force:closeQuickAction").fire();
             window.setTimeout(
                 $A.getCallback(function () {
                     // $A.get('e.force:refreshView').fire();
                     window.location.reload();
-                }), 300
+                }), 1000
             );
     },
 

@@ -21,7 +21,6 @@ public class ProjectTaskTriggerHandler{
 		BatchSize = size;
         refMapforPrevParent = new Map<Id,Date>();
 		oldMapValue = new Map<Id, buildertek__Project_Task__c>();
-		// this.oldMapValue = oldMap;
 	}
 
 	public void checkCircular(buildertek__Project_Task__c[] updatedProjectTasks, Map<ID, buildertek__Project_Task__c> oldProjectTaskMap){

@@ -3155,6 +3155,22 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         return invoicePOList;
     }
 
+    @AuraEnabled
+    public static string addInvoicePOToBudget(list<String> invoicePoList, String BudgetId){
+        list<buildertek__Account_Payable__c> invoicePoToUpdate = new list<buildertek__Account_Payable__c>();
+        if(invoicePoList.size() > 0){
+            list<buildertek__Account_Payable__c> invPoList = [SELECT Id, Name FROM buildertek__Account_Payable__c WHERE Id IN : invoicePoList];
+            for(buildertek__Account_Payable__c invoicePo : invPoList){
+                invoicePo.buildertek__Budget__c = BudgetId;
+                invoicePoToUpdate.add(invoicePo);
+            }
+                update invoicePoToUpdate;
+            return 'Successs';
+        }
+        return null;
+
+    }
+
 
 
 

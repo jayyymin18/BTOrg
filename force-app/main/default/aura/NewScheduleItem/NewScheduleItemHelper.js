@@ -7,10 +7,12 @@
         action.setCallback(this, function (response) {
         	if (response.getState() === "SUCCESS") {  
         	    var result = response.getReturnValue();
+                console.log('result===>',result);
         	    if(result.buildertek__Project__c != null){
                     component.set("v.selectedProjectId", result.buildertek__Project__c);
                     component.set("v.disablePro", 'true');
-                }else if(result.ContactId != null){
+                }
+                if(result.ContactId != null){
                     component.set("v.selectedContactRecord", result.ContactId);
                     component.set("v.disableCon", 'true');
                 }
@@ -21,7 +23,7 @@
 	getSchedules : function(component, event, helper) {
 		var action = component.get("c.getSchedulelist"); 
 		action.setParams({
-		    "recordId" : component.get("v.recordId")
+		    "recordId" : component.get("v.selectedProjectId")
 		});
         action.setCallback(this, function (response) {
         	if (response.getState() === "SUCCESS") {  

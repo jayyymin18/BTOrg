@@ -235,7 +235,7 @@
             </div>
     </aura:if>
 
-        <div style="margin: 0px 0px;">
+        <div style="margin: 0px 0px; min-height: 60vh; height: 60vh;">
             <div style="display:block">
                 <aura:if isTrue="{!v.isproject}">
                     <!-- <a href="{!'/'+v.quoteId}" onclick="{!c.closetab}">{!v.quoteName}</a> -->
@@ -657,7 +657,7 @@
             <div aura:id="quoteItem" />
             <!-- <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:50vh;padding:0px !important;"> -->
             <div class="av slds-box" id="{!v.recordId + 'groups'}" style="min-height:54vh;padding:0px !important;" aura:id="av">
-                <div>
+                <div style="min-height: 60vh; height: 61vh;">
                     <aura:if isTrue="{!!v.removeSingleQuoteLineOption}">
                         <div id='Tablebox' style="margin-top: -5px;padding-inline: 10px;padding-block: 0px;">
                             <br />
@@ -1412,7 +1412,7 @@
                             </div>
                             <!--<br />-->
                             <aura:if isTrue="{!v.total > 50}">
-                                <div class="slds-align_absolute-center" style="background-color: white;">
+                                <div class="slds-align_absolute-center" style="background-color: white; padding-block: 5px">
                                     <lightning:button disabled="{!v.page == 1}" variant="brand" label="Previous"
                                         onclick="{! c.navigate }" />
                                     <lightning:button disabled="{!v.page == v.pages}" aura:id="previousPage"

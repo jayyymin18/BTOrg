@@ -43,7 +43,7 @@
         .forceStyle.desktop .slds-form .slds-form-element__label{
             display: none !important;
         }
-        .slds-form-element_stacked:not(.slds-is-editing) {
+        .rkclass1 .slds-form-element_stacked:not(.slds-is-editing) {
             padding-top: 0.3% !important;
             padding-right: 0% !important;
             padding-bottom: 0% !important;
@@ -69,7 +69,7 @@
                         </div>
                     </div>
                     <div class="slds-form-element slds-size_1-of-2">
-                        <div class="slds-form-element__control">
+                        <div class="slds-form-element__control rkclass1">
                             <label>Project</label>
                             <!-- <span class="{!if(v.isProject == false,'slds-show','slds-hide')}">
                                 <c:BT_LightningLookup objectAPIName="buildertek__Project__c" aura:id="projectLookup" selectedRecord="{!v.selectedProjectRecord}"/>
@@ -85,7 +85,7 @@
                 <div class="slds-form-element__row">
                     <div class="slds-form-element slds-size_1-of-2">
                         <div class="slds-form-element__control">
-                            <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}">
+                            <lightning:select name="colorId" label="Schedule" aura:id="colorId" value="{!v.selectedValue}" required="true" onchange="{!c.handleScheduleChange}" onfocus="{!c.getschdule}">
                                 <option text="None" value="" /> 
                                 <aura:iteration items="{!v.Schedules}" var="sch">
                                     <option text="{!sch.getSchedulesList.Name +' - '+sch.getSchedulesList.buildertek__Description__c}" value="{!sch.getSchedulesList.Id}" />
@@ -109,9 +109,9 @@
                             <label >Schedule Item</label>
                             <!-- <c:BT_LightningLookup objectAPIName="buildertek__Project_Task__c" selectedRecord="{!v.selectedLookUpRecord}" />       -->
 
-                            <lightning:input autocomplete="off" type="search" placeholder="Search Schedule Item" variant="label-hidden" value="{!v.selectedPredecessor}" onfocus="{!c.serachPredecessor}" onblur="{!c.hideList}" onkeyup="{!c.onkeyUp}" />
+                            <lightning:input autocomplete="off" type="search" placeholder="Search Schedule Item" variant="label-hidden" value="{!v.selectedPredecessor}" onfocus="{!c.serachPredecessor}"  onkeyup="{!c.onkeyUp}" onblur="{!c.hideList}" />
                             <aura:if isTrue="{!v.diplayPredecessorlist}" >
-                                <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="height:100px;">
+                                <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="height:100px;position: fixed;width: 47%;margin-left: 24.5%;" onmousedown="{!c.preventHide}">
                                     <ul class="slds-listbox slds-listbox_vertical" role="presentation">
                                         <aura:iteration items="{!v.predecessorList}" var="result">
                                             <li role="presentation" class="slds-listbox__item" data-value="{!result.value}" onclick="{!c.clickPredecessorValue}" data-id="{!result.key}">
@@ -149,7 +149,7 @@
                     </div>
 
                     <div class="slds-form-element slds-size_1-of-2">
-                        <div class="slds-form-element__control">
+                        <div class="slds-form-element__control rkclass1">
                             <label >Resource</label>
                             <!-- <span class="{!if(v.isVendor == false,'slds-show','slds-hide')}"> -->
                                 <!-- <c:BT_LightningLookup objectAPIName="Contact" IconName="standard:contact" selectedRecord="{!v.selectedContactRecord}"/>  -->

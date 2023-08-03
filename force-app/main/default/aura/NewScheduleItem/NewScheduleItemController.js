@@ -1,8 +1,27 @@
 ({
 	doInit : function(component, event, helper) {
 	    helper.getPODetails(component, event, helper);
-		helper.getSchedules(component, event, helper);
+		// helper.getSchedules(component, event, helper);
 		// helper.fetchPickListVal(component, 'phaseId', 'buildertek__Phase__c');
+	},
+    getschdule : function(component, event, helper) {
+        var proId = component.get("v.selectedProjectId");
+        console.log('proId====>',proId);
+	    if (proId != undefined) {
+            helper.getSchedules(component, event, helper);  
+        }else {
+            var toastEvent = $A.get("e.force:showToast"); 
+            toastEvent.setParams({
+                "title" : "Error",
+                //"message" : result.Message,
+                "message" : 'Please select Project first.',
+                "type" : "error",
+                "duration" : 3000
+            });
+            toastEvent.fire();
+        }
+		
+		
 	},
 	 
 	clearSelectedValue : function(component, event, helper) {
@@ -72,7 +91,8 @@
        var conId = component.get("v.selectedContactRecord");
        console.log('conId====>',conId);
 
-       if (taskname != '' && scheduleId != '' && startDate != '') {
+       if (taskname != undefined && scheduleId != '' && startDate != null) {
+        // console.log('Successssssss');
         var action = component.get('c.insertScheduleTask');
        action.setParams({
            task: taskname,
@@ -231,8 +251,12 @@
         component.set('v.predecessorList' , tempArray);
     },
     hideList:function(component, event, helper){
-            // component.set('v.diplayPredecessorlist' , false);
+            component.set('v.diplayPredecessorlist' , false);
 
     },
+    preventHide: function(component, event, helper) {
+        // Prevent the default behavior (i.e., closing the list)
+        event.preventDefault();
+    }
 
 })

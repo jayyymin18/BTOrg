@@ -579,6 +579,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
         cd.PreferencesAllowOriginalDownload = true;
         cd.PreferencesAllowPDFDownload = true;
         cd.PreferencesAllowViewInBrowser = true;
+        cd.PreferencesNotifyOnVisit = false;
         insert cd;
         ContentDistribution cdPublickLink = [SELECT Id, DistributionPublicUrl, ContentDownloadUrl
                                              FROM ContentDistribution
@@ -690,6 +691,7 @@ Messaging.sendEmail(new Messaging.SingleEmailMessage[] { email });  */
             if (corec != null){
                 corec.buildertek__Status__c = 'Customer Accepted';
                 corec.buildertek__Customer_Accepted_Date__c = nowDT;
+                corec.buildertek__Date_Approved__c = nowDT;
                 update corec;
             }
         }

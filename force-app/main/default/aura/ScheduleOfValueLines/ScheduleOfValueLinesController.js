@@ -1,6 +1,6 @@
 ({
     doInit : function(component, event, helper) {
-        debugger;
+        
         
         
         
@@ -44,7 +44,7 @@
                 
                 
                 
-                debugger;
+                
                 var action7 = component.get("c.getSovType");
                 action7.setParams({
                     "recordId": recordId
@@ -69,7 +69,9 @@
                     recordId: recordId
                 });
                 action1.setCallback(this, function(response){
-                    debugger;
+                    console.log(response.getError());
+                    console.log(response.getReturnValue());
+
                     
                     
                     if(response.getState() === "SUCCESS"){
@@ -77,7 +79,7 @@
                         
                         if(result.length > 0){
                             
-                            debugger;
+                            
                             component.set("v.continuationSheetLines",result)
                             
                             console.log('continuationSheetLines----------->',result);
@@ -119,7 +121,7 @@
                             component.set("v.sovTotal",scheduleTotal);
                             component.set("v.continuationSheetLines",sovlist);
                         }else{
-                            debugger;
+                            
                             component.set("v.continuationSheetLines",result) 
                             component.set("v.sovTotal",0);
                             component.set("v.continuationSheetLinesDup",result) 
@@ -196,7 +198,7 @@
                     recordId: component.get("v.recordId")
                 });
                 action2.setCallback(this, function(response){
-                    debugger;
+                    
                     if(response.getState() === "SUCCESS"){
                         var result = response.getReturnValue();
                         if(result == 'Company Approved'){
@@ -220,7 +222,7 @@
                     recordId: component.get("v.recordId")
                 });
                 action3.setCallback(this, function (response) {
-                    debugger;
+                    
                     if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
                         var  result = response.getReturnValue();
                         component.set("v.SOVName",result)
@@ -242,7 +244,7 @@
       
         
         component.set("v.indexValWithError",event.target.getAttribute('data-id'));
-        debugger;
+        
         var sovValue;
         var inputField = event.getSource();
         
@@ -309,7 +311,7 @@
     },
     
     inputClick: function(component, event, helper){
-        debugger;
+        
         var sov = event.getSource().get("v.value");
         var sovValue;
         if(sov != undefined){
@@ -397,7 +399,7 @@
     
     
     deleteRow : function(component, event, helper){
-        debugger;
+        
         var target = event.target;
         var index = Number(target.getAttribute("data-index"));
         var records = component.get('v.continuationSheetLines');
@@ -529,7 +531,7 @@
         component.set("v.Spinner", true);
         component.set("v.showMessage", true);
         
-        debugger;
+        
         var coIds = [];
         console.log(component.get("v.continuationSheetLines"));
         var sheetLines = component.get("v.continuationSheetLines");
@@ -729,7 +731,7 @@
     
     
     importMasterSov : function(component, event, helper) {
-        debugger;
+        
         if(component.get("v.Iscommunity") == true){
             var address = '/import-master-sov?id='+component.get("v.recordId")+'&dummy=ignore'+'&fromsovsheet=ignore'+'/';
             
@@ -1064,11 +1066,11 @@
     
     
     importVendorSov : function(component, event, helper) {
-        debugger;
+        
         component.set("v.isImpVndSOV",true);
         
         
-        debugger;
+        
         var action10 = component.get("c.getSovType");
         action10.setParams({
             "recordId": component.get("v.recordId")
@@ -1207,14 +1209,14 @@
     },
     
      ImportSOVLines: function (component, event, helper){
-            debugger;
+            
             component.set("v.IsSpinner",true);
         var SOVIds=component.get("v.listOfSelectedSOVIds");
        // alert('SOVIds------------'+SOVIds);
         //alert('newRecId--------'+newRecId);
         var action = component.get("c.createSOVLines");
            console.log(SOVIds.length);
-            debugger;
+            
         action.setParams({
             selectedSOV : SOVIds,
             newSOV : component.get("v.recordId")

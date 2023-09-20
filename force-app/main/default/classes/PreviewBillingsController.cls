@@ -222,6 +222,7 @@ public with sharing class PreviewBillingsController{
     @AuraEnabled
     public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc){
         try{
+
             Blob tempblob;
             List<Contact> conList =  [Select Id,Name,email from Contact where Id IN :to and email != null];
 
@@ -352,5 +353,30 @@ public with sharing class PreviewBillingsController{
 
         Blob blobbody = !Test.isRunningTest() ? pdf.getContent() : Blob.ValueOf('dummy text');
         return blobbody;
+    }
+
+    @AuraEnabled
+    public static List<Contact> getObjectContact(String recordId){
+        List<Contact> con;
+        buildertek__Billings__c invoice;
+        Set<Id> accId= new Set<Id>();
+        
+        invoice = [SELECT Id, Name, buildertek__Project__c ,buildertek__Customer_Account__c, buildertek__Project__r.buildertek__Customer__c FROM buildertek__Billings__c WHERE Id = :recordId];
+
+        if (invoice.buildertek__Project__c != null && invoice.buildertek__Project__r.buildertek__Customer__c != null){
+            if(invoice.buildertek__Project__r.buildertek__Customer__c != null){
+                accId.add(invoice.buildertek__Project__r.buildertek__Customer__c);
+                if(!accId.isEmpty()){
+                    con = [SELECT Id, Name, Email , buildertek__Primary_Contact__c, AccountId FROM Contact WHERE AccountId IN: accId AND Email != null AND buildertek__Primary_Contact__c = true];
+                }
+            }           
+        }
+        else if (invoice.buildertek__Customer_Account__c != null) {
+            accId.add(invoice.buildertek__Customer_Account__c);
+            if(!accId.isEmpty()){
+                con = [SELECT Id, Name, Email , buildertek__Primary_Contact__c, AccountId, CreatedDate FROM Contact WHERE AccountId IN: accId AND Email != null ORDER by CreatedDate Desc Limit 1];
+            }
+        }
+        return con;
     }
 }

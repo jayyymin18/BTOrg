@@ -18,9 +18,12 @@ import getPickListValuesIntoList from "@salesforce/apex/bryntumGanttController.g
 import {
   formatApexDatatoJSData,
   recordsTobeDeleted,
+  makeComboBoxDataForContractor,
+  calcBusinessDays,
+  makeComboBoxDataForResourceData,
+  mergeArrays
 } from "./gantt_componentHelper";
 import { populateIcons } from "./lib/BryntumGanttIcons";
-import bryntum_gantt from "@salesforce/resourceUrl/bryntum_gantt";
 
 export default class Gantt_component extends NavigationMixin(LightningElement) {
   @track spinnerDataTable = false;
@@ -29,6 +32,8 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   @track scheduleItemsDataList;
   @track scheduleData;
   @track scheduleItemsData;
+  @track contractorAndResources;
+  @track internalResources;
 
   @track error_toast = true;
 
@@ -163,7 +168,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       loadScript(this, GANTTModule),
       loadStyle(this, GanttStyle + "/gantt.stockholm.css"),
       console.log("Loaded libraries"),
-      // loadStyle(this, GanttStyle + "/gantt.stockholm.css")
     ])
       .then(() => {
         // this.handleHideSpinner();
@@ -239,9 +243,15 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         var data = response.lstOfSObjs;
         console.log("data-->", data);
         this.scheduleItemsDataList = response.lstOfSObjs;
+        this.contractorAndResources = response.listOfContractorAndResources;
+        this.internalResources = response.listOfInternalResources;
         console.log(
           "scheduleItemsDataList",
           JSON.parse(JSON.stringify(this.scheduleItemsDataList))
+        );
+        console.log(
+          "internalResources",
+          JSON.parse(JSON.stringify(this.internalResources))
         );
         this.scheduleData = response.scheduleObj;
         console.log("scheduleData", this.scheduleData);
@@ -522,9 +532,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           rowPhaseElement.innerHTML.indexOf("slds-icon-custom-custom62") == -1
         ) {
           if (rowPhaseElement.children.length) {
-            if (rowPhaseElement.children[2].children.length) {
-              rowPhaseElement.children[2].children[0].innerHTML =
-                iconElement + rowPhaseElement.children[2].children[0].innerHTML;
+            if (rowPhaseElement.children[3].children.length) {
+              rowPhaseElement.children[3].children[0].innerHTML =
+                iconElement + rowPhaseElement.children[3].children[0].innerHTML;
             }
           }
         }
@@ -540,9 +550,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           rowPhaseElement.innerHTML.indexOf("slds-icon-custom-custom70") == -1
         ) {
           if (rowPhaseElement.children.length) {
-            if (rowPhaseElement.children[2].children.length) {
-              rowPhaseElement.children[2].children[0].innerHTML =
-                iconElement + rowPhaseElement.children[2].children[0].innerHTML;
+            if (rowPhaseElement.children[3].children.length) {
+              rowPhaseElement.children[3].children[0].innerHTML =
+                iconElement + rowPhaseElement.children[3].children[0].innerHTML;
             }
           }
         }
@@ -595,16 +605,15 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     resourceRowData = formatedSchData["resourceRowData"];
     assignmentRowData = formatedSchData["assignmentRowData"];
 
-    // //this.spinnerDataTable = false;
+    let resourceData = makeComboBoxDataForResourceData(this.contractorAndResources, this.internalResources);
 
     const project = new bryntum.gantt.ProjectModel({
       calendar: data.project.calendar,
       // startDate: data.project.startDate,
       // tasksData: data.tasks.rows,
       tasksData: tasks.rows,
-      // resourcesData: data.resources.rows,
       skipNonWorkingTimeWhenSchedulingManually: true,
-      resourcesData: resourceRowData,
+      resourcesData: resourceData,
       // assignmentsData: data.assignments.rows,
       assignmentsData: assignmentRowData,
       // dependenciesData: data.dependencies.rows,
@@ -615,6 +624,8 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     project.hoursPerDay = 8;
     project.calendar = "business";
 
+    let contractorComboData = makeComboBoxDataForContractor(this.contractorAndResources);
+
     const gantt = new bryntum.gantt.Gantt({
       project,
       appendTo: this.template.querySelector(".container"),
@@ -622,6 +633,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       // endDate: "2019-10-01",
 
       tbar: new GanttToolbar(),
+      rowHeight         : 30,
+      barMargin         : 5,
+
 
       dependencyIdField: "sequenceNumber",
       columns: [
@@ -630,10 +644,36 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           draggable: false,
         },
         {
+          type: "action",
+          text: "Complete",
+          width: 50,
+          actions: [
+            {
+              cls: "b-fa b-fa-check",
+              onClick: ({ record }) => {
+                if (record._data.type == "Task") {
+                  if (record._data.percentDone == 100) {
+                    record.set("percentDone", 0);
+                  } else {
+                    record.set("percentDone", 100);
+                  }
+                }
+              },
+              renderer: ({ action, record }) => {
+                if (record._data.type == "Task") {
+                  return `<i class="b-action-item ${action.cls}" ></i>`;
+                } else {
+                  return `<i class="b-action-item ${action.cls}" style="display:none;"></i>`;
+                }
+              },
+            },
+          ],
+        },
+        {
           type: "percentdone",
           draggable: false,
           showCircle: true,
-          width: 100,
+          width: 50,
           text: "% Complete",
         },
         {
@@ -663,33 +703,6 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             } else {
               return record.value;
             }
-
-            children : [
-              {
-                  tag  : 'span',
-                  html : bryntum.gantt.StringHelper.encodeHtml(record.name)
-              },
-              {
-                  class    : 'b-actions',
-                  children : [
-                      {
-                          tag     : 'i',
-                          class   : 'edit b-fa b-fa-fw b-fa-pen',
-                          dataset : { btip : 'Edit' }
-                      },
-                      {
-                          tag     : 'i',
-                          class   : 'add b-fa b-fa-fw b-fa-plus',
-                          dataset : { btip : 'Add task' }
-                      },
-                      {
-                          tag     : 'i',
-                          class   : 'menu b-fa b-fa-fw b-fa-ellipsis-h',
-                          dataset : { btip : 'Task menu' }
-                      }
-                  ]
-              }
-            ]
           },
         },
         {
@@ -721,175 +734,83 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           type: "enddate",
           allowedUnits: "datetime",
           draggable: false,
-          editor: false,
+          // editor: false,
         },
         {
           type: "duration",
           draggable: false,
           allowedUnits: "day",
+          renderer: function (record) {
+            if (record.record._data.type == "Project") {
+              let projectStartDate = new Date(record.record._data.startDate);
+              let projectEndDate = new Date(record.record.endDate);
+              let projectDuration = calcBusinessDays(projectStartDate, projectEndDate);
+              return projectDuration + ' days';
+            }
+            if (record.record._data.type == "Phase") {
+              return record.record.duration+' days';
+            }
+            if (record.record._data.name == "Milestone Complete") {
+              return record.record._data.duration+' days';
+            } else {
+              return record.record._data.duration+' days';
+            }
+          }
         },
-        // {
-        //   text: "Internal Resource",
-        //   draggable: false,
-        //   width: 120,
-        //   editor: false,
-        //   renderer: function (record) {
-        //     populateIcons(record);
-        //     if (
-        //       record.record._data.type == "Task" &&
-        //       record.record._data.name != "Milestone Complete"
-        //     ) {
-        //       if (record.record._data.internalresource) {
-        //         record.cellElement.classList.add("b-resourceassignment-cell");
-        //         record.cellElement.innerHTML = `<div class="b-assignment-chipview-wrap">
-        //                           <div class="b-assignment-chipview b-widget b-list b-chipview b-outer b-visible-scrollbar b-chrome b-no-resizeobserver b-widget-scroller b-hide-scroll" tabindex="0" style="overflow-x: auto;" >
-        //                               <div class="b-chip" data-index="0" data-isinternalresource="true" > ${record.record._data.internalresourcename}</div>
-        //                               <i id="editInternalResource" data-resource="${record.record._data.internalresource}" class="b-action-item b-fa b-fa-pen" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;" id="editInternalResource" ></i>
-        //                               </div>
-        //                       </div>`;
-        //       } else {
-        //         record.cellElement.innerHTML = `
-        //                       <i  class="b-action-item b-fa b-fa-user-plus addinternalresource" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;"  ></i>
-        //                       `;
-        //       }
-        //     } else {
-        //       record.cellElement.innerHTML = `<span></span>`;
-        //     }
-        //   },
-        //   filterable: ({
-        //     record,
-        //     value,
-        //     operator
-        //   }) => {
-        //     if (record._data.internalresourcename && value) {
-        //       if (
-        //         record._data.internalresourcename
-        //         .toUpperCase()
-        //         .indexOf(value.toUpperCase()) > -1
-        //       ) {
-        //         return true;
-        //       }
-        //     }
-        //   },
-        // },
-        // //Added for Contractor
-        // {
-        //   type: "widget",
-        //   text: "Contractor",
-        //   draggable: false,
-        //   width: 120,
-        //   readOnly: true,
-
-        //   // editor: "Combo",
-        //   type: "widget",
-        //   widgets: [
-        //     {
-        //       type: "Combo",
-        //       items: ["test1", "test2"],
-        //       editable : false,
-        //       name: "contractorname",
-
-        //     },
-        //   ],
-        // },
-        // {
-        //   text: "Contractor",
-        //   draggable: false,
-        //   width: 120,
-        //   editor: false,
-        //   renderer: function (record) {
-        //     populateIcons(record);
-
-        //     if (
-        //       record.record._data.type == "Task" &&
-        //       record.record._data.name != "Milestone Complete"
-        //     ) {
-        //       if (record.record._data.contractoracc) {
-        //         record.cellElement.classList.add("b-resourceassignment-cell");
-        //         record.cellElement.innerHTML = `<div id="" class="b-assignment-chipview-wrap">
-        //                           <div class="b-assignment-chipview b-widget b-list b-chipview b-outer b-visible-scrollbar b-chrome b-no-resizeobserver b-widget-scroller b-hide-scroll" tabindex="0" style="overflow-x: auto;" >
-        //                               <div class="b-chip" data-index="0" data-isinternalres="false" > ${record.record._data.contractorname}</div>
-        //                               <i id="editcontractor" data-resource="${record.record._data.contractorname}" class="b-action-item b-fa b-fa-pen" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;"  ></i>
-        //                               </div>
-        //                       </div>`;
-        //       } else {
-        //         record.cellElement.innerHTML = `
-        //                       <i  class="b-action-item b-fa b-fa-user-plus addcontractor" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;"  ></i>
-        //                       `;
-        //       }
-        //     } else {
-        //       record.cellElement.innerHTML = `<span></span>`;
-        //     }
-        //   },
-        //   filterable: ({
-        //     record,
-        //     value,
-        //     operator
-        //   }) => {
-        //     if (record._data.contractorresourcename && value) {
-        //       if (
-        //         record._data.contractorresourcename
-        //         .toUpperCase()
-        //         .indexOf(value.toUpperCase()) > -1
-        //       ) {
-        //         return true;
-        //       }
-        //     }
-        //   },
-        // },
-        // {
-        //   text: "Contractor Resource",
-        //   draggable: false,
-        //   width: 110,
-        //   editor: false,
-        //   renderer: function (record) {
-        //     populateIcons(record);
-        //     if (
-        //       record.record._data.type == "Task" &&
-        //       record.record._data.name != "Milestone Complete"
-        //     ) {
-        //       if (record.record._data.contractorresource) {
-        //         record.cellElement.classList.add("b-resourceassignment-cell");
-        //         record.cellElement.innerHTML = `<div id="" class="b-assignment-chipview-wrap">
-        //                           <div class="b-assignment-chipview b-widget b-list b-chipview b-outer b-visible-scrollbar b-chrome b-no-resizeobserver b-widget-scroller b-hide-scroll" tabindex="0" style="overflow-x: auto;" >
-        //                               <div class="b-chip" data-index="0" data-isinternalres="false" > ${record.record._data.contractorresourcename}</div>
-        //                               <i id="editcontractorResource" data-resource="${record.record._data.contractorresource}" class="b-action-item b-fa b-fa-pen" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;"  ></i>
-        //                               </div>
-        //                       </div>`;
-        //       } else {
-        //         record.cellElement.innerHTML = `
-        //                       <i  class="b-action-item b-fa b-fa-user-plus addcontractorresource" style="font-size:1rem;color:#cfd1d3;margin-left:0.2rem;"  ></i>
-        //                       `;
-        //       }
-        //     } else {
-        //       record.cellElement.innerHTML = `<span></span>`;
-        //     }
-        //   },
-        //   filterable: ({
-        //     record,
-        //     value,
-        //     operator
-        //   }) => {
-        //     if (record._data.contractorresourcename && value) {
-        //       if (
-        //         record._data.contractorresourcename
-        //         .toUpperCase()
-        //         .indexOf(value.toUpperCase()) > -1
-        //       ) {
-        //         return true;
-        //       }
-        //     }
-        //   },
-        // },
-        // {
-        //   type: "schedulingmodecolumn"
-        // },
-        // {
-        //   type: "calendar"
-        // },
-        // {
-        //   type: "constrainttype"
-        // },
+        /* {
+          type: "widget",
+          text: "Contractor",
+          draggable: false,
+          width: 180,
+          widgets: [
+            {
+              type: "Combo",
+              items: contractorComboData,
+              name: "contractorId",
+            },
+          ],
+          renderer: (record) => {
+            if (record.record._data.type == "Project") {
+              return {class: 'd-none'};
+            }
+            else if (record.record._data.type == "Phase") {
+              return {class: 'd-none'};
+            }
+            else if (record.record._data.name == "Milestone Complete") {
+              return {class: 'd-none'};
+            }
+          },
+        },
+        {
+          type : 'resourceassignment',
+          width : 120,
+          showAvatars : false,
+          draggable : false,
+          editor      : {
+            picker : {
+              height   : 350,
+              width    : 450,
+              selectionMode: {
+                rowCheckboxSelection: true,
+                multiSelect: true,
+                showCheckAll: false,
+              },
+              features : {
+                  filterBar  : true,
+                  group      : 'resource.type',
+                  headerMenu : false,
+                  cellMenu   : false,
+              },
+            },
+            listeners: {
+              paint: ({ source }) => {
+                let contractorId = source._projectEvent._data.contractorId
+                source.store.filter(record => (record.resource._data.type == 'Internal Resources' || record.resource._data.contractorId == contractorId));
+              }
+            }
+          },
+          itemTpl : assignment => assignment.resourceName
+        }, */
         // {
         //   type: "addnew",
         // },
@@ -1000,6 +921,8 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       columnLines: false,
 
       features: {
+        dependencyEdit : true,
+        // dependencies : {radius:10},
         rowReorder: false,
         rollups: {
           disabled: true,
@@ -1031,8 +954,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                 // Remove "% Complete","Effort", and the divider in the "General" tab
                 effort: false,
                 // flex:5,
-                endDate: false,
                 startDate: {
+                  weight: 100,
+                },
+                endDate: {
                   weight: 100,
                 },
                 divider: false,
@@ -1076,6 +1001,15 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           editNextOnEnterPress: false,
           addNewAtEnd: false,
         },
+        // indicators : {
+        //     items : {
+        //         deadlineDate   : false,
+        //         earlyDates     : false,
+        //         lateDates      : false,
+        //         // display constraint indicators
+        //         constraintDate : true
+        //     }
+        // },
       },
 
       listeners: {
@@ -1091,6 +1025,20 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           }
         },
       },
+
+      taskRenderer({ taskRecord, renderData }) {
+        if (taskRecord.isLeaf && !taskRecord.isMilestone) {
+            // For leaf tasks we return some custom elements, described as DomConfig objects.
+            // Please see https://bryntum.com/products/grid/docs/api/Core/helper/DomHelper#typedef-DomConfig for more information.
+            return [
+                {
+                    tag   : 'div',
+                    class : 'taskName',
+                    html  : taskRecord.name
+                }
+            ];
+        }
+      },
     });
 
     gantt.on("cellClick", ({ record }) => {
@@ -1098,9 +1046,21 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
       gantt.scrollTaskIntoView(record);
     });
 
-    gantt.callGanttComponent = this;
+    gantt.on('beforeTaskChange', ({event}) => {
+      console.log('beforeTaskChange ',event.record);
+      var task = event.record;
+      var resources = task.getResources();
 
-    console.log("gantt:-", gantt);
+      // Check if the task already has two resources assigned
+      if (resources.length >= 2) {
+        // Prevent adding or removing resources
+        if (event.field === 'resources') {
+          event.preventDefault();
+        }
+      }
+    });
+
+    gantt.callGanttComponent = this;
 
     gantt.on("addSuccessor", (event) => {
       // Get the data of the new task.
@@ -1240,30 +1200,25 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   }
 
   //* calling this method on save changes
-  saveChanges(scheduleData, taskData, dependenciesDatamap) {
+  saveChanges(scheduleData, taskData, dependenciesDatamap, assignedResources) {
     this.handleShowSpinner();
+    let mergeTaskData = mergeArrays(taskData, assignedResources);
+
     let listOfRecordsToDelete = recordsTobeDeleted(
       this.scheduleItemsDataList,
       taskData
     ); //!helper method to get list of string to delete
 
     console.log("taskdata:- ", taskData);
-    // var mapofphase = {};
-    // var listofmilestone = [];
+    let projectTaskObj = {};
     var newtasklistafterid = [];
-    // var taskidrecordMap = new Map();
-    taskData.forEach((newTaskRecord) => {
-      console.log("infor loop newTaskrecord");
+    mergeTaskData.forEach((newTaskRecord) => {
       var demoidvar = newTaskRecord.Id;
       var demoidvar2 = newTaskRecord.buildertek__Dependency__c;
-      console.log("demoidvar:- ", demoidvar);
-      // taskidrecordMap.set(newTaskRecord.Id, newTaskRecord);
 
       if (demoidvar != undefined || demoidvar != null) {
         if (demoidvar.includes("_generatedt_")) {
-          console.log("newTaskRecord:- ", newTaskRecord);
           delete newTaskRecord.Id;
-          console.log("newTaskRecord2:- ", newTaskRecord);
         }
       }
       if (demoidvar2 != undefined || demoidvar2 != null) {
@@ -1271,37 +1226,24 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           delete newTaskRecord.buildertek__Dependency__c;
         }
       }
+      projectTaskObj[demoidvar] = newTaskRecord;
       newtasklistafterid.push(newTaskRecord);
     });
 
-    console.log("taskData before apex:- ", taskData);
+    console.log("mergeTaskData before apex:- ", mergeTaskData);
     var that = this;
-    // var newdependencydatalist = [];
-    // dependenciesDatamap.forEach((newTaskRecord) => {
-    //   console.log("infor loop newTaskrecord");
-    //   delete newTaskRecord.id;
-    //   delete newTaskRecord.lagUnit;
-    //   delete newTaskRecord.type;
-    //   delete newTaskRecord.cls;
-    //   delete newTaskRecord.fromSide;
-    //   delete newTaskRecord.toSide;
-    //   delete newTaskRecord.lag;
-    //   delete newTaskRecord.fromEvent;
-    //   delete newTaskRecord.toEvent;
-    //   delete newTaskRecord.active;
-    //   newdependencydatalist.push(newTaskRecord);
-    // });
-    // console.log("Dependency Data map :- ", dependenciesDatamap);
-    // console.log("Dependency Data map :- ", newdependencydatalist);
-    // console.log('Task id and record Data map :- ', taskidrecordMap)
-    // console.log('Task id and record Data map :- ', JSON.stringify(taskidrecordMap))
+
+    let childParentObj = {};
+    dependenciesDatamap.forEach(element => {
+      childParentObj[element.to] = element.from;
+    });
+
     upsertDataOnSaveChanges({
       scheduleRecordStr: JSON.stringify(scheduleData),
       taskRecordsStr: JSON.stringify(newtasklistafterid),
-      // taskRecordsStr: JSON.stringify(taskData),
       listOfRecordsToDelete: listOfRecordsToDelete,
-      // dependenciesDatamap: JSON.stringify(dependenciesDatamap),
-      // taskIdAndRecordDataMap :JSON.stringify(taskidrecordMap)
+      childParentMap : childParentObj,
+      projectTaskMap : projectTaskObj
     })
       .then(function (response) {
         console.log("response ", {
@@ -1369,5 +1311,22 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     // Set isLoading to true to show the spinner
     // this.isLoading = false;
     this.spinnerDataTable = false;
+  }
+
+  openMasterSchedule() {
+    const urlWithParameters =
+      "/lightning/cmp/buildertek__ImportMasterSchedule?buildertek__RecordId=" +
+      this.scheduleData.Id +
+      "&buildertek__isFromNewGantt=" +
+      true;
+    this[NavigationMixin.Navigate](
+      {
+        type: "standard__webPage",
+        attributes: {
+          url: urlWithParameters,
+        },
+      },
+      false
+    );
   }
 }

@@ -10,6 +10,11 @@
             component.set("v.additionalUrl", additionalUrl);
         }
 
+
+        helper.Check_Create_User_Access(component, event, helper);
+        helper.Check_Update_User_Access(component, event, helper);
+        helper.Check_Delete_User_Access(component, event, helper);
+
         console.log({ additionalUrl });
         var fromWhereBudgetIsOpen = component.get('v.fromWhereBudgetIsOpen');
         console.log({ fromWhereBudgetIsOpen });
@@ -419,223 +424,337 @@
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
-        var selectedRecs = component.get('v.selectedRecs');
-
-        selectedRecs.filter((item, index) => selectedRecs.indexOf(item) === index);
-
-        console.log('v.selectedRecs ==> ', { selectedRecs });
-        if (selectedRecs.length > 0) {
-            if (selectedRecs.length == 1) {
-                var BudgetIds = [];
-                var rowData;
-                var newPOItems = [];
-                // if (selectedRecs.length > 0) {
-                var budgetlineid = BudgetIds[0];
-                var action = component.get("c.BudgetItemList");
-                action.setParams({
-                    BudgetIds: selectedRecs
-                });
-                action.setCallback(this, function (response) {
-                    console.log(response.getState(), '::::::::STATE;;;;;;;');
-                    if (component.isValid() && response.getState() === "SUCCESS") {
-                        $A.get("e.c:BT_SpinnerEvent").setParams({
-                            "action": "HIDE"
-                        }).fire();
-                        for (var i = 0; i < response.getReturnValue().length; i++) {
-                            component.set("v.addtcsection", true);
-                            var pageNumber = component.get("v.PageNumber");
-                            var pageSize = component.get("v.pageSize");
-                            component.set("v.isExistingTc", true);
-                            helper.gettcList(component, pageNumber, pageSize);
+        if(component.get("v.HaveCreateAccess")){
+            
+            var selectedRecs = component.get('v.selectedRecs');
+            selectedRecs.filter((item, index) => selectedRecs.indexOf(item) === index);
+    
+            console.log('v.selectedRecs ==> ', { selectedRecs });
+            if (selectedRecs.length > 0) {
+                if (selectedRecs.length == 1) {
+                    var BudgetIds = [];
+                    var rowData;
+                    var newPOItems = [];
+                    // if (selectedRecs.length > 0) {
+                    var budgetlineid = BudgetIds[0];
+                    var action = component.get("c.BudgetItemList");
+                    action.setParams({
+                        BudgetIds: selectedRecs
+                    });
+                    action.setCallback(this, function (response) {
+                        console.log(response.getState(), '::::::::STATE;;;;;;;');
+                        if (component.isValid() && response.getState() === "SUCCESS") {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            for (var i = 0; i < response.getReturnValue().length; i++) {
+                                component.set("v.addtcsection", true);
+                                var pageNumber = component.get("v.PageNumber");
+                                var pageSize = component.get("v.pageSize");
+                                component.set("v.isExistingTc", true);
+                                helper.gettcList(component, pageNumber, pageSize);
+                            }
                         }
-                    }
-                });
-                $A.enqueueAction(action);
-
-
-                // } else {
-                //     $A.get("e.c:BT_SpinnerEvent").setParams({
-                //         "action": "HIDE"
-                //     }).fire();
-                //     component.find('notifLib').showNotice({
-                //         "variant": "error",
-                //         "header": "Please Select Budget Line!",
-                //         "message": "Please Select Budget Line to Create TimeCard.",
-                //         closeCallback: function() {}
-                //     });
-                // }
-
-
+                    });
+                    $A.enqueueAction(action);
+    
+    
+                    // } else {
+                    //     $A.get("e.c:BT_SpinnerEvent").setParams({
+                    //         "action": "HIDE"
+                    //     }).fire();
+                    //     component.find('notifLib').showNotice({
+                    //         "variant": "error",
+                    //         "header": "Please Select Budget Line!",
+                    //         "message": "Please Select Budget Line to Create TimeCard.",
+                    //         closeCallback: function() {}
+                    //     });
+                    // }
+    
+    
+                } else {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": "Select Budget Line",
+                        "message": "Please Select only 1 Budget Line to Create Time Card.",
+                        //"header": "No Budget Lines",
+                        //"message": "Please select a Budget Line.",
+                        closeCallback: function () { }
+                    });
+    
+                }
+    
             } else {
                 $A.get("e.c:BT_SpinnerEvent").setParams({
                     "action": "HIDE"
                 }).fire();
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": "Select Budget Line",
-                    "message": "Please Select only 1 Budget Line to Create Time Card.",
-                    //"header": "No Budget Lines",
-                    //"message": "Please select a Budget Line.",
-                    closeCallback: function () { }
-                });
 
+                component.set("v.addtcsection", true);
+                var pageNumber = component.get("v.PageNumber");
+                var pageSize = component.get("v.pageSize");
+                component.set("v.isExistingTc", true);
+                helper.gettcList(component, pageNumber, pageSize);
+    
             }
-
-        } else {
+        }
+        else{
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "HIDE"
             }).fire();
-            component.set("v.addtcsection", true);
-            var pageNumber = component.get("v.PageNumber");
-            var pageSize = component.get("v.pageSize");
-            component.set("v.isExistingTc", true);
-            helper.gettcList(component, pageNumber, pageSize);
 
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
         }
     },
     addInvoice: function (component, event, helper) {
-        console.log('addInvoice');
-        $A.get("e.c:BT_SpinnerEvent").setParams({
-            "action": "SHOW"
-        }).fire();
-        var selectedRecs = component.get('v.selectedRecs');
-        console.log('v.selectedRecs ==> ', { selectedRecs });
-        if (selectedRecs.length > 0) {
-            var BudgetIds = [];
-            var rowData;
-            var newPOItems = [];
-
-            if (selectedRecs.length > 0 && selectedRecs.length == 1) {
-                var budgetlineid = BudgetIds[0];
-                var action;
-                action = component.get("c.BudgetItemList");
-                action.setParams({
-                    BudgetIds: selectedRecs
-                });
-                action.setCallback(this, function (response) {
-                    console.log('response ==> ', response);
-                    if (component.isValid() && response.getState() === "SUCCESS") {
-                        $A.get("e.c:BT_SpinnerEvent").setParams({
-                            "action": "HIDE"
-                        }).fire();
-                        for (var i = 0; i < response.getReturnValue().length; i++) {
-                            component.set("v.addinvsection", true);
-                            var pageNumber = component.get("v.PageNumber");
-                            var pageSize = component.get("v.pageSize");
-                            component.set("v.isExistingInvo", true);
-                            helper.getInvoiceList(component, pageNumber, pageSize);
-                        }
-                    }
-                });
-                $A.enqueueAction(action);
-            } else if (selectedRecs.length > 1) {
-                $A.get("e.c:BT_SpinnerEvent").setParams({
-                    "action": "HIDE"
-                }).fire();
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": "Too many Budget Lines selected.",
-                    "message": "Please Select only 1 Budget Line to Create Invoice.",
-                    closeCallback: function () { }
-                });
-            }
-            else {
-                $A.get("e.c:BT_SpinnerEvent").setParams({
-                    "action": "HIDE"
-                }).fire();
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": "Please Select Budget Line!",
-                    "message": "Please Select Budget Line to Create TimeCard.",
-                    closeCallback: function () { }
-                });
-            }
-        } else {
+        if(component.get("v.HaveCreateAccess")){
+            console.log('addInvoice');
             $A.get("e.c:BT_SpinnerEvent").setParams({
-                "action": "HIDE"
+                "action": "SHOW"
             }).fire();
-            component.set("v.addinvsection", true);
-            var pageNumber = component.get("v.PageNumber");
-            var pageSize = component.get("v.pageSize");
-            component.set("v.isExistingInvo", true);
-            helper.getInvoiceList(component, pageNumber, pageSize);
+            var selectedRecs = component.get('v.selectedRecs');
+            console.log('v.selectedRecs ==> ', { selectedRecs });
+            if (selectedRecs.length > 0) {
+                var BudgetIds = [];
+                var rowData;
+                var newPOItems = [];
+    
+                if (selectedRecs.length > 0 && selectedRecs.length == 1) {
+                    var budgetlineid = BudgetIds[0];
+                    var action;
+                    action = component.get("c.BudgetItemList");
+                    action.setParams({
+                        BudgetIds: selectedRecs
+                    });
+                    action.setCallback(this, function (response) {
+                        console.log('response ==> ', response);
+                        if (component.isValid() && response.getState() === "SUCCESS") {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            for (var i = 0; i < response.getReturnValue().length; i++) {
+                                component.set("v.addinvsection", true);
+                                var pageNumber = component.get("v.PageNumber");
+                                var pageSize = component.get("v.pageSize");
+                                component.set("v.isExistingInvo", true);
+                                helper.getInvoiceList(component, pageNumber, pageSize);
+                            }
+                        }
+                    });
+                    $A.enqueueAction(action);
+                } else if (selectedRecs.length > 1) {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": "Too many Budget Lines selected.",
+                        "message": "Please Select only 1 Budget Line to Create Invoice.",
+                        closeCallback: function () { }
+                    });
+                }
+                else {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": "Please Select Budget Line!",
+                        "message": "Please Select Budget Line to Create TimeCard.",
+                        closeCallback: function () { }
+                    });
+                }
+            } else {
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
+                component.set("v.addinvsection", true);
+                var pageNumber = component.get("v.PageNumber");
+                var pageSize = component.get("v.pageSize");
+                component.set("v.isExistingInvo", true);
+                helper.getInvoiceList(component, pageNumber, pageSize);
+            }
+        } else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
 
-
-
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
         }
     },
 
     addPO: function (component, event, helper) {
-        var selectedRecs = component.get('v.selectedRecs');
-        if (selectedRecs.length > 1) {
-            component.find('notifLib').showNotice({
-                "variant": "error",
-                "header": "Too many Budget Lines selected.",
-                "message": "Please Select only 1 Budget Line to add PO.",
-                closeCallback: function () { }
-            });
-            return;
-        }
-        console.log('v.selectedRecs ==> ', { selectedRecs });
-        if (selectedRecs.length > 0) {
-            var BudgetIds = [];
-            var rowData;
-            var newPOItems = [];
-
-            if (selectedRecs.length > 0) {
-                var budgetlineid = BudgetIds[0];
-                var action;
-                action = component.get("c.BudgetItemList");
-                action.setParams({
-                    BudgetIds: selectedRecs
-                });
-                action.setCallback(this, function (response) {
-                    if (component.isValid() && response.getState() === "SUCCESS") {
-                        for (var i = 0; i < response.getReturnValue().length; i++) {
-                            component.set("v.addposection", true);
-                            var pageNumber = component.get("v.PageNumber");
-                            var pageSize = component.get("v.pageSize");
-                            component.set("v.isExistingPo", true);
-                            helper.getpoList(component, pageNumber, pageSize);
+        //  >>> should be in master <<<
+        console.log('addPO');
+        console.log('v.HaveCreateAccess ==> ', component.get("v.HaveCreateAccess"));
+        // Changed by Jaimin
+        if(component.get("v.HaveCreateAccess")){
+        //  >>> should be in master <<<
+            var selectedRecs = [];
+            var getAllId;
+            if(component.find("checkGroupQuoteItem1") != undefined){
+                getAllId = component.find("checkGroupQuoteItem1");
+                if (!Array.isArray(getAllId)) {
+                    if (getAllId.get("v.value") == true) {
+                        selectedRecs.push(getAllId.get("v.text"));
+                    }
+                } else {
+                    for (var i = 0; i < getAllId.length; i++) {
+                        console.log(getAllId[i].get("v.value")  , 'getAllId[i].get("v.value") ');
+                        if (getAllId[i].get("v.value") == true) {
+                            console.log('inside if');
+                            selectedRecs.push(getAllId[i].get("v.text"));
                         }
                     }
+                }
+            }else{
+                selectedRecs = component.get('v.selectedRecs');
+
+            }
+            if (selectedRecs.length > 1) {
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Too many Budget Lines selected.",
+                    "message": "Please Select only 1 Budget Line to add PO.",
+                    closeCallback: function () { }
                 });
-                $A.enqueueAction(action);
-
-
+                return;
+            }
+            console.log('v.selectedRecs ==> ', { selectedRecs });
+            if (selectedRecs.length > 0) {
+                var BudgetIds = [];
+                var rowData;
+                var newPOItems = [];
+    
+                if (selectedRecs.length > 0) {
+                    var budgetlineid = BudgetIds[0];
+                    var action;
+                    action = component.get("c.BudgetItemList");
+                    action.setParams({
+                        BudgetIds: selectedRecs
+                    });
+                    action.setCallback(this, function (response) {
+                        if (component.isValid() && response.getState() === "SUCCESS") {
+                            for (var i = 0; i < response.getReturnValue().length; i++) {
+                                component.set("v.addposection", true);
+                                var pageNumber = component.get("v.PageNumber");
+                                var pageSize = component.get("v.pageSize");
+                                component.set("v.isExistingPo", true);
+                                helper.getpoList(component, pageNumber, pageSize);
+                            }
+                        }
+                    });
+                    $A.enqueueAction(action);
+    
+    
+                } else {
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": "Please Select Budget Line!",
+                        "message": "Please Select Budget Line to Create PO.",
+                        closeCallback: function () { }
+                    });
+                }
             } else {
                 component.find('notifLib').showNotice({
                     "variant": "error",
-                    "header": "Please Select Budget Line!",
-                    "message": "Please Select Budget Line to Create PO.",
+                    "header": "Select Budget Line",
+                    "message": "Please Select at least One Budget Line to Add PO.",
                     closeCallback: function () { }
                 });
             }
-        } else {
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
             component.find('notifLib').showNotice({
                 "variant": "error",
-                "header": "Select Budget Line",
-                "message": "Please Select at least One Budget Line to Add PO.",
-                closeCallback: function () { }
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
             });
         }
     },
     onClickAddlines: function (component, event, helper) {
-        var evt = $A.get("e.force:navigateToComponent");
-        evt.setParams({
-            componentDef: "c:BT_MassAddBudgetItem",
-            /*componentAttributes: {
-                recordId: component.get("v.recordId + 'groups'"),
-                // "_gFiled": "buildertek__Group__c",
-                //"_gSobject": "buildertek__Budget_Item__c",
-                //"_gFilter": "buildertek__Budget__c = '" + component.get("v.recordId") + "'"
-                
-            }*/
-            componentAttributes: {
-                recordId: component.get("v.recordId"),
-            }
-        });
-        evt.fire();
+        if(component.get("v.HaveCreateAccess")){
+            var evt = $A.get("e.force:navigateToComponent");
+            evt.setParams({
+                componentDef: "c:BT_MassAddBudgetItem",
+                /*componentAttributes: {
+                    recordId: component.get("v.recordId + 'groups'"),
+                    // "_gFiled": "buildertek__Group__c",
+                    //"_gSobject": "buildertek__Budget_Item__c",
+                    //"_gFilter": "buildertek__Budget__c = '" + component.get("v.recordId") + "'"
+                    
+                }*/
+                componentAttributes: {
+                    recordId: component.get("v.recordId"),
+                }
+            });
+            evt.fire();
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
+        }
 
 
     },
@@ -1124,8 +1243,15 @@
                         });
                         toastEvent.fire();
 
-                        var action1 = component.get("c.doInit");
-                        $A.enqueueAction(action1);
+                        let getValue=component.get('v.displayGrouping')
+                        if (getValue) {
+                            helper.getBudgetGrouping(component, event, helper); 
+                        } else{
+                            var action1 = component.get("c.doInit");
+                            $A.enqueueAction(action1);
+
+                        }
+
                     } else {
                         var toastEvent = $A.get("e.force:showToast");
                         toastEvent.setParams({
@@ -1240,8 +1366,16 @@
                         });
                         toastEvent.fire();
 
-                        var action1 = component.get("c.doInit");
-                        $A.enqueueAction(action1);
+                        let getValue=component.get('v.displayGrouping')
+                        if (getValue) {
+                            helper.getBudgetGrouping(component, event, helper); 
+                        } else{
+                            var action1 = component.get("c.doInit");
+                            $A.enqueueAction(action1);
+
+                        }
+
+                       
                     } else {
                         var toastEvent = $A.get("e.force:showToast");
                         toastEvent.setParams({
@@ -2021,122 +2155,151 @@ helper.getProductDetails(component,event,helper);
         $A.get("e.c:BT_SpinnerEvent").setParams({
             "action": "SHOW"
         }).fire();
-        console.log(component.get('v.newBudgetLine.name'));
-        console.log(component.find('budgetLineID').get('v.value'));
-        var getDescriptionValue = component.find('budgetLineID').get('v.value');
 
-        var recordId = component.get("v.recordId");
-        component.set("v.newBudgetLine.buildertek__Budget__c", recordId);
-        //alert('Budget --> '+component.get("v.newBudgetLine.buildertek__Product__c"));
-        var uom = component.get("v.UOMvalues");
-        component.set("v.newBudgetLine.buildertek__UOM__c", uom);
-        var budgetLineObject = component.get("v.newBudgetLine");
+        if(component.get("v.HaveCreateAccess")){
 
-        var tradeType;
-        var contractor;
-        /*  Comment by Laxman 08-07-2020
-        var selectedTradetype = component.get("v.selectedTradeType");
-        if (selectedTradetype != undefined) {
-            tradeType = selectedTradetype.Id;
-        } else {
-            tradeType = null;
-        } */
-        console.log('=============================================================');
-        console.log('Sub Group::', JSON.stringify(budgetLineObject));
-        var selectedContractor = component.get("v.selectedContractor");
-        if (selectedContractor != undefined) {
-            contractor = selectedContractor.Id;
-        } else {
-            contractor = null;
+            console.log(component.get('v.newBudgetLine.name'));
+            console.log(component.find('budgetLineID').get('v.value'));
+            var getDescriptionValue = component.find('budgetLineID').get('v.value');
+    
+            var recordId = component.get("v.recordId");
+            component.set("v.newBudgetLine.buildertek__Budget__c", recordId);
+            //alert('Budget --> '+component.get("v.newBudgetLine.buildertek__Product__c"));
+            var uom = component.get("v.UOMvalues");
+            component.set("v.newBudgetLine.buildertek__UOM__c", uom);
+            var budgetLineObject = component.get("v.newBudgetLine");
+    
+            var tradeType;
+            var contractor;
+            /*  Comment by Laxman 08-07-2020
+            var selectedTradetype = component.get("v.selectedTradeType");
+            if (selectedTradetype != undefined) {
+                tradeType = selectedTradetype.Id;
+            } else {
+                tradeType = null;
+            } */
+            console.log('=============================================================');
+            console.log('Sub Group::', JSON.stringify(budgetLineObject));
+            var selectedContractor = component.get("v.selectedContractor");
+            if (selectedContractor != undefined) {
+                contractor = selectedContractor.Id;
+            } else {
+                contractor = null;
+            }
+    
+            /*var selectedCostcode = component.get("v.selectedCostcode");
+            if (selectedCostcode != undefined) {
+                contractors = selectedCostcode.Id;
+            } else {
+                contractors = null;
+            }*/
+    
+            // If we want tarade type value we have to pass parameter like "tradeType:tradeType"
+            if (getDescriptionValue != '' && getDescriptionValue != undefined) {
+                var action = component.get("c.saveBudgetLineItem");
+                action.setParams({
+                    "budgetLineRecord": JSON.stringify(budgetLineObject),
+                    recordId: recordId,
+                    contractor: contractor,
+    
+                });
+                action.setCallback(this, function (respo) {
+                    if (component.isValid() && respo.getState() === "SUCCESS") {
+                        //  alert(JSON.stringify(respo));
+                        var url = location.href;
+                        var baseURL = url.substring(0, url.indexOf('/', 14));
+                        var result = respo.getReturnValue();
+                        var group = component.find('costCodeId');
+                        group.set("v._text_value", '');
+                        var costCode = component.find('groupId');
+                        costCode.set("v._text_value", '');
+                        var product = component.get('v.selectedLookUpRecord');
+                        var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
+                        compEvent.setParams({
+                            "recordByEvent": product
+                        });
+                        compEvent.fire();
+                        component.set('v.newBudgetLine.Name', '');
+                        //component.set('v.selectedContractor', null);
+                        component.set('v.selectedContractor', null);
+                        component.set('v.newBudgetLine.buildertek__Group__c', '');
+                        component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
+                        component.set('v.newBudgetLine.buildertek__UOM__c', '');
+                        component.set('v.newBudgetLine.buildertek__Notes__c', '');
+                        component.set('v.newBudgetLine.buildertek__Unit_Price__c', '');
+                        component.set('v.newBudgetLine.buildertek__Quantity__c', '1');
+                        component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
+                        component.set('v.newBudgetLine.buildertek__Cost_Code__c', '');
+                        component.set('v.UOMvalues', '');
+                        component.set('v.pricebookName', '');
+    
+                        //  component.set('v.Notevalues', '');
+    
+                        $A.enqueueAction(component.get("c.clearLookupValue"));
+                        $A.get("e.c:BT_SpinnerEvent").setParams({
+                            "action": "HIDE"
+                        }).fire();
+    
+                        /*$A.get('e.force:refreshView').fire();
+                        alert('TS');*/
+                        window.setTimeout(
+                            $A.getCallback(function () {
+                                var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    mode: 'sticky',
+                                    message: 'Budget Line created successfully',
+                                    type: 'success',
+                                    duration: '10000',
+                                    mode: 'dismissible'
+                                });
+                                toastEvent.fire();
+                            }), 3000
+                        );
+                        //$A.get('e.force:refreshView').fire();
+                        // component.refreshData();
+                        let getValue=component.get('v.displayGrouping')
+                        if (getValue) {
+                            helper.getBudgetGrouping(component, event, helper); 
+                        } 
+                        component.refreshData();
+                    }
+                });
+                $A.enqueueAction(action);
+            } else {
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
+    
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    mode: 'sticky',
+                    message: 'Please Enter Description',
+                    type: 'error',
+                    duration: '10000',
+                    mode: 'dismissible'
+                });
+                toastEvent.fire();
+            }
         }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
 
-        /*var selectedCostcode = component.get("v.selectedCostcode");
-        if (selectedCostcode != undefined) {
-            contractors = selectedCostcode.Id;
-        } else {
-            contractors = null;
-        }*/
-
-        // If we want tarade type value we have to pass parameter like "tradeType:tradeType"
-        if (getDescriptionValue != '' && getDescriptionValue != undefined) {
-            var action = component.get("c.saveBudgetLineItem");
-            action.setParams({
-                "budgetLineRecord": JSON.stringify(budgetLineObject),
-                recordId: recordId,
-                contractor: contractor,
-
-            });
-            action.setCallback(this, function (respo) {
-                if (component.isValid() && respo.getState() === "SUCCESS") {
-                    //  alert(JSON.stringify(respo));
-                    var url = location.href;
-                    var baseURL = url.substring(0, url.indexOf('/', 14));
-                    var result = respo.getReturnValue();
-                    var group = component.find('costCodeId');
-                    group.set("v._text_value", '');
-                    var costCode = component.find('groupId');
-                    costCode.set("v._text_value", '');
-                    var product = component.get('v.selectedLookUpRecord');
-                    var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
-                    compEvent.setParams({
-                        "recordByEvent": product
-                    });
-                    compEvent.fire();
-                    component.set('v.newBudgetLine.Name', '');
-                    //component.set('v.selectedContractor', null);
-                    component.set('v.selectedContractor', null);
-                    component.set('v.newBudgetLine.buildertek__Group__c', '');
-                    component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
-                    component.set('v.newBudgetLine.buildertek__UOM__c', '');
-                    component.set('v.newBudgetLine.buildertek__Notes__c', '');
-                    component.set('v.newBudgetLine.buildertek__Unit_Price__c', '');
-                    component.set('v.newBudgetLine.buildertek__Quantity__c', '1');
-                    component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
-                    component.set('v.newBudgetLine.buildertek__Cost_Code__c', '');
-                    component.set('v.UOMvalues', '');
-                    component.set('v.pricebookName', '');
-
-                    //  component.set('v.Notevalues', '');
-
-                    $A.enqueueAction(component.get("c.clearLookupValue"));
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
                     $A.get("e.c:BT_SpinnerEvent").setParams({
                         "action": "HIDE"
                     }).fire();
-
-                    /*$A.get('e.force:refreshView').fire();
-                    alert('TS');*/
-                    window.setTimeout(
-                        $A.getCallback(function () {
-                            var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                mode: 'sticky',
-                                message: 'Budget Line created successfully',
-                                type: 'success',
-                                duration: '10000',
-                                mode: 'dismissible'
-                            });
-                            toastEvent.fire();
-                        }), 3000
-                    );
-                    //$A.get('e.force:refreshView').fire();
-                    component.refreshData();
                 }
             });
-            $A.enqueueAction(action);
-        } else {
-            $A.get("e.c:BT_SpinnerEvent").setParams({
-                "action": "HIDE"
-            }).fire();
-
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                mode: 'sticky',
-                message: 'Please Enter Description',
-                type: 'error',
-                duration: '10000',
-                mode: 'dismissible'
-            });
-            toastEvent.fire();
         }
 
     },
@@ -2177,10 +2340,34 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         editRecordEvent.fire();
     },
 
-    deleteBudget: function (component, event, helper) {
-        component.set("v.isOpen", true);
-        var recordId = event.currentTarget.dataset.id;
-        component.set("v.quoteItemId", recordId);
+    
+      deleteBudget: function (component, event, helper) {
+
+        if(component.get("v.HaveDeleteAccess")){
+            component.set("v.isOpen", true);
+            var recordId = event.currentTarget.dataset.id;
+            component.set("v.quoteItemId", recordId);
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to delete record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Delete record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
+        }
     },
 
     removegrouping: function (component, event, helper) {
@@ -2208,76 +2395,121 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     deleteSelectedBudgetItem: function (component, event, helper) {
-        var selectedRecs = component.get('v.selectedRecs');
-        console.log('selected:id', selectedRecs);
-        if (component.get('v.selectedRecs') != undefined) {
-            // $A.get("e.c:BT_SpinnerEvent").setParams({
-            //     "action": "SHOW"
-            // }).fire();
-            var BudgetIds = component.get('v.selectedRecs');
-            var rowData;
-            var newRFQItems = [];
-            var delId = [];
-            /*var getAllId = component.find("checkQuoteItem");
-            if (!Array.isArray(getAllId)) {
-                if (getAllId.get("v.value") == true) {
-                    BudgetIds.push(getAllId.get("v.text"));
-                }
-            } else {
-                for (var i = 0; i < getAllId.length; i++) {
-                    if (getAllId[i].get("v.value") == true) {
-                        BudgetIds.push(getAllId[i].get("v.text"));
+        if(component.get("v.HaveDeleteAccess")){
+            var selectedRecs = component.get('v.selectedRecs');
+            console.log('selected:id', selectedRecs);
+            if (component.get('v.selectedRecs') != undefined || component.find("checkGroupQuoteItem1") != undefined) {
+                // $A.get("e.c:BT_SpinnerEvent").setParams({
+                //     "action": "SHOW"
+                // }).fire();
+                var BudgetIds = [];
+                var getAllId;
+                if(component.find("checkGroupQuoteItem1") != undefined){
+                    getAllId = component.find("checkGroupQuoteItem1");
+                    if (!Array.isArray(getAllId)) {
+                        if (getAllId.get("v.value") == true) {
+                            BudgetIds.push(getAllId.get("v.text"));
+                        }
+                    } else {
+                        for (var i = 0; i < getAllId.length; i++) {
+                            console.log(getAllId[i].get("v.value")  , 'getAllId[i].get("v.value") ');
+                            if (getAllId[i].get("v.value") == true) {
+                                console.log('inside if');
+                                BudgetIds.push(getAllId[i].get("v.text"));
+                                console.log({BudgetIds});
+                            }
+                        }
                     }
+                }else{
+                    BudgetIds = component.get('v.selectedRecs');
+    
                 }
-            }*/
-            if (BudgetIds.length > 0) {
-                component.set("v.BudgetlinePopupHeader", "Delete Budget Lines");
-                component.set("v.BudgetlinePopupDescription", "Are you sure you want to delete Budget Lines?");
-                component.set("v.isBudgetlinedelete", true);
-                component.set("v.isSelectAll", false);
-                /* var action = component.get('c.deleteSelectedItems');
-            action.setParams({
-                "recordIds": BudgetIds
-            });
-            action.setCallback(this, function (response) {
-                var state = response.getState();
-                if (state === "SUCCESS") {
-                    $A.get("e.force:refreshView").fire();
-                    //$A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire(); 
-                    window.setTimeout(
-                        $A.getCallback(function () {
-                            var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                mode: 'sticky',
-                                message: 'Selected Budget Lines was deleted',
-                                type: 'success',
-                                duration: '10000',
-                                mode: 'dismissible'
-                            });
-                            toastEvent.fire();
-                        }), 3000
-                    );
-                     window.setTimeout(
-                        $A.getCallback(function() {
-                            document.location.reload(true);    
-                        }), 4000
-                    ); 
-                	
-                }
-            });
-            $A.enqueueAction(action); */
-            } else {
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": " Select Budget Line",
-                    "message": "Please select the Budget Line you would like to Delete.",
-                    closeCallback: function () {
-                        $A.get("e.c:BT_SpinnerEvent").setParams({
-                            "action": "HIDE"
-                        }).fire();
+                
+                // var BudgetIds = component.get('v.selectedRecs');
+                var rowData;
+                var newRFQItems = [];
+                var delId = [];
+                /*var getAllId = component.find("checkQuoteItem");
+                if (!Array.isArray(getAllId)) {
+                    if (getAllId.get("v.value") == true) {
+                        BudgetIds.push(getAllId.get("v.text"));
+                    }
+                } else {
+                    for (var i = 0; i < getAllId.length; i++) {
+                        if (getAllId[i].get("v.value") == true) {
+                            BudgetIds.push(getAllId[i].get("v.text"));
+                        }
+                    }
+                }*/
+                if (BudgetIds.length > 0) {
+                    component.set("v.BudgetlinePopupHeader", "Delete Budget Lines");
+                    component.set("v.BudgetlinePopupDescription", "Are you sure you want to delete Budget Lines?");
+                    component.set("v.isBudgetlinedelete", true);
+                    component.set("v.isSelectAll", false);
+                    /* var action = component.get('c.deleteSelectedItems');
+                action.setParams({
+                    "recordIds": BudgetIds
+                });
+                action.setCallback(this, function (response) {
+                    var state = response.getState();
+                    if (state === "SUCCESS") {
+                        $A.get("e.force:refreshView").fire();
+                        //$A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire(); 
+                        window.setTimeout(
+                            $A.getCallback(function () {
+                                var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    mode: 'sticky',
+                                    message: 'Selected Budget Lines was deleted',
+                                    type: 'success',
+                                    duration: '10000',
+                                    mode: 'dismissible'
+                                });
+                                toastEvent.fire();
+                            }), 3000
+                        );
+                         window.setTimeout(
+                            $A.getCallback(function() {
+                                document.location.reload(true);    
+                            }), 4000
+                        ); 
+                        
                     }
                 });
+                $A.enqueueAction(action); */
+                } else {
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": " Select Budget Line",
+                        "message": "Please select the Budget Line you would like to Delete.",
+                        closeCallback: function () {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                        }
+                    });
+                }
             }
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to delete record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Delete record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
         }
     },
     createnewbudgetlinegroup: function (component, event, helper) {
@@ -2435,6 +2667,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     closeModel: function (component, event, helper) {
         // for Hide/Close Model,set the "isOpen" attribute to "Fasle"  
         component.set("v.isOpen", false);
+        component.set("v.isBOMmodalOpen", false);
     },
     removegroupingcloseModel: function (component, event, helper) {
         // for Hide/Close Model,set the "isremovegroup" attribute to "Fasle"  
@@ -2521,8 +2754,15 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 );
                 var page = component.get("v.page") || 1
                 //To much loading on deletion problem
-                component.set("v.TotalRecords", {});
-                helper.getBudgetGroups(component, event, helper, page, function () { });
+                let getValue=component.get('v.displayGrouping')
+                if (getValue) {
+                    helper.getBudgetGrouping(component, event, helper); 
+                } else{
+                    component.set("v.TotalRecords", {});
+                    helper.getBudgetGroups(component, event, helper, page, function () { });
+                }
+                // component.set("v.TotalRecords", {});
+                // helper.getBudgetGroups(component, event, helper, page, function () { });
             }
         });
         $A.enqueueAction(action);
@@ -2531,16 +2771,36 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     deleteSelectedBudgetItemlines: function (component, event, helper) {
         var selectedRecs = component.get('v.selectedRecs');
         console.log('selected:id when delete--->>>', selectedRecs);
-        if (component.get('v.selectedRecs') != undefined) {
+        if (component.get('v.selectedRecs') != undefined || component.find("checkGroupQuoteItem1") != undefined) {
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "SHOW"
             }).fire();
-            var BudgetIds = component.get('v.selectedRecs');
+                var BudgetIds = [];
+                var getAllId;
+                if(component.find("checkGroupQuoteItem1") != undefined){
+                    getAllId = component.find("checkGroupQuoteItem1");
+                    if (!Array.isArray(getAllId)) {
+                        if (getAllId.get("v.value") == true) {
+                            BudgetIds.push(getAllId.get("v.text"));
+                        }
+                    } else {
+                        for (var i = 0; i < getAllId.length; i++) {
+                            console.log(getAllId[i].get("v.value")  , 'getAllId[i].get("v.value") ');
+                            if (getAllId[i].get("v.value") == true) {
+                                console.log('inside if');
+                                BudgetIds.push(getAllId[i].get("v.text"));
+                                console.log({BudgetIds});
+                            }
+                        }
+                    }
+                }else{
+                    BudgetIds = component.get('v.selectedRecs');
+    
+                }
             console.log('BudgetIds--->>>', { BudgetIds });
             var rowData;
             var newRFQItems = [];
             var delId = [];
-            var getAllId = component.find("checkQuoteItem");
             if (BudgetIds.length > 0) {
                 var action = component.get('c.deleteSelectedItems');
                 action.setParams({
@@ -2556,6 +2816,21 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         var noRecord = [];
                         component.set('v.selectedRecs', noRecord);
                         var page = component.get("v.page") || 1
+                        let getValue=component.get('v.displayGrouping')
+                        if (getValue) {
+                            helper.getBudgetGrouping(component, event, helper, function () {
+                                // Callback function to execute after the helper method has finished
+                                var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    mode: 'sticky',
+                                    message: 'Selected Budget Lines were deleted',
+                                    type: 'success',
+                                    duration: '10000',
+                                    mode: 'dismissible'
+                                });
+                                toastEvent.fire();
+                            }); 
+                        } else {
                         component.set("v.TotalRecords", {});
                         helper.getBudgetGroups(component, event, helper, page, function () {
                             // Callback function to execute after the helper method has finished
@@ -2569,6 +2844,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                             });
                             toastEvent.fire();
                         });
+                    }
                     }
                 });
                 $A.enqueueAction(action);
@@ -2744,9 +3020,31 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     //mass Functionality start
 
     onclickDuplicate: function (component, event, helper) {
-        var currentId = event.currentTarget.getAttribute("data-id");
-        component.set("v.currentId", currentId);
-        component.set("v.isDuplicate", true);
+        if(component.get("v.HaveDeleteAccess")){
+            var currentId = event.currentTarget.getAttribute("data-id");
+            component.set("v.currentId", currentId);
+            component.set("v.isDuplicate", true);
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to duplicate record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Delete record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
+        }
     },
     closeDuplicateModel: function (component, event, helper) {
         // for Hide/Close Model,set the "isDuplicate" attribute to "Fasle"  
@@ -2798,8 +3096,16 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         }), 3000
                     );
                     var page = component.get("v.page") || 1
-                    component.set("v.TotalRecords", {});
-                    helper.getBudgetGroups(component, event, helper, page, function () { });
+                    
+                    let getValue=component.get('v.displayGrouping')
+                    if (getValue) {
+                        helper.getBudgetGrouping(component, event, helper); 
+                    } else{
+                        component.set("v.TotalRecords", {});
+                        helper.getBudgetGroups(component, event, helper, page, function () { });
+                    }
+                    // component.set("v.TotalRecords", {});
+                    // helper.getBudgetGroups(component, event, helper, page, function () { });
                 }
             });
             $A.enqueueAction(action);
@@ -2931,288 +3237,324 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     onClickMassUpdate: function (component, event, helper) {
-        component.set("v.isExpandGrp", false);
-
-        component.set("v.enableMassUpdate", component.get("v.enableMassUpdate") == true ? false : true);
-        // component.set("v.isExpandGrp",false);
-        if (component.get("v.enableMassUpdate") == false && component.get('v.isChangeData')) {
-            // var start = new Date().getTime();
-            // var output = "";                        
-            // for (var i = 1; i <= 1e6; i++) {
-            //     output += i;
-            // } 
-            $A.get("e.c:BT_SpinnerEvent").setParams({
-                action: "SHOW",
-            }).fire();
-            var groupHierarchy = component.get('v.TotalRecords').groupHierarchy;
-            //  alert(JSON.stringify(groupHierarchy));
-            var newMassQi = [];
-            var newMassQuoteItem = {};
-            var newnames = [];
-
-
-            // var Name = component.get("v.productName");
-            //alert(Name);
-            //var expandallicon = document.getElementsByClassName(tabId+' expandAllBtn_'+budgetIdele);
-            for (var i in groupHierarchy) {
-                for (var j in groupHierarchy[i].subGroupRecords) {
-                    var subGroupRecs = groupHierarchy[i].subGroupRecords[j].records;
-                    for (var k in subGroupRecs) {
-                        newMassQuoteItem = {};
-                        var recordList = subGroupRecs[k].recordList;
-                        for (var l in recordList) {
-                            var currency = recordList[l].recordValue;
-                            var recordValue = Number(currency.replace(/[^0-9.-]+/g, ""));
-                            if (recordValue != recordList[l].originalValue) {
-                                if (recordList[l].fieldName == 'Name') {
-                                    newMassQuoteItem.Name = subGroupRecs[k].recordName;
-                                    console.log('subGroupRecs.recordName::::::', subGroupRecs[k].recordName);
-                                } else if (recordList[l].fieldName == 'buildertek__Quantity__c') {
-                                    if (recordList[l].originalValue != '') {
-                                        newMassQuoteItem.buildertek__Quantity__c = recordList[l].originalValue;
-                                    } else {
-                                        newMassQuoteItem.buildertek__Quantity__c = 1;
+        if(component.get("v.HaveUpdateAccess")){
+            let getValue=component.get('v.displayGrouping')
+                if (getValue) {
+                    component.find('notifLib').showNotice({
+                        "variant": "error",
+                        "header": "Error!",
+                        "message": "Can't update the Budget Line in grouping stage.",
+                    });
+                } 
+                else{
+                    component.set("v.isExpandGrp", false);
+    
+            component.set("v.enableMassUpdate", component.get("v.enableMassUpdate") == true ? false : true);
+            // component.set("v.isExpandGrp",false);
+            if (component.get("v.enableMassUpdate") == false && component.get('v.isChangeData')) {
+                // var start = new Date().getTime();
+                // var output = "";                        
+                // for (var i = 1; i <= 1e6; i++) {
+                //     output += i;
+                // } 
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    action: "SHOW",
+                }).fire();
+                var groupHierarchy = component.get('v.TotalRecords').groupHierarchy;
+                //  alert(JSON.stringify(groupHierarchy));
+                var newMassQi = [];
+                var newMassQuoteItem = {};
+                var newnames = [];
+    
+    
+                // var Name = component.get("v.productName");
+                //alert(Name);
+                //var expandallicon = document.getElementsByClassName(tabId+' expandAllBtn_'+budgetIdele);
+                for (var i in groupHierarchy) {
+                    for (var j in groupHierarchy[i].subGroupRecords) {
+                        var subGroupRecs = groupHierarchy[i].subGroupRecords[j].records;
+                        for (var k in subGroupRecs) {
+                            newMassQuoteItem = {};
+                            var recordList = subGroupRecs[k].recordList;
+                            for (var l in recordList) {
+                                var currency = recordList[l].recordValue;
+                                var recordValue = Number(currency.replace(/[^0-9.-]+/g, ""));
+                                if (recordValue != recordList[l].originalValue) {
+                                    if (recordList[l].fieldName == 'Name') {
+                                        newMassQuoteItem.Name = subGroupRecs[k].recordName;
+                                        console.log('subGroupRecs.recordName::::::', subGroupRecs[k].recordName);
+                                    } else if (recordList[l].fieldName == 'buildertek__Quantity__c') {
+                                        if (recordList[l].originalValue != '') {
+                                            newMassQuoteItem.buildertek__Quantity__c = recordList[l].originalValue;
+                                        } else {
+                                            newMassQuoteItem.buildertek__Quantity__c = 1;
+                                        }
+                                    } else if (recordList[l].fieldName == 'buildertek__Unit_Price__c') {
+                                        newMassQuoteItem.buildertek__Unit_Price__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Complete__c') {
+                                        newMassQuoteItem.buildertek__Complete__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Forecast_To_Complete__c') {
+                                        newMassQuoteItem.buildertek__Forecast_To_Complete__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Sales_Price__c') {
+                                        newMassQuoteItem.buildertek__Sales_Price__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Notes__c') {
+                                        newMassQuoteItem.buildertek__Notes__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Cost_Code__c') {
+                                        newMassQuoteItem.buildertek__Cost_Code__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__UOM__c') {
+                                        newMassQuoteItem.buildertek__UOM__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Amount_In__c') {
+                                        newMassQuoteItem.buildertek__Amount_In__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Amount_Out_2__c') {
+                                        newMassQuoteItem.buildertek__Amount_Out_2__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Base_Sq_Feet__c') {
+                                        newMassQuoteItem.buildertek__Base_Sq_Feet__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Item_Name__c') {
+                                        newMassQuoteItem.buildertek__Item_Name__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Forecast_To_Complete__c') {
+                                        newMassQuoteItem.buildertek__Forecast_To_Complete__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Cost_Type__c') {
+                                        newMassQuoteItem.buildertek__Cost_Type__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Description__c') {
+                                        newMassQuoteItem.buildertek__Description__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Discount__c') {
+                                        newMassQuoteItem.buildertek__Discount__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Eligible_Amount__c') {
+                                        newMassQuoteItem.buildertek__Eligible_Amount__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Group__c') {
+                                        newMassQuoteItem.buildertek__Group__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Previously_Billed__c') {
+                                        newMassQuoteItem.buildertek__Previously_Billed__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Product__c') {
+                                        newMassQuoteItem.buildertek__Product__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Regional_Factor__c') {
+                                        newMassQuoteItem.buildertek__Regional_Factor__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Trade_Type__c') {
+                                        newMassQuoteItem.buildertek__Trade_Type__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Upgrades__c') {
+                                        newMassQuoteItem.buildertek__Upgrades__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Contractor__c') {
+                                        // alert('hello');
+                                        //  alert('&&'+recordList[l].originalValue);
+                                        newMassQuoteItem.buildertek__Contractor__c = recordList[l].originalValue;
+                                        // alert('&&'+newMassQuoteItem.buildertek__Cost_Code__c );
+                                        // alert('&&'+recordList[l].originalValue);
+                                    } else if (recordList[l].fieldName == 'buildertek__Tax__c') {
+                                        newMassQuoteItem.buildertek__Tax__c = recordList[l].originalValue;
+                                    } else if (recordList[l].fieldName == 'buildertek__Markup__c') {
+                                        newMassQuoteItem.buildertek__Markup__c = recordList[l].originalValue;
                                     }
-                                } else if (recordList[l].fieldName == 'buildertek__Unit_Price__c') {
-                                    newMassQuoteItem.buildertek__Unit_Price__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Complete__c') {
-                                    newMassQuoteItem.buildertek__Complete__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Forecast_To_Complete__c') {
-                                    newMassQuoteItem.buildertek__Forecast_To_Complete__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Sales_Price__c') {
-                                    newMassQuoteItem.buildertek__Sales_Price__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Notes__c') {
-                                    newMassQuoteItem.buildertek__Notes__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Cost_Code__c') {
-                                    newMassQuoteItem.buildertek__Cost_Code__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__UOM__c') {
-                                    newMassQuoteItem.buildertek__UOM__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Amount_In__c') {
-                                    newMassQuoteItem.buildertek__Amount_In__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Amount_Out_2__c') {
-                                    newMassQuoteItem.buildertek__Amount_Out_2__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Base_Sq_Feet__c') {
-                                    newMassQuoteItem.buildertek__Base_Sq_Feet__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Item_Name__c') {
-                                    newMassQuoteItem.buildertek__Item_Name__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Forecast_To_Complete__c') {
-                                    newMassQuoteItem.buildertek__Forecast_To_Complete__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Cost_Type__c') {
-                                    newMassQuoteItem.buildertek__Cost_Type__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Description__c') {
-                                    newMassQuoteItem.buildertek__Description__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Discount__c') {
-                                    newMassQuoteItem.buildertek__Discount__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Eligible_Amount__c') {
-                                    newMassQuoteItem.buildertek__Eligible_Amount__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Group__c') {
-                                    newMassQuoteItem.buildertek__Group__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Previously_Billed__c') {
-                                    newMassQuoteItem.buildertek__Previously_Billed__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Product__c') {
-                                    newMassQuoteItem.buildertek__Product__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Regional_Factor__c') {
-                                    newMassQuoteItem.buildertek__Regional_Factor__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Trade_Type__c') {
-                                    newMassQuoteItem.buildertek__Trade_Type__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Upgrades__c') {
-                                    newMassQuoteItem.buildertek__Upgrades__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Contractor__c') {
-                                    // alert('hello');
-                                    //  alert('&&'+recordList[l].originalValue);
-                                    newMassQuoteItem.buildertek__Contractor__c = recordList[l].originalValue;
-                                    // alert('&&'+newMassQuoteItem.buildertek__Cost_Code__c );
-                                    // alert('&&'+recordList[l].originalValue);
-                                } else if (recordList[l].fieldName == 'buildertek__Tax__c') {
-                                    newMassQuoteItem.buildertek__Tax__c = recordList[l].originalValue;
-                                } else if (recordList[l].fieldName == 'buildertek__Markup__c') {
-                                    newMassQuoteItem.buildertek__Markup__c = recordList[l].originalValue;
                                 }
                             }
+    
+                            newMassQuoteItem.Id = subGroupRecs[k].recordId;
+                            newMassQuoteItem.Name = subGroupRecs[k].recordName;
+                            newMassQi.push(newMassQuoteItem);
+                            newnames.push(newMassQuoteItem.Name);
+                            //alert( JSON.stringify(newnames));
                         }
-
-                        newMassQuoteItem.Id = subGroupRecs[k].recordId;
-                        newMassQuoteItem.Name = subGroupRecs[k].recordName;
-                        newMassQi.push(newMassQuoteItem);
-                        newnames.push(newMassQuoteItem.Name);
-                        //alert( JSON.stringify(newnames));
                     }
                 }
-            }
-            // for (var i = 0; i < ListOfEachRecordLength; i++) {
-            // 	var newMassQuoteItem = {};
-            // 	newMassQuoteItem.sobjectType = 'buildertek__Budget_Item__c';
-            // 	var countUnchangedValue = 0;
-            // 	for (var j = 0; j < ListOfEachRecord[i].recordList.length; j++) {
-            // 		var listOfRecord = ListOfEachRecord[i].recordList.length;
-            // 		var currency = ListOfEachRecord[i].recordList[j].recordValue;
-            // 		var recordValue = Number(currency.replace(/[^0-9.-]+/g, ""));
-            // 		if (recordValue != ListOfEachRecord[i].recordList[j].originalValue) {
-
-            // 			if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Quantity__c') {
-            // 				if (ListOfEachRecord[i].recordList[j].originalValue != '') {
-            // 					newMassQuoteItem.buildertek__Quantity__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 				} else {
-            // 					newMassQuoteItem.buildertek__Quantity__c = 1;
-            // 				}
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Unit_Price__c') {
-            // 				debugger;
-            // 				newMassQuoteItem.buildertek__Unit_Price__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Forecast_To_Complete__c') {
-            // 				newMassQuoteItem.buildertek__Forecast_To_Complete__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Sales_Price__c') {
-            // 				newMassQuoteItem.buildertek__Sales_Price__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Notes__c') {
-            // 				newMassQuoteItem.buildertek__Notes__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Cost_Code__c') {
-            // 				newMassQuoteItem.buildertek__Cost_Code__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__UOM__c') {
-            // 				newMassQuoteItem.buildertek__UOM__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Amount_In__c') {
-            // 				newMassQuoteItem.buildertek__Amount_In__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Amount_Out_2__c') {
-            // 				newMassQuoteItem.buildertek__Amount_Out_2__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Base_Sq_Feet__c') {
-            // 				newMassQuoteItem.buildertek__Base_Sq_Feet__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Item_Name__c') {
-            // 				newMassQuoteItem.buildertek__Item_Name__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Forecast_To_Complete__c') {
-            // 				newMassQuoteItem.buildertek__Forecast_To_Complete__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Cost_Type__c') {
-            // 				newMassQuoteItem.buildertek__Cost_Type__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Description__c') {
-            // 				newMassQuoteItem.buildertek__Description__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Discount__c') {
-            // 				newMassQuoteItem.buildertek__Discount__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Eligible_Amount__c') {
-            // 				newMassQuoteItem.buildertek__Eligible_Amount__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Group__c') {
-            // 				newMassQuoteItem.buildertek__Group__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Previously_Billed__c') {
-            // 				newMassQuoteItem.buildertek__Previously_Billed__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Product__c') {
-            // 				newMassQuoteItem.buildertek__Product__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Regional_Factor__c') {
-            // 				newMassQuoteItem.buildertek__Regional_Factor__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Trade_Type__c') {
-            // 				newMassQuoteItem.buildertek__Trade_Type__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Upgrades__c') {
-            // 				newMassQuoteItem.buildertek__Upgrades__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Contractor__c') {
-            // 				newMassQuoteItem.buildertek__Contractor__c = ListOfEachRecord[i].recordList[j].originalValue;
-            // 			}
-            // 		} else {
-            // 			countUnchangedValue++;
-            // 		}
-            // 	}
-            // 	newMassQuoteItem.Id = ListOfEachRecord[i].recordId;
-            // 	newMassQuoteItem.Name = ListOfEachRecord[i].recordName;
-            // 	newMassQi.push(newMassQuoteItem);
-            // }
-            for (var i = 0; i < newnames.length; i++) {
-
-                //alert('hii'+ newMassQuoteItem.Name.length);
-                //alert('bye'+ newMassQi.Name.length);
-                //if(newMassQi[i].Name == undefine){
-                if (newnames[i].length > 80) {
-                    $A.get("e.c:BT_SpinnerEvent").setParams({
-                        "action": "HIDE"
-                    }).fire();
-                    component.set("v.Spinner", false);
-                    component.set("v.isDescription", true);
-                    //alert("1");
-                    var toastEvent = $A.get("e.force:showToast");
-                    toastEvent.setParams({
-                        message: 'Please assign the product name lessthan 80 characters.',
-                        duration: ' 5000',
-                        key: 'info_alt',
-                        type: 'error',
-                        mode: 'dismissible'
-                    });
-                    toastEvent.fire();
-                    component.set("v.enableMassUpdate", true);
-                    component.set("v.Spinner", false);
-                    //var page = component.get("v.page") || 1;
-                    //component.set("v.TotalRecords", {});
-                    //helper.getBudgetGroups(component, event, helper, page);
-                    // helper.getBudgetGroups(component, event, helper,page);
-                } else {
-                    component.set("v.isDescription", false);
-                }
-            }
-            if (component.get("v.isDescription") == false) {
-                //if (newMassQi.length > 0) {
-
-                //alert("2");
-                var action = component.get("c.massUpdateBudgetLineItem");
-                action.setParams({
-                    "budgetLineRecords": JSON.stringify(newMassQi)
-                });
-
-                action.setCallback(this, function (respo) {
-                    component.set("v.isChangeData", false);
-                    // alert(JSON.stringify(respo.getState()));
-                    if (respo.getState() === "SUCCESS") {
-
+                // for (var i = 0; i < ListOfEachRecordLength; i++) {
+                // 	var newMassQuoteItem = {};
+                // 	newMassQuoteItem.sobjectType = 'buildertek__Budget_Item__c';
+                // 	var countUnchangedValue = 0;
+                // 	for (var j = 0; j < ListOfEachRecord[i].recordList.length; j++) {
+                // 		var listOfRecord = ListOfEachRecord[i].recordList.length;
+                // 		var currency = ListOfEachRecord[i].recordList[j].recordValue;
+                // 		var recordValue = Number(currency.replace(/[^0-9.-]+/g, ""));
+                // 		if (recordValue != ListOfEachRecord[i].recordList[j].originalValue) {
+    
+                // 			if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Quantity__c') {
+                // 				if (ListOfEachRecord[i].recordList[j].originalValue != '') {
+                // 					newMassQuoteItem.buildertek__Quantity__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 				} else {
+                // 					newMassQuoteItem.buildertek__Quantity__c = 1;
+                // 				}
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Unit_Price__c') {
+                // 				debugger;
+                // 				newMassQuoteItem.buildertek__Unit_Price__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Forecast_To_Complete__c') {
+                // 				newMassQuoteItem.buildertek__Forecast_To_Complete__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Sales_Price__c') {
+                // 				newMassQuoteItem.buildertek__Sales_Price__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Notes__c') {
+                // 				newMassQuoteItem.buildertek__Notes__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Cost_Code__c') {
+                // 				newMassQuoteItem.buildertek__Cost_Code__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__UOM__c') {
+                // 				newMassQuoteItem.buildertek__UOM__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Amount_In__c') {
+                // 				newMassQuoteItem.buildertek__Amount_In__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Amount_Out_2__c') {
+                // 				newMassQuoteItem.buildertek__Amount_Out_2__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Base_Sq_Feet__c') {
+                // 				newMassQuoteItem.buildertek__Base_Sq_Feet__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Item_Name__c') {
+                // 				newMassQuoteItem.buildertek__Item_Name__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Forecast_To_Complete__c') {
+                // 				newMassQuoteItem.buildertek__Forecast_To_Complete__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Cost_Type__c') {
+                // 				newMassQuoteItem.buildertek__Cost_Type__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Description__c') {
+                // 				newMassQuoteItem.buildertek__Description__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Discount__c') {
+                // 				newMassQuoteItem.buildertek__Discount__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Eligible_Amount__c') {
+                // 				newMassQuoteItem.buildertek__Eligible_Amount__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Group__c') {
+                // 				newMassQuoteItem.buildertek__Group__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Previously_Billed__c') {
+                // 				newMassQuoteItem.buildertek__Previously_Billed__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Product__c') {
+                // 				newMassQuoteItem.buildertek__Product__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Regional_Factor__c') {
+                // 				newMassQuoteItem.buildertek__Regional_Factor__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Trade_Type__c') {
+                // 				newMassQuoteItem.buildertek__Trade_Type__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Upgrades__c') {
+                // 				newMassQuoteItem.buildertek__Upgrades__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			} else if (ListOfEachRecord[i].recordList[j].fieldName == 'buildertek__Contractor__c') {
+                // 				newMassQuoteItem.buildertek__Contractor__c = ListOfEachRecord[i].recordList[j].originalValue;
+                // 			}
+                // 		} else {
+                // 			countUnchangedValue++;
+                // 		}
+                // 	}
+                // 	newMassQuoteItem.Id = ListOfEachRecord[i].recordId;
+                // 	newMassQuoteItem.Name = ListOfEachRecord[i].recordName;
+                // 	newMassQi.push(newMassQuoteItem);
+                // }
+                for (var i = 0; i < newnames.length; i++) {
+    
+                    //alert('hii'+ newMassQuoteItem.Name.length);
+                    //alert('bye'+ newMassQi.Name.length);
+                    //if(newMassQi[i].Name == undefine){
+                    if (newnames[i].length > 80) {
+                        $A.get("e.c:BT_SpinnerEvent").setParams({
+                            "action": "HIDE"
+                        }).fire();
+                        component.set("v.Spinner", false);
+                        component.set("v.isDescription", true);
+                        //alert("1");
                         var toastEvent = $A.get("e.force:showToast");
                         toastEvent.setParams({
-                            mode: 'sticky',
-                            message: 'Budget Line Updated successfully',
-                            type: 'success',
-                            duration: '1000',
+                            message: 'Please assign the product name lessthan 80 characters.',
+                            duration: ' 5000',
+                            key: 'info_alt',
+                            type: 'error',
                             mode: 'dismissible'
                         });
                         toastEvent.fire();
-                        var page = component.get("v.page") || 1;
-                        component.set("v.TotalRecords", {});
-                        helper.getBudgetGroups(component, event, helper, page, function () { }) //,start,output);
+                        component.set("v.enableMassUpdate", true);
+                        component.set("v.Spinner", false);
+                        //var page = component.get("v.page") || 1;
+                        //component.set("v.TotalRecords", {});
+                        //helper.getBudgetGroups(component, event, helper, page);
+                        // helper.getBudgetGroups(component, event, helper,page);
+                    } else {
+                        component.set("v.isDescription", false);
                     }
-                });
-                $A.enqueueAction(action);
+                }
+                if (component.get("v.isDescription") == false) {
+                    //if (newMassQi.length > 0) {
+    
+                    //alert("2");
+                    var action = component.get("c.massUpdateBudgetLineItem");
+                    action.setParams({
+                        "budgetLineRecords": JSON.stringify(newMassQi)
+                    });
+    
+                    action.setCallback(this, function (respo) {
+                        component.set("v.isChangeData", false);
+                        // alert(JSON.stringify(respo.getState()));
+                        if (respo.getState() === "SUCCESS") {
+    
+                            var toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams({
+                                mode: 'sticky',
+                                message: 'Budget Line Updated successfully',
+                                type: 'success',
+                                duration: '1000',
+                                mode: 'dismissible'
+                            });
+                            toastEvent.fire();
+                            var page = component.get("v.page") || 1;
+                            component.set("v.TotalRecords", {});
+                            helper.getBudgetGroups(component, event, helper, page, function () { }) //,start,output);
+                        }
+                    });
+                    $A.enqueueAction(action);
+                }
             }
-        }
-
-        if (component.get("v.enableMassUpdate")) {
-            console.log(component.get("v.TotalRecords").groupHierarchy);
-            var budgetIdele = component.get("v.budgetId");
-            var tabId = component.get("v.currentTab")
-            // var spanEle = event.currentTarget.dataset.iconname;
-            //console.log(spanEle)
-            var expandallicon = document.getElementsByClassName(tabId + ' expandAllBtn_' + budgetIdele);
-            //var labelName =spanEle
-            var collapeallIcon = document.getElementsByClassName(tabId + ' CollapeseAllBtn_' + budgetIdele);
-
-            expandallicon[0].style.display = 'none';
-            collapeallIcon[0].style.display = 'inline-block';
-
-
-            var groups = component.get("v.TotalRecords").groupHierarchy;
-            var budgetId = component.get("v.budgetId")
-            for (var j = 0; j < groups.length; j++) {
-                var grpIndex = j;
-                var expandicon = document.getElementsByClassName(tabId + ' ' + budgetId + ' expandGrpIcon_' + grpIndex);
-                var collapeIcon = document.getElementsByClassName(tabId + ' ' + budgetId + ' collapseGrpIcon_' + grpIndex);
-                var className = tabId + ' ' + budgetId + " groupRows_" + grpIndex;
-                var grpRows = document.getElementsByClassName(className);
-                component.set("v.isExpandGrp", true);
-
-                expandicon[0].style.display = 'none';
-                collapeIcon[0].style.display = 'inline-block';
-
-                for (var i = 0; i < grpRows.length; i++) {
-                    var item = grpRows[i];
-
-                    if (!expandicon[0].classList.contains(tabId + 'hideExpandIcon')) {
-                        expandicon[0].classList.add(tabId + 'hideExpandIcon')
-                    }
-                    if (expandicon[0].classList.contains(tabId + 'hideExpandIconhideCollapseIcon')) {
-                        expandicon[0].classList.remove(tabId + 'hideExpandIconhideCollapseIcon')
-                    }
-                    if (item.style.display == "none") {
-                        item.style.display = 'table-row';
+    
+            if (component.get("v.enableMassUpdate")) {
+                console.log(component.get("v.TotalRecords").groupHierarchy);
+                var budgetIdele = component.get("v.budgetId");
+                var tabId = component.get("v.currentTab")
+                // var spanEle = event.currentTarget.dataset.iconname;
+                //console.log(spanEle)
+                var expandallicon = document.getElementsByClassName(tabId + ' expandAllBtn_' + budgetIdele);
+                //var labelName =spanEle
+                var collapeallIcon = document.getElementsByClassName(tabId + ' CollapeseAllBtn_' + budgetIdele);
+    
+                expandallicon[0].style.display = 'none';
+                collapeallIcon[0].style.display = 'inline-block';
+    
+    
+                var groups = component.get("v.TotalRecords").groupHierarchy;
+                var budgetId = component.get("v.budgetId")
+                for (var j = 0; j < groups.length; j++) {
+                    var grpIndex = j;
+                    var expandicon = document.getElementsByClassName(tabId + ' ' + budgetId + ' expandGrpIcon_' + grpIndex);
+                    var collapeIcon = document.getElementsByClassName(tabId + ' ' + budgetId + ' collapseGrpIcon_' + grpIndex);
+                    var className = tabId + ' ' + budgetId + " groupRows_" + grpIndex;
+                    var grpRows = document.getElementsByClassName(className);
+                    component.set("v.isExpandGrp", true);
+    
+                    expandicon[0].style.display = 'none';
+                    collapeIcon[0].style.display = 'inline-block';
+    
+                    for (var i = 0; i < grpRows.length; i++) {
+                        var item = grpRows[i];
+    
+                        if (!expandicon[0].classList.contains(tabId + 'hideExpandIcon')) {
+                            expandicon[0].classList.add(tabId + 'hideExpandIcon')
+                        }
+                        if (expandicon[0].classList.contains(tabId + 'hideExpandIconhideCollapseIcon')) {
+                            expandicon[0].classList.remove(tabId + 'hideExpandIconhideCollapseIcon')
+                        }
+                        if (item.style.display == "none") {
+                            item.style.display = 'table-row';
+                        }
                     }
                 }
             }
+
+                }
+
+            
+        }
+
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to edit record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Update record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
         }
     },
 
@@ -3690,21 +4032,62 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     addCO: function (component, event, helper) {
-        var selectedRecs = component.get('v.selectedRecs');
-        console.log('v.selectedRecs ==> ', { selectedRecs });
-        // Changes for BUIL - 3434
-        if (selectedRecs.length == 0) {
-            helper.getcoList(component, event, helper);
-        } else {
-            //changes for BUIL-3336
-            // helper.getcoList(component, event, helper);
+        if(component.get("v.HaveCreateAccess")){
+            var selectedRecs = [];
+            var getAllId;
+            console.log('v.selectedRecs ==> ', { selectedRecs });
+            if(component.find("checkGroupQuoteItem1") != undefined){
+                getAllId = component.find("checkGroupQuoteItem1");
+                if (!Array.isArray(getAllId)) {
+                    if (getAllId.get("v.value") == true) {
+                        selectedRecs.push(getAllId.get("v.text"));
+                    }
+                } else {
+                    for (var i = 0; i < getAllId.length; i++) {
+                        console.log(getAllId[i].get("v.value")  , 'getAllId[i].get("v.value") ');
+                        if (getAllId[i].get("v.value") == true) {
+                            console.log('inside if');
+                            selectedRecs.push(getAllId[i].get("v.text"));
+                        }
+                    }
+                }
+            }else{
+                selectedRecs = component.get('v.selectedRecs');
 
+            }
             // Changes for BUIL - 3434
+            if (selectedRecs.length == 0) {
+                helper.getcoList(component, event, helper);
+            } else {
+                //changes for BUIL-3336
+                // helper.getcoList(component, event, helper);
+    
+                // Changes for BUIL - 3434
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Budget Lines selected.",
+                    "message": "You can only add a Change Order at the budget level.",
+                    closeCallback: function () { }
+                });
+            }
+        }else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
             component.find('notifLib').showNotice({
                 "variant": "error",
-                "header": "Budget Lines selected.",
-                "message": "You can only add a Change Order at the budget level.",
-                closeCallback: function () { }
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
             });
         }
     },
@@ -3825,9 +4208,31 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     addExpense: function (component, event, helper) {
-        var selectedRecs = component.get('v.selectedRecs');
-        console.log('v.selectedRecs ==> ', { selectedRecs });
-        helper.getExpenseList(component, event, helper);
+
+        if(component.get("v.HaveCreateAccess")){
+            var selectedRecs = component.get('v.selectedRecs');
+            console.log('v.selectedRecs ==> ', { selectedRecs });
+            helper.getExpenseList(component, event, helper);
+        }else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
+        }
     },
 
 
@@ -3872,8 +4277,14 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                         });
                         toastEvent.fire();
 
-                        var action1 = component.get("c.doInit");
-                        $A.enqueueAction(action1);
+                        let getValue=component.get('v.displayGrouping')
+                        if (getValue) {
+                            helper.getBudgetGrouping(component, event, helper); 
+                        } else {
+                            var action1 = component.get("c.doInit");
+                            $A.enqueueAction(action1);
+                        }
+
                     } else {
                         var toastEvent = $A.get("e.force:showToast");
                         toastEvent.setParams({
@@ -4178,15 +4589,37 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
     //  ----------- For Add Sales Invoice Button BUIL - 3525 --------------
     addSalesInvoice: function (component, event, helper) {
-        var selectedRecs = component.get('v.selectedRecs');
-        if (selectedRecs.length == 0) {
-            helper.getsalesInvoiceHelper(component, event, helper);
-        } else {
+
+        if(component.get("v.HaveCreateAccess")){
+            var selectedRecs = component.get('v.selectedRecs');
+            if (selectedRecs.length == 0) {
+                helper.getsalesInvoiceHelper(component, event, helper);
+            } else {
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Budget Lines selected.",
+                    "message": "You can only add a Sales Invoice at the budget level.",
+                    closeCallback: function () { }
+                });
+            }
+        } else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
+
             component.find('notifLib').showNotice({
                 "variant": "error",
-                "header": "Budget Lines selected.",
-                "message": "You can only add a Sales Invoice at the budget level.",
-                closeCallback: function () { }
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
             });
         }
 
@@ -4249,29 +4682,43 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     addInvoicePO:function (component, event, helper) {
-        console.log('add Invoice po button click......');
-        var selectedRecords = component.get('v.selectedRecs');
-
-        $A.get("e.c:BT_SpinnerEvent").setParams({
-            "action": "SHOW"
-        }).fire();
-
-        if(selectedRecords.length < 1){
-
-            helper.addInvoicePOHelper(component, event, helper);
-
-        }else{
+        if(component.get("v.HaveCreateAccess")){
+            console.log('add Invoice po button click......');
+            var selectedRecords = component.get('v.selectedRecs');
+    
+            $A.get("e.c:BT_SpinnerEvent").setParams({
+                "action": "SHOW"
+            }).fire();
+    
+            if(selectedRecords.length < 1){
+    
+                helper.addInvoicePOHelper(component, event, helper);
+    
+            }else{
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Budget Lines selected.",
+                    "message": "You can only add a Invoice PO at the budget level.",
+                    closeCallback: function () { }
+                });
+    
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
+    
+            }
+        }
+        else{
             component.find('notifLib').showNotice({
                 "variant": "error",
-                "header": "Budget Lines selected.",
-                "message": "You can only add a Invoice PO at the budget level.",
-                closeCallback: function () { }
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
             });
-
-            $A.get("e.c:BT_SpinnerEvent").setParams({
-                "action": "HIDE"
-            }).fire();
-
         }
 
 
@@ -4300,73 +4747,548 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     },
 
     addNewInvoicePO:function (component, event, helper) {
-        var selectedRecords = component.get('v.selectedRecs');
-        var invoicePoList = component.get("v.invoicePORecordList");
-        let selectedInvoiceList = [];
-        let selectedInvoiceIdList = [];
-
-        const result= invoicePoList.map(element => {
-            if (element.Selected) {
-                selectedInvoiceList.push(element);
-                selectedInvoiceIdList.push(element.Id);
+        if(component.get("v.HaveCreateAccess")){
+            
+            var selectedRecords = component.get('v.selectedRecs');
+            var invoicePoList = component.get("v.invoicePORecordList");
+            let selectedInvoiceList = [];
+            let selectedInvoiceIdList = [];
+    
+            const result= invoicePoList.map(element => {
+                if (element.Selected) {
+                    selectedInvoiceList.push(element);
+                    selectedInvoiceIdList.push(element.Id);
+                }
+            });
+    
+            console.log({selectedInvoiceList});
+    
+            if(selectedInvoiceList.length > 0){
+    
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "SHOW"
+                }).fire();
+                var BudgetId = component.get('v.recordId');
+                var action = component.get("c.addInvoicePOToBudget");
+                action.setParams({
+                    'invoicePoList': selectedInvoiceIdList,
+                    'BudgetId': BudgetId
+                })
+                action.setCallback(this, function (response) {
+                    if (response.getState() == 'SUCCESS') {
+                        $A.get("e.c:BT_SpinnerEvent").setParams({
+                            "action": "HIDE"
+                        }).fire();
+                        if (response.getReturnValue() == 'HasDisburshment') {   // Changes for BUIL-3498 END
+                            var toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams({
+                                type: 'ERROR',
+                                message: 'You are trying to add Invoice which has contentDisburshment associated with it.',
+                                duration: '5000',
+                            });
+                            toastEvent.fire();
+                            component.set("v.addInvoicePOSection", false); // to close popup
+                        }else{
+                        var toastEvent = $A.get("e.force:showToast");
+                        toastEvent.setParams({
+                            type: 'SUCCESS',
+                            message: 'Invoice (PO)  added Successfully',
+                            duration: '5000',
+                        });
+                        toastEvent.fire();
+                        component.set("v.addInvoicePOSection", false); // to close popup
+                        $A.get("e.force:refreshView").fire();
+                        document.location.reload(true);    
+                        }
+                    }
+                    else if (response.getState() == 'ERROR') {
+                        $A.get("e.c:BT_SpinnerEvent").setParams({
+                            "action": "HIDE"
+                        }).fire();
+                        var toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams({
+                                type: 'ERROR',
+                                message: 'Something went wrong.',
+                                duration: '5000',
+                            });
+                            toastEvent.fire();
+                            component.set("v.addInvoicePOSection", false); // to close popup
+                        console.log('Error to Add Sales Invoice => ', response.getError());
+                    } // Changes for BUIL-3498 END
+                });
+                $A.enqueueAction(action);
+    
+        
+            }else{
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    type: 'ERROR',
+                    message: 'Please select atleast one Invoice (PO)',
+                    duration: '5000',
+                });
+                toastEvent.fire();
             }
-        });
+        }
+        else{
+            // var toastEvent = $A.get("e.force:showToast");
+            // toastEvent.setParams({
+            //     "type": "error",
+            //     "title": "Error!",
+            //     "message": 'You don\'t have the necessary privileges to create record.'
+            // });
+            // toastEvent.fire();
 
-        console.log({selectedInvoiceList});
-
-        if(selectedInvoiceList.length > 0){
-
-            $A.get("e.c:BT_SpinnerEvent").setParams({
-                "action": "SHOW"
-            }).fire();
-            var BudgetId = component.get('v.recordId');
-            var action = component.get("c.addInvoicePOToBudget");
-            action.setParams({
-                'invoicePoList': selectedInvoiceIdList,
-                'BudgetId': BudgetId
-            })
-            action.setCallback(this, function (response) {
-                if (response.getState() == 'SUCCESS') {
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
                     $A.get("e.c:BT_SpinnerEvent").setParams({
                         "action": "HIDE"
                     }).fire();
-
-                    var toastEvent = $A.get("e.force:showToast");
-                    toastEvent.setParams({
-                        type: 'SUCCESS',
-                        message: 'Invoice (PO)  added Successfully',
-                        duration: '5000',
-                    });
-                    toastEvent.fire();
-                    component.set("v.addInvoicePOSection", false); // to close popup
-                    $A.get("e.force:refreshView").fire();
-                    document.location.reload(true);    
-    
-
-                }
-                else if (response.getState() == 'Error') {
-                    $A.get("e.c:BT_SpinnerEvent").setParams({
-                        "action": "HIDE"
-                    }).fire();
-                    console.log('Error to Add Sales Invoice => ', response.getError());
                 }
             });
-            $A.enqueueAction(action);
-
-    
-        }else{
-
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                type: 'ERROR',
-                message: 'Please select atleast one Invoice (PO)',
-                duration: '5000',
-            });
-            toastEvent.fire();
-
         }
 
 
 
-    }
+    },
+
+
+    onclickBOMGrouping : function(component, event, helper){
+        console.log('onclickBOMGrouping');
+        var budgetList = component.get("v.TotalRecords.groupHierarchy");
+        if (budgetList.length > 0) {
+            component.set("v.isBOMmodalOpen", true);
+            var opts = [
+                {label: "Phase", value:"buildertek__Group__c"},
+                {label: "Sub Group", value:"buildertek__Sub_Grouping__c"},
+            ]
+            component.set("v.GroupingOptions", opts);
+        }
+        else{
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "There is no Budget Line for this record.",
+            });
+        }
+    },
+    submitDetails: function(component, event, helper) {
+        helper.submitDetails(component, event, helper);
+
+     },
+     returnToNormalVIew: function(component, event, helper){
+        component.set("v.valueofField1", '');
+        component.set("v.valueofField2", '');
+        // component.set("v.valueofField3", '');
+        // component.set("v.valueofField4", '');
+        
+        component.set("v.displayGrouping", false);
+        component.set("v.BudgetLineWrapper", null);
+        component.set("v.forthGrouping", false);
+        component.set("v.thirdGrouping", false);
+        component.set("v.secondGrouping", false);
+        component.set("v.firstGrouping", false);
+        helper.applyCSSBasedOnURL(component);
+     }, 
+
+     expandCollapeAllBom: function(component, event, helper){
+        var BudgetLineWrapper = component.get("v.BudgetLineWrapper");
+
+        var iconName = event.currentTarget.dataset.iconname;
+        var recordId = component.get("v.recordId");
+
+        var expandallIcon = document.getElementById("expandAllBtn_" + recordId);
+        var collapeallIcon = document.getElementById("collapeseAllBtn_" + recordId);
+
+        let group1 = BudgetLineWrapper.groupWrapper;
+
+        if (iconName == 'Expand All') {
+            collapeallIcon.style.display = 'block';
+            expandallIcon.style.display = 'none';
+
+            if (component.get("v.forthGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let group4 = group3[k-1].budgetLineList;
+                            for (let l = 1; l <= group4.length; l++) {
+                                let spanGroupId = i+''+j+''+k+''+l;
+                                helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                            }
+                        }
+                    }
+                }
+            } else if (component.get("v.thirdGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let spanGroupId = i+''+j+''+k;
+                            helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                        }
+                    }
+                }
+            } else if (component.get("v.secondGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let spanGroupId = i+''+j;
+                        helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                    }
+                }
+            } else if(component.get("v.firstGrouping")){
+                for (let i = 1; i <= group1.length; i++) {
+                    let spanGroupId = i;
+                    helper.expandRecordsHelper(component, event, helper, spanGroupId);
+                }
+            }
+            component.set("v.CollapeCount", 0);
+        } else if (iconName == 'Collapse All') {
+            collapeallIcon.style.display = 'none';
+            expandallIcon.style.display = 'block';
+
+            if (component.get("v.forthGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let group4 = group3[k-1].budgetLineList;
+                            for (let l = 1; l <= group4.length; l++) {
+                                let spanGroupId = i+''+j+''+k+''+l;
+                                helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                            }
+                        }
+                    }
+                }
+            } else if (component.get("v.thirdGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let group3 = group2[j-1].budgetLineList;
+                        for (let k = 1; k <= group3.length; k++) {
+                            let spanGroupId = i+''+j+''+k;
+                            helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                        }
+                    }
+                }
+            } else if (component.get("v.secondGrouping")) {
+                for (let i = 1; i <= group1.length; i++) {
+                    let group2 = group1[i-1].budgetLineList;
+                    for (let j = 1; j <= group2.length; j++) {
+                        let spanGroupId = i+''+j;
+                        helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                    }
+                }
+            } else if(component.get("v.firstGrouping")){
+                for (let i = 1; i <= group1.length; i++) {
+                    let spanGroupId = i;
+                    helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+                }
+            }
+            component.set("v.CollapeCount", component.get("v.TotalRecordCount"));
+        }
+    },
+    expandCollapeGroup: function(component, event, helper){
+        var recordId = component.get("v.recordId");
+
+        var expandallIcon = document.getElementById("expandAllBtn_" + recordId);
+        var collapeallIcon = document.getElementById("collapeseAllBtn_" + recordId);
+
+        var iconName = event.currentTarget.dataset.iconname;
+        var spanId = event.target.id;
+
+        var totalRecordCount = component.get("v.TotalRecordCount");
+        var collapeCount = component.get("v.CollapeCount");
+    
+        if (iconName == 'Expand Group') {
+            let spanGroupId = spanId.replace('expandGroupBtn_','');
+            helper.expandRecordsHelper(component, event, helper, spanGroupId);
+
+            let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+            let selectedRecord = recordDivList.length;
+            collapeCount -= selectedRecord;
+        } else if (iconName == 'Collapse Group') {
+            let spanGroupId = spanId.replace('collapeseGroupBtn_','');
+            helper.collapeRecordsHelper(component, event, helper, spanGroupId);
+
+            let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
+            let selectedRecord = recordDivList.length;
+            collapeCount += selectedRecord;
+        }
+        component.set("v.CollapeCount", collapeCount);
+
+        if(collapeCount == totalRecordCount){
+            collapeallIcon.style.display = 'none';
+            expandallIcon.style.display = 'block';
+        } else{
+            collapeallIcon.style.display = 'block';
+            expandallIcon.style.display = 'none';
+        }
+
+    },
+    handleSelectAllGroup:function(component, event, helper) {
+        let firstGroup=component.get('v.firstGrouping');
+        let secondGroup=component.get('v.secondGrouping');
+        let thirdGroup=component.get('v.thirdGrouping');
+        let forthGrouping=component.get('v.forthGrouping');
+        console.log(firstGroup);
+        console.log(secondGroup);
+        console.log(thirdGroup);
+        console.log(forthGrouping);
+
+
+
+        let getCheckboxValue=event.getSource().get("v.value");
+        let BudgetLineWrapper = component.get('v.BudgetLineWrapper');
+        let selectedGroupName = event.getSource().get("v.name");
+        let groupWrapper= BudgetLineWrapper.groupWrapper;
+
+        console.log({selectedGroupName});
+        groupWrapper.forEach(function(elem){
+           
+            
+            if(firstGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    if(value.buildertek__Grouping__c === selectedGroupName){
+                        if(elem.isSelected=== true){
+                            value.isSelected=true;
+                        }else{
+                            value.isSelected=false;
+                        }
+                    } 
+                });
+            }else if(secondGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    let getGroupName;
+                    if(value.groupName!= undefined){
+                        getGroupName =elem.groupName+'_'+value.groupName;
+                    }else{
+                        getGroupName =elem.groupName+'_';
+                    }
+
+                    value.budgetLineList.forEach(function(value2){
+
+                        if(selectedGroupName === getGroupName){
+                            if(value.isSelected=== true){
+                                value2.isSelected=true;
+                            }else{
+                                value2.isSelected=false;
+                            }
+                        } 
+
+                    });
+                    
+                });
+            }else if(thirdGroup== true){
+                console.log({selectedGroupName});
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        let getGroupName;
+                        if(value.groupName!= undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName;
+                        }else if (value.groupName!= undefined && value2.groupName== undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_';
+                        }else if (value.groupName== undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'__'+value2.groupName;
+                        }else{
+
+                            getGroupName =elem.groupName+'__';
+                        }
+
+
+
+                        value2.budgetLineList.forEach(function(value3){
+                            if(getGroupName === selectedGroupName){
+                                if(value2.isSelected=== true){
+                                    value3.isSelected=true;
+                                }else{
+                                    value3.isSelected=false;
+                                }                            } 
+                        });
+                    });
+                    
+                });
+            }else if(forthGrouping== true){
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        value2.budgetLineList.forEach(function(value3){
+                            let getGroupName;
+                            if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_';
+                            }else{
+                                getGroupName =elem.groupName+'___';
+                            }
+
+                            value3.budgetLineList.forEach(function(value4){
+                                if(getGroupName === selectedGroupName){
+                                    if(value3.isSelected=== true){
+                                        value4.isSelected=true;
+                                    }else{
+                                        value4.isSelected=false;
+                                    }                                   } 
+                            });
+
+                        });
+                    });
+                    
+                });
+
+            }
+
+            
+            
+        });
+        component.set('v.BudgetLineWrapper' , BudgetLineWrapper );
+        console.log({BudgetLineWrapper});
+
+    },
+    unCheckAllGroup:function(component, event, helper) {
+        let firstGroup=component.get('v.firstGrouping');
+        let secondGroup=component.get('v.secondGrouping');
+        let thirdGroup=component.get('v.thirdGrouping');
+        let forthGrouping=component.get('v.forthGrouping');
+        let selectedId = event.getSource().get("v.text");
+        let selectedGroupName = event.getSource().get("v.name");
+        let BudgetLineWrapper = component.get('v.BudgetLineWrapper');
+        let getCurrentValue=event.getSource().get('v.value');
+
+
+        let groupWrapper= BudgetLineWrapper.groupWrapper;
+        groupWrapper.forEach(function(elem){
+            if(firstGroup== true){
+                
+                elem.budgetLineList.forEach(function(value){
+                    const allActive = elem.budgetLineList.every(function(obj) {
+                        return obj.isSelected === true;
+                     });
+                    if(value.buildertek__Grouping__c === selectedGroupName){
+                        if(getCurrentValue== true && allActive == true){
+                            elem.isSelected=true;
+                        }else{
+                            elem.isSelected=false;
+                        }
+                    } 
+                });
+            }else if(secondGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    let getGroupName;
+                    if(value.groupName!= undefined){
+                        getGroupName =elem.groupName+'_'+value.groupName;
+                    }else{
+                        getGroupName =elem.groupName+'_';
+                    }
+                    const allActive = value.budgetLineList.every(function(elem) {
+                        return elem.isSelected === true;
+                    });
+                    value.budgetLineList.forEach(function(value2){
+                        if(getGroupName === selectedGroupName){
+                            if(getCurrentValue== true && allActive == true){
+                                value.isSelected=true;
+                            }else{
+                                value.isSelected=false;
+
+                            }
+                        } 
+                    });    
+                });
+            }else if(thirdGroup== true){
+                elem.budgetLineList.forEach(function(value){
+                    
+                    value.budgetLineList.forEach(function(value2){
+                        let getGroupName;
+                        if(value.groupName!= undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName;
+                        }else if (value.groupName!= undefined && value2.groupName== undefined){
+                            getGroupName =elem.groupName+'_'+value.groupName+'_';
+                        }else if (value.groupName== undefined && value2.groupName!= undefined){
+                            getGroupName =elem.groupName+'__'+value2.groupName;
+                        }else{
+                            getGroupName =elem.groupName+'__';
+                        }
+
+                        const allActive = value2.budgetLineList.every(function(elem) {
+                            return elem.isSelected === true;
+                         });
+                            
+                        value2.budgetLineList.forEach(function(value3){
+                        if(getGroupName === selectedGroupName){
+
+                            if(getCurrentValue== true && allActive == true){
+                                value2.isSelected=true;
+                            }else{
+                                value2.isSelected=false;
+
+                            }
+                        } 
+                         })
+                    });    
+                });
+            }else if(forthGrouping== true){
+                elem.budgetLineList.forEach(function(value){
+                    value.budgetLineList.forEach(function(value2){
+                        value2.budgetLineList.forEach(function(value3){
+                            let getGroupName;
+                            if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName!= undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'_'+value2.groupName+'_';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__';
+                            }else if(value.groupName!= undefined && value2.groupName== undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'_'+value.groupName+'__'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName!= undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_'+value3.groupName;
+                            }else if(value.groupName == undefined && value2.groupName!= undefined && value3.groupName== undefined){
+                                getGroupName =elem.groupName+'__'+value2.groupName+'_';
+                            }else{
+                                getGroupName =elem.groupName+'___';
+                            }
+                            const allActive = value3.budgetLineList.every(function(elem) {
+                                return elem.isSelected === true;
+                            });
+                            value3.budgetLineList.forEach(function(value4){
+                               
+                                if(getGroupName === selectedGroupName){
+                    
+                                    if(getCurrentValue== true && allActive == true){
+                                        value3.isSelected=true;
+                                    }else{
+                                        value3.isSelected=false;
+        
+                                    }
+
+                                } 
+                            });
+
+                        
+                         })
+                    });    
+                });
+
+            }
+
+            
+        });
+        
+        
+        component.set('v.BudgetLineWrapper' , BudgetLineWrapper);
+        console.log({BudgetLineWrapper});
+
+    },
 })

@@ -109,11 +109,16 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
     handle_SaveChanges(event){
         try {
             console.log('this.EditedRecords', JSON.parse(JSON.stringify(this.EditedRecords)));
+            if(this.EditedRecords.length == 0){
+                this.showToast('success', 'Everything up to date', '');
+                return;
+            }
             UpdateFileName({UpdatedRecords : this.EditedRecords})
             .then(result => {
                 console.log('result >. ', result);
                 this.EditedRecords.splice(0, this.EditedRecords.length);
                 console.log('afetr update this.EditedRecords', JSON.parse(JSON.stringify(this.EditedRecords)));
+                this.showToast('success', 'File Name Updated Successfully', '');
             })
             .catch(error => {
                 console.log('error >> ', error);
@@ -198,6 +203,7 @@ export default class PublickFileManageLWC extends NavigationMixin(LightningEleme
                 
             }
             else{
+                this.loadFileFolderJunctionData();
                 this.spinnerDataTable=false;
                 this.showToast('error', 'Please Select at least one Record', '');
             }

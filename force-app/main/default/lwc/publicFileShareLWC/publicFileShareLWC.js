@@ -63,7 +63,9 @@ export default class PublicFileShareLWC extends NavigationMixin(LightningElement
     }
 
     createFolder(){
-            if(this.newFolderName == null || this.newFolderName == ''){
+        console.log('newFolderName :- ',this.newFolderName);
+        this.newFolderName = this.newFolderName.replace(/^\s+/g, '');
+            if(this.newFolderName == null || this.newFolderName == ' ' || this.newFolderName == ''){
                 // this.template.querySelector('c-toast-component').showToast('error', 'Name is Required, Please Fill the Name', 3000);
                 this.showToast('error', 'Name is Required, Please Fill the Name', 'Uh oh, something went wrong');
             }
@@ -135,6 +137,7 @@ export default class PublicFileShareLWC extends NavigationMixin(LightningElement
     }
 
     Handle_DeleteFolder(event){
+        this.spinnerDataTable = true
         console.log('record to delete:- ',event.currentTarget.dataset.key);
         deleteFolder({publicFolderId : event.currentTarget.dataset.key})
         .then((response) =>{

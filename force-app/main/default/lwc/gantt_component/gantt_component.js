@@ -737,7 +737,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
             }
           }
         },
-        /* {
+        {
           type: "widget",
           text: "Contractor",
           draggable: false,
@@ -764,7 +764,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
         {
           type : 'resourceassignment',
           width : 120,
-          showAvatars : false,
+          showAvatars : true,
           draggable : false,
           editor      : {
             picker : {
@@ -782,15 +782,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                   cellMenu   : false,
               },
             },
-            listeners: {
-              // paint: ({ source }) => {
-              //   let contractorId = source._projectEvent._data.contractorId
-              //   source.store.filter(record => (record.resource._data.type == 'Internal Resources' || record.resource._data.contractorId == contractorId));
-              // }
-            }
           },
           itemTpl : assignment => assignment.resourceName
-        }, */
+        },
         // {
         //   type: "addnew",
         // },
@@ -1028,7 +1022,9 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     gantt.on('startCellEdit', (editorContext) => {
       if ( editorContext.editorContext.column.type == 'resourceassignment' ) {
         let contractorId = editorContext.editorContext.record._data.contractorId;
-        editorContext.editorContext.editor.inputField.store.filter(record => (record.resource.type == 'Internal Resources' || record.resource.contractorId == contractorId));
+        editorContext.editorContext.editor.inputField.picker.onShow = ({source}) => {
+          source.store.filter(record => (record.resource.type == 'Internal Resources' || record.resource.contractorId == contractorId));
+        };
       }
     });
 

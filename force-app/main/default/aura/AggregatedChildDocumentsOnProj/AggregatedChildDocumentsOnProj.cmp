@@ -10,6 +10,15 @@
     <aura:attribute name="pageSize" type="Integer" default="5" />
     <aura:attribute name="totalPages" type="Integer" />
     <aura:attribute name="filterAttachedData" type="List"/>
+    <aura:html tag="style">
+        img{
+            width: 15vh;
+            height: 15vh; 
+        }
+        .forceContentFileCard {
+            width: 20vh;
+        }
+    </aura:html>
 
 
 

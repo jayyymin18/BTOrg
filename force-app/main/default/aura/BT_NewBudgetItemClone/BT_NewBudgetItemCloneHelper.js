@@ -2883,6 +2883,25 @@
             recordDivList[index].style.display = 'none';
         }
     },
+    getGroupingLevels:function(component, event, helper){
+        var action = component.get("c.groupingLevels");
+        action.setCallback(this, function(response) {
+
+            if(response.getState() == 'SUCCESS'){
+                console.log('Testing');
+                console.log(response.getReturnValue());
+                let groupingLevel=response.getReturnValue();
+
+                component.set('v.valueofField1' , groupingLevel[0]);
+                component.set('v.valueofField2' , groupingLevel[1]);
+
+               
+            }else{
+                console.log(response.getError());
+            }
+        });
+        $A.enqueueAction(action);
     
+    }
     
 })

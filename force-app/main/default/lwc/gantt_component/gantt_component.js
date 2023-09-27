@@ -602,7 +602,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
 
     let contractorComboData = makeComboBoxDataForContractor(this.contractorAndResources);
 
-    const gantt = new bryntum.gantt.Gantt({
+    let gantt = new bryntum.gantt.Gantt({
       project,
       appendTo: this.template.querySelector(".container"),
       // startDate: "2019-07-01",
@@ -749,10 +749,17 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               name: "contractorId",
               listeners:{
                 change : (event) => {
-                  console.log('calling this method ', event);
-                  // if (event.column.text == "Contractor"){
-                  this.resetResourceColumnValue(event);
-                  // }
+                  // Use a debounce mechanism to delay execution
+                  if (this.debouncedChange) {
+                    clearTimeout(this.debouncedChange);
+                  }
+                  this.debouncedChange = setTimeout(() => {
+                    if (event.value != event.oldValue) {
+                      let recordId = event;
+                      console.log("recordId", recordId);
+                      project.taskStore.getById('a0i1K00000LD5JuQAL').assignments = [];
+                    }
+                  }, 300);
                 }
               },
             },
@@ -1293,12 +1300,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     this.spinnerDataTable = false;
   }
 
-  resetResourceColumnValue(event){
-    // if (event.column.text === 'Contractor' && event.record.type === 'Task' && event.record.name != 'Milestone Complete') {
-    //   console.log('in if on change ',event.editorContext);
-    // }
-    console.log('calling resetResourceColumnValue',event);
-    console.log('gantt ',gantt.taskStore);
+  resetResourceColumnValue(bryntumInstance, recordId) {
+    console.log('lets see you recordId ',recordId);
+    console.log('lets see you bryntumInstance ',bryntumInstance.taskStore);
+    bryntumInstance.taskStore.getById(recordId).assignments = [];
   }
 
   openMasterSchedule() {

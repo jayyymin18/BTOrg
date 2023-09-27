@@ -169,6 +169,9 @@
 
         });
         $A.enqueueAction(btadminaction);
+
+        helper.getGroupingLevels(component, event, helper);
+
         helper.applyCSSBasedOnURL(component);
 
     },
@@ -4884,8 +4887,8 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
 
      },
      returnToNormalVIew: function(component, event, helper){
-        component.set("v.valueofField1", '');
-        component.set("v.valueofField2", '');
+        // component.set("v.valueofField1", '');
+        // component.set("v.valueofField2", '');
         // component.set("v.valueofField3", '');
         // component.set("v.valueofField4", '');
         

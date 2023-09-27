@@ -2365,6 +2365,7 @@
         component.set('v.newBudgetLine.buildertek__Sub_Grouping__c', null);
         component.set('v.options', '');
         component.set('v.newBudgetLine.buildertek__Sales_Price__c', '');
+        component.set('v.newBudgetLine.buildertek__Markup__c', '');
         component.set('v.newBudgetLine.buildertek__Unit_Price__c', '');
         component.set('v.newBudgetLine.buildertek__Quantity__c', '1');
         component.set('v.newBudgetLine.buildertek__Cost_Code__c', '');
@@ -2859,7 +2860,7 @@
         return totalObj;
     }, 
     expandRecordsHelper : function(component, event, helper, spanGroupId){
-        console.log('in expandrec');
+        console.log('in expandrec===>',spanGroupId);
         let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
         let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
         let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);
@@ -2871,7 +2872,7 @@
         }
     },
     collapeRecordsHelper : function(component, event, helper, spanGroupId){
-        console.log('in collaperec');
+        console.log('in collaperec===>',spanGroupId);
         let recordDivList = document.getElementsByClassName('record_'+spanGroupId);
         let collapeallIcon = document.getElementById("collapeseGroupBtn_" + spanGroupId);
         let expandallIcon = document.getElementById("expandGroupBtn_" + spanGroupId);

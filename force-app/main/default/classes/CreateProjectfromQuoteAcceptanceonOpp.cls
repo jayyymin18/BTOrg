@@ -11,6 +11,13 @@ public class CreateProjectfromQuoteAcceptanceonOpp {
 //  public Boolean Margin{get;set;}
 //  public Boolean Markup{get;set;}
 
+public String GroupingLevel1 { get; set; }
+public String GroupingLevel2 { get; set; }
+public String GroupingLevel3 { get; set; }
+public String GroupingLevel4 { get; set; }
+
+
+
  public string  isBaseUrl {get;set;} 
  public buildertek__Admin_Interface_Node_Configuration__c admininterface {get;set;} 
  public string  emailsubject {get;set;} 
@@ -20,7 +27,7 @@ public class CreateProjectfromQuoteAcceptanceonOpp {
         buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id,buildertek__Quote_Configuration__c,
                                                                                               buildertek__Email_Subject__c,buildertek__Send_customer_Quote_after_signature__c, buildertek__Reject_Quote_on_Rejected_Lines__c, 
                                                                                               buildertek__Create_Project_from_Opportunity__c,buildertek__Update_the_Opp_Amount__c,buildertek__Remove_Single_Quote_Line_Option__c,
-                                                                                              buildertek__Default_Project_Owner__c,buildertek__Org_Base_URL__c, buildertek__Hide_Global_Margin__c, buildertek__Hide_Global_Markup__c
+                                                                                              buildertek__Default_Project_Owner__c,buildertek__Org_Base_URL__c, buildertek__Hide_Global_Margin__c, buildertek__Hide_Global_Markup__c,buildertek__Grouping_Level_1__c,buildertek__Grouping_Level_2__c,buildertek__Grouping_Level_3__c,buildertek__Grouping_Level_4__c
                                                                                               from buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Quote Configuration'];
         isCreateProjectfromQuoteAcceptanceonOpp=adminInterfaceNodeConfigurations.buildertek__Quote_Configuration__c;
         emailsubject = adminInterfaceNodeConfigurations.buildertek__Email_Subject__c;
@@ -39,6 +46,39 @@ public class CreateProjectfromQuoteAcceptanceonOpp {
        // }
         
         
+    }
+
+    public List<SelectOption> getgrpLevel1Options() {
+        List<SelectOption> options = new List<SelectOption>();
+        Schema.DescribeFieldResult fieldResult = buildertek__Admin_Interface_Node_Configuration__c.buildertek__Grouping_Level_1__c.getDescribe();
+        for (Schema.PicklistEntry picklistEntry : fieldResult.getPicklistValues()) {
+            options.add(new SelectOption(picklistEntry.getValue(), picklistEntry.getLabel()));
+        }
+        return options;
+    }
+    public List<SelectOption> getgrpLevel2Options() {
+        List<SelectOption> options = new List<SelectOption>();
+        Schema.DescribeFieldResult fieldResult = buildertek__Admin_Interface_Node_Configuration__c.buildertek__Grouping_Level_1__c.getDescribe();
+        for (Schema.PicklistEntry picklistEntry : fieldResult.getPicklistValues()) {
+            options.add(new SelectOption(picklistEntry.getValue(), picklistEntry.getLabel()));
+        }
+        return options;
+    }
+    public List<SelectOption> getgrpLevel3Options() {
+        List<SelectOption> options = new List<SelectOption>();
+        Schema.DescribeFieldResult fieldResult = buildertek__Admin_Interface_Node_Configuration__c.buildertek__Grouping_Level_1__c.getDescribe();
+        for (Schema.PicklistEntry picklistEntry : fieldResult.getPicklistValues()) {
+            options.add(new SelectOption(picklistEntry.getValue(), picklistEntry.getLabel()));
+        }
+        return options;
+    }
+    public List<SelectOption> getgrpLevel4Options() {
+        List<SelectOption> options = new List<SelectOption>();
+        Schema.DescribeFieldResult fieldResult = buildertek__Admin_Interface_Node_Configuration__c.buildertek__Grouping_Level_1__c.getDescribe();
+        for (Schema.PicklistEntry picklistEntry : fieldResult.getPicklistValues()) {
+            options.add(new SelectOption(picklistEntry.getValue(), picklistEntry.getLabel()));
+        }
+        return options;
     }
     
     public void onCreateProjectfromQuoteAcceptanceonOpp(){

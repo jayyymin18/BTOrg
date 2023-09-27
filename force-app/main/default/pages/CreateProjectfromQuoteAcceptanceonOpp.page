@@ -24,6 +24,24 @@
                 <!-- Labbel changed from : Reject Quote on Rejected Lines based on CHB-35 -->
                 <apex:inputcheckbox value="{!reject_Quote_on_Rejected_Lines}" label="Reject all or Acccept all">
                 </apex:inputcheckbox>
+
+                 <apex:selectList label="Grouping Level 1"  value="{!GroupingLevel1}" size="1">
+                    <apex:selectOptions value="{!grpLevel1Options}" />
+                </apex:selectList>
+
+                <apex:selectList label="Grouping Level 2"  value="{!GroupingLevel2}" size="1">
+                    <apex:selectOptions value="{!grpLevel2Options}" />
+                </apex:selectList>
+
+                <apex:selectList label="Grouping Level 3"  value="{!GroupingLevel3}" size="1">
+                    <apex:selectOptions value="{!grpLevel3Options}" />
+                </apex:selectList>
+
+                <apex:selectList label="Grouping Level 4"  value="{!GroupingLevel4}" size="1">
+                    <apex:selectOptions value="{!grpLevel4Options}" />
+                </apex:selectList>
+
+
                 <center>
                     <apex:commandButton value="Save" id="onCreateProjectfromQuoteAcceptanceonOpp" styleClass="slds-button slds-button_brand" action="{!onCreateProjectfromQuoteAcceptanceonOpp}"></apex:commandButton>
                 </center>

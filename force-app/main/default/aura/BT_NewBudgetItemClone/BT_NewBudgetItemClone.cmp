@@ -618,8 +618,11 @@
                                                 <th style="background-color:rgba(27, 82, 151, 1.0); color:white;">
                                                     <div class="slds-truncate" title="Unit Cost">Unit Cost</div>
                                                 </th>
-                                                <th style="background-color:rgba(27, 82, 151, 1.0); color:white;">
+                                                <!-- <th style="background-color:rgba(27, 82, 151, 1.0); color:white;">
                                                     <div class="slds-truncate" title="Unit Cost">Unit Sales Price</div>
+                                                </th> -->
+                                                <th style="background-color:rgba(27, 82, 151, 1.0); color:white;">
+                                                    <div class="slds-truncate" title="Markup (%)">Markup (%)</div>
                                                 </th>
                                                 <th scope="col" style="background-color:rgba(27, 82, 151, 1.0); color:white; border-top-right-radius:5px;">
                                                     <div class="slds-truncate" title="Save">Save</div>
@@ -733,10 +736,19 @@
                                                     <!--<force:inputField value="{!v.newBudgetLine.buildertek__Unit_Price__c}" />-->
                                                     <ui:inputCurrency class="costInputField" value="{!v.newBudgetLine.buildertek__Unit_Price__c}" aura:id="unitPriceId" />
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <ui:inputCurrency class="costInputField" value="{!v.newBudgetLine.buildertek__Sales_Price__c}" />
+                                                </td> -->
+                                                <td>
+                                                    <div class="slds-form slds-form_inline">
+                                                        <div class="slds-form-element">
+                                                            <lightning:input class="costInputField" value="{!v.newBudgetLine.buildertek__Markup__c}" formatter="percent-fixed" label="" type="number" step="0.01" />
+                                                        </div>
+                                                    </div>
+                                                    <!-- <ui:inputNumber class="costInputField" value="{!v.newBudgetLine.buildertek__Markup__c}" /> -->
                                                 </td>
                                                 <td>
+                                                    
                                                     <lightning:buttonIcon iconName="utility:save" alternativeText="save" onclick="{!c.saveBudgetItemRecord}" />
                                                 </td>
                                             </tr>
@@ -1468,10 +1480,10 @@
                                                 <tr>
                                                     <td class="groupHeaderIcon">
                                                         <div id='collapseBtn' class="slds-float_left">
-                                                            <span data-iconname="Expand Group" id="{!'expandGroupBtn_'+group1.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
+                                                            <span data-iconname="Expand Group" data-iconattr="{!'expandGroupBtn_'+group1.groupIndex}" id="{!'expandGroupBtn_'+group1.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
                                                                 <lightning:buttonIcon iconName="utility:add" variant="border-filled" iconClass="dark" alternativeText="Expand Group" title="Expand Group" size="x-small" /> 
                                                             </span>
-                                                            <span data-iconname="Collapse Group" id="{!'collapeseGroupBtn_'+group1.groupIndex}" onclick="{!c.expandCollapeGroup}"  style="display:inline-block;">
+                                                            <span data-iconname="Collapse Group" data-iconattr="{!'collapeseGroupBtn_'+group1.groupIndex}" id="{!'collapeseGroupBtn_'+group1.groupIndex}" onclick="{!c.expandCollapeGroup}"  style="display:inline-block;">
                                                                 <lightning:buttonIcon iconName="utility:dash" variant="border-filled" iconClass="dark" alternativeText="Collapse Group" title="Collapse Group" size="x-small"/>
                                                             </span>
                                                         </div>
@@ -1637,10 +1649,10 @@
                                                     <tr>
                                                         <td class="groupHeaderIcon">
                                                             <div id='collapseBtn' class="slds-float_left">
-                                                                <span data-iconname="Expand Group" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
+                                                                <span data-iconname="Expand Group" data-iconattr="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex}" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
                                                                     <lightning:buttonIcon iconName="utility:add" variant="border-filled" iconClass="dark" alternativeText="Expand Group" title="Expand Group" size="x-small" />
                                                                 </span>
-                                                                <span data-iconname="Collapse Group" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
+                                                                <span data-iconname="Collapse Group" data-iconattr="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex}" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
                                                                     <lightning:buttonIcon iconName="utility:dash" variant="border-filled" iconClass="dark" alternativeText="Collapse Group" title="Collapse Group" size="x-small" />
                                                                 </span>
                                                             </div>
@@ -1839,10 +1851,10 @@
                                                             <td class="groupHeaderDiv blankDiv"> </td>
                                                             <td class="groupHeaderIcon">
                                                                 <div id='collapseBtn' class="slds-float_left">
-                                                                    <span data-iconname="Expand Group" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
+                                                                    <span data-iconname="Expand Group" data-iconattr="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
                                                                         <lightning:buttonIcon iconName="utility:add" variant="border-filled" iconClass="dark" alternativeText="Expand Group" title="Expand Group" size="x-small" />
                                                                     </span>
-                                                                    <span data-iconname="Collapse Group" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
+                                                                    <span data-iconname="Collapse Group" data-iconattr="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
                                                                         <lightning:buttonIcon iconName="utility:dash" variant="border-filled" iconClass="dark" alternativeText="Collapse Group" title="Collapse Group" size="x-small" />
                                                                     </span>
                                                                 </div>
@@ -2069,10 +2081,10 @@
 
                                                                 <td class="groupHeaderIcon">
                                                                     <div id='collapseBtn' class="slds-float_left">
-                                                                        <span data-iconname="Expand Group" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
+                                                                        <span data-iconname="Expand Group" data-iconattr="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" id="{!'expandGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:none">
                                                                             <lightning:buttonIcon iconName="utility:add" variant="border-filled" iconClass="dark" alternativeText="Expand Group" title="Expand Group" size="x-small" />
                                                                         </span>
-                                                                        <span data-iconname="Collapse Group" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
+                                                                        <span data-iconname="Collapse Group" data-iconattr="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" id="{!'collapeseGroupBtn_'+group1.groupIndex+group2.groupIndex+group3.groupIndex+group4.groupIndex}" onclick="{!c.expandCollapeGroup}" style="display:inline-block;">
                                                                             <lightning:buttonIcon iconName="utility:dash" variant="border-filled" iconClass="dark" alternativeText="Collapse Group" title="Collapse Group" size="x-small" />
                                                                         </span>
                                                                     </div>

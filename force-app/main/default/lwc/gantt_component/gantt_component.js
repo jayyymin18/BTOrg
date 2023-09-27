@@ -747,6 +747,14 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               type: "Combo",
               items: contractorComboData,
               name: "contractorId",
+              listeners:{
+                change : (event) => {
+                  console.log('calling this method ', event);
+                  // if (event.column.text == "Contractor"){
+                  this.resetResourceColumnValue(event);
+                  // }
+                }
+              },
             },
           ],
           renderer: (record) => {
@@ -1283,6 +1291,14 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     // Set isLoading to true to show the spinner
     // this.isLoading = false;
     this.spinnerDataTable = false;
+  }
+
+  resetResourceColumnValue(event){
+    // if (event.column.text === 'Contractor' && event.record.type === 'Task' && event.record.name != 'Milestone Complete') {
+    //   console.log('in if on change ',event.editorContext);
+    // }
+    console.log('calling resetResourceColumnValue',event);
+    console.log('gantt ',gantt.taskStore);
   }
 
   openMasterSchedule() {

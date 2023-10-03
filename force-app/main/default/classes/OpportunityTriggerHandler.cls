@@ -72,7 +72,7 @@ public without sharing class OpportunityTriggerHandler{
         if (oppoids.size() > 0){
             list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id, buildertek__Quote_Configuration__c, buildertek__Create_Project_from_Opportunity__c
                                                                                                         from buildertek__Admin_Interface_Node_Configuration__c
-                                                                                                        WHERE Name = 'Quote Configuration' and buildertek__Create_Project_from_Opportunity__c != false
+                                                                                                        WHERE Name = :'Quote Configuration' and buildertek__Create_Project_from_Opportunity__c != false
                                                                                                         limit 1];
 
             if (adminInterfaceNodeConfigurations.size() > 0){

@@ -1,0 +1,18 @@
+<template>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-slide-up-open" style="height: 80vh;">
+        <header class="slds-modal__header">
+            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Import Takeoff</h2>
+        </header>
+        <template if:true={takeoffList}>
+            <lightning-datatable key-field="id" data={takeoffList} columns={columns}></lightning-datatable>
+        </template>
+        <template if:false={takeoffList}>
+            {error}
+        </template>
+        <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" title="Cancel">Cancel</button>
+            <button class="slds-button slds-button_brand" title="OK">OK</button>
+        </footer>
+    </section>
+</template>

@@ -1,6 +1,6 @@
 ({
     doSearchHelper: function (component, event, helper) {
-
+        
         var searchKeyword = component.get('v.searchKeyword');
         console.log('searchKeyword', searchKeyword);
         var action = component.get("c.fetchTakeoff");

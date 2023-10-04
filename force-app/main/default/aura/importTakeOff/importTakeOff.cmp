@@ -3,6 +3,7 @@
     access="global">
     <aura:attribute name="takeoffList" type="object" />
     <aura:attribute name="Spinner" type="Boolean" />
+    <aura:attribute name="quoteId" type="String" />
 
     <!-- Attribute Declaration For Pagination -->
 
@@ -57,10 +58,6 @@
                         </th>
                         <th
                             style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
-                            Build Phase
-                        </th>
-                        <th
-                            style="background-color:rgba(27, 82, 151, 1.0); color:white;vertical-align: top;line-height: 2;">
                             No. Takeoff Lines
                         </th>
                         <th
@@ -80,9 +77,6 @@
                             </td>
                             <td role="gridcell">
                                 <ui:outputText value="{!rec.buildertek__Name__c}" />
-                            </td>
-                            <td role="gridcell">
-                                <ui:outputText value="{!rec.buildertek__Build_Phase__c}" />
                             </td>
                             <td role="gridcell">
                                 <ui:outputText value="{!rec.buildertek__Number_of_TakeOff_Lines__c}" />

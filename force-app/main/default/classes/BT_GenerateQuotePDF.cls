@@ -57,7 +57,6 @@ public without sharing class BT_GenerateQuotePDF {
                 }
             }
             if(objectAPIName.contains('buildertek__Quote__c')){
-            System.debug('------------------'+apexpages.currentPage().getParameters());
              filerecid = apexpages.currentPage().getParameters().get('fileId').escapeHtml4();
                 /*List<buildertek__Quote__c> quoterec = [select id,
                                         Name,

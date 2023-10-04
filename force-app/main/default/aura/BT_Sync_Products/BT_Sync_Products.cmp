@@ -6,9 +6,11 @@
     <aura:attribute name="selectedRecId" type="String" default=""/>
     <aura:attribute name="productList" type="List" />
     <aura:attribute name="displayProduct" type="boolean" default="false" />
+    <aura:attribute name="disableProductField" type="boolean" default="false" />
     <aura:attribute name="selectedProductName" type="String" default="" />
     <aura:attribute name="selectedProductNames" type="Object" default="{}" />
     <aura:attribute name="selectedProductId" type="String" default="" />
+    <aura:attribute name="QuoteLine_modified" type="Object" default="{}" />
 
     <ltng:require styles="{!$Resource.MOdalPreviewWidth72}"/>
 
@@ -33,7 +35,7 @@
     				</tr>
     			</thead>
     			<tbody>
-    			    <aura:iteration items="{!v.quoteLineList}" var="rec">
+    			    <aura:iteration items="{!v.QuoteLine_modified}" var="rec">
     			        <tr class="slds-hint-parent">
                             <td width="40%" role="gridcell">
                                 <ui:outputText value="{!rec.Name}" />
@@ -50,7 +52,7 @@
                                                         <span class="slds-icon_container slds-combobox__input-entity-icon searchIcon" title="record">
                                                             <span class="slds-assistive-text"></span>
                                                         </span>
-                                                    <lightning:input id="productInput" class="budgetInput" autocomplete="off" type="search" placeholder="Search Product..." variant="label-hidden" value="{!v.selectedProductName}" disabled="true" />
+                                                    <lightning:input id="productInput" class="budgetInput" autocomplete="off" type="search" placeholder="Search Product..." value="{!rec.value}" variant="label-hidden" disabled="true" />
                                                 </div>
                                                 </aura:if>
                                                 <aura:if isTrue="{!rec.Id == v.selectedRecId}">
@@ -68,7 +70,7 @@
                                                                 </span>
                                                             </aura:set>
                                                         </aura:if>
-                                                        <lightning:input data-index="{!rec.Id}" Id="{!rec.Id}" aura:id="productInputs_{!rec.Id}" class="productInput" autocomplete="off" type="search" placeholder="Search Product..." variant="label-hidden" value="{!v.selectedProductName}" onclick="{!c.searchProductData}" onkeyup="{!c.keyupProductData}" />
+                                                        <lightning:input data-index="{!rec.Id}" id="{!rec.Id}" disabled="{!v.disableProductField}" class="productInput" autocomplete="off" type="search" placeholder="Search Product..." value="{!rec.value}" variant="label-hidden" onclick="{!c.searchProductData}" onkeyup="{!c.keyupProductData}" />
                                                     </div>
             
                                                     <aura:if isTrue="{!v.displayProduct}" >

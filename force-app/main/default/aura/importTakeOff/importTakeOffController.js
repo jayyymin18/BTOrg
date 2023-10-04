@@ -1,11 +1,14 @@
 ({
     doInit: function (component, event, helper) {
         component.set("v.Spinner", true);
-
+        var recordId = component.get('v.recordId');
+        component.set("v.quoteId", recordId);
         var action = component.get("c.fetchTakeoff");
         action.setParams({
             'searchKeyword': ''
         });
+
+        // Fetch takeoff records with status approved
         action.setCallback(this, function (response) {
             var state = response.getState();
             if (state === "SUCCESS") {
@@ -33,12 +36,18 @@
         $A.enqueueAction(action);
     },
 
+    // Handle Checkbox selection
     handleCheckedTakeoff: function (component, event, helper) {
         var checkbox = event.getSource();
         var isChecked = checkbox.get("v.value");
         var recordId = checkbox.get("v.text");
-
         var checkedRecordIds = component.get("v.checkedRecordIds");
+        var selectAllCheckbox = component.find("checkAllTakeoff");
+        var isAllChecked = selectAllCheckbox.get("v.value");
+        
+        if(isAllChecked){
+            selectAllCheckbox.set("v.value",false);
+        }
 
         if (isChecked) {
             checkedRecordIds.push(recordId);
@@ -58,6 +67,7 @@
         var isChecked = selectAllCheckbox.get("v.value");
         var checkboxes = component.find("checkTakeoff");
         var checkedRecordIds = [];
+        
         checkboxes.forEach(function (checkbox) {
             checkbox.set("v.value", isChecked);
 
@@ -66,6 +76,7 @@
                 checkedRecordIds.push(recordId);
             }
         });
+        
         component.set("v.checkedRecordIds", checkedRecordIds);
         console.log('checkedRecordIds', checkedRecordIds);
     },
@@ -74,16 +85,21 @@
         $A.get("e.force:closeQuickAction").fire();
     },
 
+    // Create quoteLine from takeoffline based on takeoff selected.
     importTakeoff: function (component, event, helper) {
         component.set("v.Spinner", true);
         var selectedRecordIds = component.get("v.checkedRecordIds");
+        var quoteId = component.get("v.quoteId");
         console.log('selectedRecordIds:', selectedRecordIds);
+        console.log('import quoteId', quoteId);
         if (selectedRecordIds.length === 0) {
             helper.showToast('error', 'Error', 'Please check at least one record before importing.', '3');
+            component.set("v.Spinner", false);
         } else {
             var action = component.get("c.fetchTakeoffLines");
             action.setParams({
-                "listOfTakeoffIds": selectedRecordIds
+                "listOfTakeoffIds": selectedRecordIds,
+                "quoteId": quoteId
             });
 
             action.setCallback(this, function (response) {
@@ -93,7 +109,8 @@
                     console.log("Result: ", result);
                     component.set("v.Spinner", false);
                     helper.showToast('success', 'Success', 'QuoteLine Imported Successfully !!!', '3');
-                } 
+                    location.reload();
+                }
                 else if (state === "ERROR") {
                     var errors = response.getError();
                     if (errors && errors[0] && errors[0].message) {
@@ -108,6 +125,7 @@
         }
     },
 
+    // Used for Pagination
     next: function (component, event, helper) {
         var sObjectList = component.get("v.takeoffList");
         var end = component.get("v.endPage");
@@ -150,6 +168,7 @@
         component.set('v.PaginationList', Paginationlist);
     },
 
+    // Handle search result
     onSearch: function (component, event, helper) {
         helper.doSearchHelper(component, event, helper);
     },

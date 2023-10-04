@@ -7,9 +7,16 @@
         action.setCallback(this, function (response) {
             if (response.getState() == 'SUCCESS') {
                 var QuoteLineList = response.getReturnValue();
+                console.log('QuoteLine_modified ',QuoteLineList);
                 component.set("v.quoteLineList", QuoteLineList);
-                component.set("v.changeColorToRed", true);
-                console.log(' QuoteLine-->',component.get("v.quoteLineList"));
+                // console.log(' QuoteLine-->',JSON.parse(JSON.stringify(component.get("v.quoteLineList"))));
+                var QuoteLine_modified = QuoteLineList;
+                for(var item of QuoteLine_modified){
+                    item.value = '';
+                    console.log(item);
+                }
+                component.set('v.QuoteLine_modified', QuoteLine_modified);
+                console.log('QuoteLine_modified >. ', JSON.parse(JSON.stringify(component.get("v.QuoteLine_modified"))));
             }
         });
         $A.enqueueAction(action);
@@ -32,48 +39,49 @@
 
     },
     clickHandlerProduct: function(component, event, helper){
-        console.log("Select Product---->");
-        var prodName = '';
-        component.set('v.displayProduct', false);   
-        var recordId = event.currentTarget.dataset.value;
-        console.log('clickHandlerProduct---->',recordId);
-        component.set('v.selectedProductId', recordId);
-        var productList = component.get("v.productList");
-        productList.forEach(element => {
-            if (recordId == element.Id) {
-                prodName = element.Name;
-                // component.set('v.selectedProductName', element.Name);
-                component.set('v.selectedProductId', element.Id);
-            }
-        });
-        var productId = recordId; 
-        console.log("INPUT Name--->", prodName);
-        var qutLineID = component.get("v.selectedRecId");
-        console.log("INPUT Name New--->", qutLineID);
-        var auraId = "productInputs_" + qutLineID;
-        console.log("AuraId", auraId);
-        var inputCmp = component.find(auraId);
-        console.log("INPUT Name New 1--->", inputCmp);
-        if (inputCmp) {
-            inputCmp.set("v.selectedProductName", prodName);
+        try{
+
+            console.log("Select Product---->");
+            var prodName = '';
+            component.set('v.displayProduct', false);   
+            var recordId = event.currentTarget.dataset.value;
+            console.log('clickHandlerProduct---->',recordId);
+            var qutLineId =  component.get("v.selectedRecId");
+            
+            console.log('clickHandlerProduct---->',qutLineId);
+            // component.set('v.selectedProductId', recordId);
+            var productList = component.get("v.productList");
+            var QuoteLine_modified = component.get('v.QuoteLine_modified');
+            
+            productList.forEach(element => {
+                if (recordId == element.Id) {
+                    prodName = element.Name;
+                    component.set('v.selectedProductId', element.Id);
+                    component.set('v.selectedProductName', element.Name);
+                    console.log('idd --> ', qutLineId);
+                    QuoteLine_modified.forEach(ele => {
+                        // console.log("aq" , ele.Id);
+                        if(ele.Id == qutLineId){
+                            console.log('indise >> ');
+                            ele.value = element.Name;
+                        }
+                    })
+                    console.log('QuoteLine_modified------9090909 >. ', component.get('v.QuoteLine_modified'));
+                }
+            });
+            var productId = recordId; 
+            console.log("INPUT Name--->", prodName);
+            component.set("v.disableProductField" , true);
         }
-        // var inputCmp = component.find("productInputs");
-        // console.log("INPUT--->", inputCmp);
-        // for (var i = 0; i < inputCmp.length; i++) {
-        //     console.log("NEW DASH ---->" , inputCmp[i].getElement().id);
-        //     if (inputCmp[i].getElement().id === productId) {
-        //         console.log("Prod Name---->", prodName);
-        //         inputCmp[i].set("v.value",prodName);
-        //         break; 
-        //     }
-        // }
+        catch(error){
+            console.log('error in click >> ', error.stack);
+        }
     },
     searchProductData: function(component, event, helper) {
         console.log("Search for Product---->");
         component.set('v.displayProduct', true);
         var searchFilter = '';
-        // var recordId = event.currentTarget.dataset.id;
-        // console.log("REC ID--->",recordId);
+        console.log('id ==> ', event.getSource().get("v.id"));
         helper.getPricebooksProduct(component, event, helper, searchFilter);
         // event.stopPropagation();
     },

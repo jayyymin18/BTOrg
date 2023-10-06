@@ -40,14 +40,17 @@ public with sharing class importTakeoff {
                 quoteLine.buildertek__Product__c = takeoffline.buildertek__Product__c;
                 
                 String productName = takeoffline.buildertek__Product__r.Name;
-                if (productName != null && productName.length() > 79) {
-                    quoteLine.Name = productName.substring(0, 79);
+                if (productName != null) {
+                    quoteLine.Name = (productName.length() > 79) ? productName.substring(0, 79) : productName;
+                    quoteLine.buildertek__Item_Name__c = (productName.length() > 255) ? productName.substring(0, 254) : productName;
+                    quoteLine.buildertek__Description__c = productName;
                 } else {
-                    quoteLine.Name = productName;
+                    quoteLine.Name = takeoffline.Name;
+                    quoteLine.buildertek__Item_Name__c = takeoffline.Name;
+                    quoteLine.buildertek__Description__c = takeoffline.Name;
                 }
-                System.debug('(1) takeoffline.buildertek__Build_Phase__c: ' + takeoffline.buildertek__Build_Phase__c);
+
                 System.debug('quoteLine.buildertek__Product__c: ' + quoteLine.buildertek__Product__c);
-                quoteLine.buildertek__Item_Name__c = productName;
                 quotelineList.add(quoteLine);
             }
 

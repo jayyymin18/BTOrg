@@ -1,0 +1,59 @@
+<aura:component controller="BT_SyncProductsController" access="global">
+    <aura:attribute name="productList" type="List" />
+    <aura:attribute name="displayProduct" type="boolean" default="false" />
+    <aura:attribute name="selectedProductName" type="String" default="" />
+    <aura:attribute name="selectedProductId" type="String" default="" />
+    <aura:attribute name="compid" type="String" default="" />
+    <aura:attribute name="hideProducts" type="boolean" default="true" />
+    <aura:attribute name="dropdownInfo" type="String" default="Loading..." />
+
+    <aura:method name="hideProductList" action="{!c.hideList}" access="PUBLIC" />
+    <aura:registerEvent name="hideProdListInPerent" type="c:BT_Sync_Product_Event"/>
+
+    <div class="slds-form slds-form_inline" >
+        <div class="slds-form-element">
+            <div class="slds-input-has-icon slds-input-has-iconright">
+                <aura:if isTrue="{!v.selectedProductName == ''}">
+                    <span class="slds-icon_container slds-combobox__input-entity-icon searchIcon" title="record">
+                        <lightning:icon class="slds-icon slds-icon slds-icon_small" iconName="utility:search" size="x-small" alternativeText="icon"/>
+                        <span class="slds-assistive-text"></span>
+                    </span>
+                    <aura:set attribute="else">
+                        <span class="slds-icon_container slds-combobox__input-entity-icon" title="record">
+                            <lightning:icon class="slds-icon slds-icon slds-icon_small" iconName="custom:custom5" size="x-small" alternativeText="icon"/>
+                            <span class="slds-assistive-text"></span>
+                        </span>
+                    </aura:set>
+                </aura:if>
+                <lightning:input   class="productInput" autocomplete="off" type="search" placeholder="Search Product..." variant="label-hidden" value="{!v.selectedProductName}"  onclick="{!c.searchProductData}" onkeyup="{!c.keyupProductData}" />
+            </div>
+            <aura:if isTrue="{!v.displayProduct}" >       
+                <div id="listbox-id-11" class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid searchResult" role="listbox" style="position: absolute;">
+                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                        <aura:iteration items="{!v.productList}" var="result">
+                            <li role="presentation" class="slds-listbox__item" data-value="{!result.Id}" onclick="{!c.clickHandlerProduct}">
+                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small slds-media slds-listbox__option slds-listbox__option_entity slds-media_center" role="option">
+                                    <span class="slds-media__figure slds-listbox__option-icon ">
+                                        <lightning:icon iconName="custom:custom5" size="small" alternativeText="Approved" title="Approved" />
+                                    </span>
+                                    <span class="slds-media__body">
+                                        <span class="slds-truncate" title="Products">
+                                            <span>{!result.Name}</span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </li>
+                        </aura:iteration>
+                        <aura:if isTrue="{!empty(v.productList)}">
+                            <span>
+                                <p class="blank-lst" style="text-align: center; padding:10px" >
+                                    {!v.dropdownInfo}
+                                </p>
+                            </span>
+                        </aura:if>
+                    </ul>
+                </div>
+            </aura:if>
+        </div>
+    </div>
+</aura:component>

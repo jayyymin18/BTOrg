@@ -1,0 +1,18 @@
+<apex:page >
+    <apex:includeLightning />
+    <apex:includeScript value="/lightning/lightning.out.js" />
+    <div id="lightning" />
+    <script>
+        $Lightning.use("c:BT_SyncProductApp", function() {
+            $Lightning.createComponent("c:BT_Sync_Products",
+                {
+                    "recordId": "{!$CurrentPage.parameters.id}" 
+                },
+                "lightning",
+                function(cmp) {
+                    // Component was created
+                }
+            );
+        });
+    </script>
+</apex:page>

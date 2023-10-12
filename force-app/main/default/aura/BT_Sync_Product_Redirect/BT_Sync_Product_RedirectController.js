@@ -1,68 +1,43 @@
-// ({
-//     doInit: function(component, event, helper) {
-//         var workspaceAPI = component.find("workspace");
-//         var recordId = component.get("v.recordId");
-//            workspaceAPI.getFocusedTabInfo().then(function(response) {
-//                var focusedTabId = response.tabId;
-//                var vfURL = '/apex/BT_SyncProductRedirectToAura?id=' +recordId;
-//                var tabLabel = 'Sync Product';
-//                workspaceAPI.openSubtab({
-//                    parentTabId: focusedTabId,
-//                    url: vfURL ,
-//                    focus: true,
-//                    pageReference: {
-//                     "type": "standard__webPage",
-//                     "attributes": {
-//                         "url": vfURL,
-//                         "label": tabLabel
-//                     }
-//                    }
-//                });
-//            })
-//            .catch(function(error) {
-//                console.log(error);
-//            });
-//        }
-// });
-
 ({
-    doInit: function(component, event, helper) {
+    doInit : function(component, event, helper) {
         var workspaceAPI = component.find("workspace");
-        var recordId = component.get("v.recordId");
-        
-        workspaceAPI.getFocusedTabInfo().then(function(response) {
-            var focusedTabId = response.tabId;
-            var vfURL = '/apex/BT_SyncProductRedirectToAura?id=' + recordId;
-            var tabLabel = 'Sync Product';
-            var tabIcon = 'custom:custom5'; // Custom tab icon
+        workspaceAPI.getFocusedTabInfo().then(function(tabResponse) {
             
-            // Open the subtab
+            var parentTabId = tabResponse.tabId;
+            var isSubtab = tabResponse.isSubtab;
+            
             workspaceAPI.openSubtab({
-                parentTabId: focusedTabId,
-                url: vfURL,
-                focus: true,
+                parentTabId: parentTabId,
                 pageReference: {
-                    "type": "standard__webPage",
+                    "type": "standard__component",
                     "attributes": {
-                        "url": vfURL,
+                        "recordId" : component.get("v.recordId"),
+                        "componentName": "buildertek__BT_Sync_Products"
+                    },
+                    "state": {
+                        "buildertek__parentId": component.get("v.recordId")
                     }
-                }
-            }).then(function(subtabId) {
-                // Set the label of the subtab
-                workspaceAPI.setTabLabel({
-                    tabId: subtabId,
-                    label: tabLabel
+                },
+                //focus: true
+            }).then(function(response){
+                var workspaceAPI = component.find("workspace");
+                workspaceAPI.getFocusedTabInfo().then(function(response) {
+                    var focusedTabId = response.tabId;
+                    workspaceAPI.setTabLabel({
+                        tabId: focusedTabId,
+                        label: "Sync Products",
+                    });
+                    workspaceAPI.setTabIcon({
+                        tabId: focusedTabId,
+                        icon: "custom:custom5",
+                        iconAlt: "products"
+                    });
+                })
+                .catch(function(error) {
+                    console.log(error);
                 });
-
-                // Set the tab icon
-                workspaceAPI.setTabIcon({
-                    tabId: subtabId,
-                    icon: tabIcon
-                });
-            });
-        })
-        .catch(function(error) {
-            console.log(error);
-        });
+            })
+        });                           
     }
-});
+    
+})

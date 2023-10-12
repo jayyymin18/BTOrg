@@ -47,7 +47,7 @@ public class BT_SyncProductsController {
         public Decimal Discount;
 
         @AuraEnabled
-        public String QuantityUnitOfMeasure;        //----
+        public String QuantityUnitOfMeasure;
     }
     @AuraEnabled
     public static List<pricebookWrapper> getPricebookList(string recordId){
@@ -77,7 +77,7 @@ public class BT_SyncProductsController {
     @AuraEnabled
     public static List<buildertek__Quote_Item__c> getQuoteLineRecordList(String recordId) {
        
-        List<buildertek__Quote_Item__c>  QuoteLineList = [SELECT Id, Name, buildertek__Product__r.Id ,buildertek__Product__r.Name,buildertek__Grouping__r.Name FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c =:recordId AND buildertek__Product__c =''];
+        List<buildertek__Quote_Item__c>  QuoteLineList = [SELECT Id, Name, buildertek__Product__r.Id ,buildertek__Product__r.Name,buildertek__Grouping__r.Name FROM buildertek__Quote_Item__c WHERE buildertek__Quote__c =:recordId AND buildertek__Product__c ='' ORDER BY Name ASC];
         return QuoteLineList;
     }
     @AuraEnabled
@@ -96,7 +96,7 @@ public class BT_SyncProductsController {
 
 
         List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), 
-                                            Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  //----
+                                            Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  
                                             FROM PricebookEntry WHERE Pricebook2Id=:pbookId AND IsActive = True 
                                             ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000];
 
@@ -127,7 +127,7 @@ public class BT_SyncProductsController {
 
 
         List<PriceBookEntry> pEntries = [SELECT Id,Product2Id, Product2.buildertek__Quote_Group__c , Product2.Name, Product2.ProductCode, Product2.Description, toLabel(Product2.Family), 
-                                            Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  //----
+                                            Product2.IsActive,buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Pricebook2.Name, UnitPrice, Product2.QuantityUnitOfMeasure  
                                             FROM PricebookEntry WHERE Pricebook2Id=:pbookId AND IsActive = True AND toLabel(Product2.Family)=:pfId
                                             ORDER BY Product2.Family ASC NULLS LAST, Product2.Name ASC NULLS LAST LIMIT 1000];
 
@@ -147,7 +147,7 @@ public class BT_SyncProductsController {
             aProduct.Discount = pEntry.buildertek__Discount__c;
             aProduct.UnitCost = pEntry.buildertek__Unit_Cost__c;
             aProduct.Phase = pEntry.Product2.buildertek__Quote_Group__c;
-            aProduct.QuantityUnitOfMeasure = pEntry.Product2.QuantityUnitOfMeasure;     //----
+            aProduct.QuantityUnitOfMeasure = pEntry.Product2.QuantityUnitOfMeasure; 
             products.add(aProduct);
         }
 
@@ -225,6 +225,30 @@ public class BT_SyncProductsController {
         }
     
         return products;
-    }   
+    } 
+    @AuraEnabled
+    public static void massUpdateQuoteLine(String onlyUpdatedQuoteLines){
+       List<buildertek__Quote_Item__c> UpdateQl = (list<buildertek__Quote_Item__c>)JSON.deserialize(onlyUpdatedQuoteLines, List<buildertek__Quote_Item__c>.class);
+       update UpdateQl;
+       List<buildertek__Quote_Item__c> UpdateQlList = new List<buildertek__Quote_Item__c>();
+       Set<Id> qlIds = new Set<Id>();
+       Set<Id> prodIds = new Set<Id>();
+       for(buildertek__Quote_Item__c Ql: UpdateQl){
+            qlIds.add(Ql.Id);
+            prodIds.add(Ql.buildertek__Product__c);
+       }
+       List<Product2> prdList = [SELECT Id,Name FROM Product2 WHERE ID IN:prodIds];
+       List<buildertek__Quote_Item__c> UpQl = [SELECT ID,Name , buildertek__Item_Name__c,buildertek__Product__c FROM buildertek__Quote_Item__c WHERE Id IN:qlIds ];
+
+       for(buildertek__Quote_Item__c ql : UpQl){
+            for(Product2 prd: prdList){
+                if ((ql.buildertek__Product__c == prd.Id) && (ql.buildertek__Item_Name__c == null || ql.buildertek__Item_Name__c == '')) {
+                    ql.buildertek__Item_Name__c = prd.Name;
+                    UpdateQlList.add(ql);
+                }
+            }
+        }
+        update UpdateQlList;
+    }  
 
 }

@@ -1312,14 +1312,23 @@
                                                                                     value="{!value.originalValue}"
                                                                                     class="inputCss" />
                                                                             </aura:if>
-                                                                            <aura:if
-                                                                                isTrue="{!value.fieldType == 'string'}">
+                                                                            <aura:if isTrue="{!value.fieldType == 'string'}">
+                                                                                <aura:if isTrue="{!value.fieldName == 'buildertek__Item_Name__c'}">
+                                                                                    <div class="textAreaDiv">
+                                                                                        <lightning:formattedRichText
+                                                                                            value="{!value.originalValue}"
+                                                                                            class="textAreaCss" />
+                                                                                    </div>
+                                                                                    <aura:set attribute="else">
+                                                                                        <lightning:formattedNumber
+                                                                                            value="{!value.originalValue/100}"
+                                                                                            style="percent"
+                                                                                            minimumFractionDigits="2"
+                                                                                            class="inputCss" />
+                                                                                    </aura:set>
+                                                                                </aura:if>
 
-                                                                                <lightning:formattedNumber
-                                                                                    value="{!value.originalValue/100}"
-                                                                                    style="percent"
-                                                                                    minimumFractionDigits="2"
-                                                                                    class="inputCss" />
+                                                                                
                                                                             </aura:if>
                                                                             <aura:if isTrue="{!value.fieldType == 'textarea'}">
                                                                                 <div class="textAreaDiv">
@@ -1333,10 +1342,12 @@
                                                                                 {!value.originalValue}
                                                                             </aura:if>
                                                                             <aura:if isTrue="{!value.referenceValue}">
+                                                                                <div class="textAreaDiv textAreaCss">
                                                                                 <ui:outputURL
                                                                                     value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}"
                                                                                     target="_blank"
                                                                                     label="{!value.referenceValue}" />
+                                                                                </div>
                                                                             </aura:if>
                                                                             <!-- <button
                                                                                 class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small"

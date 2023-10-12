@@ -19,10 +19,12 @@
         component.set("v.showMessage", true);
         // debugger;
         var action = component.get("c.getIsNextPAyment");
+        console.log("Calling apex" , component.get("v.recordId"));
         action.setParams({"recordId": component.get("v.recordId")});
         action.setCallback(this, function(response) {
             var state = response.getState(); 
             if(state === "SUCCESS") {
+                console.log("Success");
                 var resultData = response.getReturnValue();
                 console.log(resultData.payment);
                 console.log(resultData.payment.buildertek__SOV_Payment_Application__r.buildertek__Status__c );

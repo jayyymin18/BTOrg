@@ -1,18 +1,4 @@
-.THIS lightning-icon.some-indicator {
-    /*  background-color: #006DCC; 
-       background-color: red; */
-      width: 2rem;
-      height: 2rem;
-  }
-  
-  .THIS lightning-icon.some-indicator>lightning-primitive-icon>svg>use {
-      fill: white;
-      background-color: #006DCC;
-      width: 2rem;
-      height: 2rem;
-  }
-  
-  .THIS .modal {
+.THIS .modal {
       display: block !important;
   }
   

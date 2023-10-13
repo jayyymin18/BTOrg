@@ -1342,12 +1342,10 @@
                                                                                 {!value.originalValue}
                                                                             </aura:if>
                                                                             <aura:if isTrue="{!value.referenceValue}">
-                                                                                <div class="textAreaDiv textAreaCss">
                                                                                 <ui:outputURL
                                                                                     value="{!'/one/one.app?#/sObject/'+ value.originalValue + '/view'}"
                                                                                     target="_blank"
                                                                                     label="{!value.referenceValue}" />
-                                                                                </div>
                                                                             </aura:if>
                                                                             <!-- <button
                                                                                 class="slds-button slds-button_icon slds-cell-edit__button slds-m-left_x-small"

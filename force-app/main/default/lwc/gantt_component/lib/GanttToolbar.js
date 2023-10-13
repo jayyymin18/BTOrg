@@ -157,7 +157,7 @@ export default base => class GanttToolbar extends base {
                   ref                  : 'filterByName',
                   cls                  : 'filter-by-name',
                   // flex                 : '1 1 12.5em',
-                  width: '13em',
+                  width: '17em',
                   // Label used for material, hidden in other themes
                   // Placeholder for others
                   placeholder          : 'Name',

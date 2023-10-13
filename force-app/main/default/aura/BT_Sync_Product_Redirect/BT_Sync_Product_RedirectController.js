@@ -10,17 +10,19 @@
                 var allQuoteLineItemsHaveProducts = response.getReturnValue();
                 if (allQuoteLineItemsHaveProducts) {
                     //show toast message that all quote line items have products
+                    console.log('all quote line items have products');
                     var toastEvent = $A.get("e.force:showToast");
                     toastEvent.setParams({
                         "title": "All Quote Line have Products",
                         "type": "error",
-                        "message": "All Quote Line have Products. No need to sync."
+                        "message": "All Quote Line have been sycn'd to a product."
 
                     });
                     toastEvent.fire();
                     //close quick action
                     $A.get("e.force:closeQuickAction").fire();
                 } else {
+                    console.log('not all quote line items have products');
                     var workspaceAPI = component.find("workspace");
                     workspaceAPI.getFocusedTabInfo().then(function(tabResponse) {
                         

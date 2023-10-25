@@ -1,7 +1,7 @@
 public class ScheduleCalendarController {
     @AuraEnabled
     public static List<buildertek__Project_Task__c> getProjects(List<Id> projectIdList, String tradeTypeId, String vendorId){
-        // system.debug('projectId --------> '+projectId);
+        system.debug('projectId --------> '+projectIdList);
         system.debug('tradeTypeId --------> '+tradeTypeId);
         system.debug('vendorId --------> '+vendorId);
 

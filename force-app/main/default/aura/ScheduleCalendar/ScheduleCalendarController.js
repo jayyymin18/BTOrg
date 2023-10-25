@@ -1,4 +1,8 @@
 ({
+    doInit: function(component, event, helper){
+        console.log(component.get("v.recordId"));
+    },
+
 	afterScriptsLoaded : function(component, event, helper) {
         helper.getAllActiveProjects(component, event, helper);
         helper.getAllVendors(component, event, helper);
@@ -7,6 +11,8 @@
         var defaultDate = new Date()
         $('#calendar').fullCalendar('addEventSource', eventArr, true);
         helper.loadCalendar(component,event,helper,eventArr,defaultDate);
+        $('#calendar').fullCalendar('removeEvents', function () { return true; });
+        helper.getActiveProjects(component, event, helper);
         // helper.getActiveProjects(component, event, helper);
         //helper.gettabname(component);
 	},
@@ -136,7 +142,7 @@
     handleRecordListEvent : function(component, event, helper){
 
         var recordListByEvent = event.getParam("recordListByEvent");
-        component.set("v.ProjectRecordList", recordListByEvent);
+        // component.set("v.ProjectRecordList", recordListByEvent);
 
         console.log('--- Event Receive ---');
         console.log('recordListByEvent => ',{recordListByEvent});

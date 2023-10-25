@@ -48,41 +48,7 @@
             var inputElement = event.getSource().get('v.value');
         }
     
-    }, 
-    searchVendorInDatatable: function(component, event, helper){
-        console.log('in search vendor method');
-        component.get('v.sVendorName', '');
-           if (component.get("v.selectedPricebookId") != '') {
-               var inputElement = event.getSource().get('v.value');
-               console.log('iE', inputElement);
-               component.set('v.sVendorName', inputElement);
-                   var prevVendorInput = component.get('v.prevVendorInput');
-                   var searchTimeout = component.get('v.searchTimeout');
-                   
-                   clearTimeout(searchTimeout);
-   
-                   // if (inputElement.trim() !== '') {
-                       // console.log('in if');
-                       console.log("called");
-                       if (inputElement === prevVendorInput) {
-                        console.log("called");
-                           helper.searchVendorDatatableHelper(component, event, helper);
-                       } else {
-                        console.log("call 2");
-                           searchTimeout = setTimeout($A.getCallback(function() {
-                               if (inputElement === component.get('v.sVendorName')) {
-                                   helper.searchVendorDatatableHelper(component, event, helper);
-                               }
-                           }), 2000);
-                           component.set('v.searchTimeout', searchTimeout);
-                       }
-                       component.set('v.prevVendorInput', inputElement);
-               // } 
-           }else{
-               var inputElement = event.getSource().get('v.value');
-           }
-       
-       },  
+    },  
 
    goToEditModal: function(component, event, helper) {
        helper.goToEditModalHelper(component, event, helper);

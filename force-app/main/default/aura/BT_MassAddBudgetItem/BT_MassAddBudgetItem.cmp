@@ -56,7 +56,7 @@
                                 <div class="slds-truncate" title="Description">Description</div>
                             </th>
                             <th scope="col" class="table-Header">
-                                <div class="slds-truncate" title="Group">Group</div>
+                                <div class="slds-truncate" title="Group">Phase</div>
                             </th>
                             <th scope="col" class="table-Header">
                                 <div class="slds-truncate" title="UOM">UOM</div>

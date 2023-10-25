@@ -332,28 +332,6 @@
         }
     }, 
 
-    searchVendorDatatableHelper : function(component, event, helper){
-        console.log('searchDatatableHelper vendoor method is called------');
-        component.set('v.Spinner', true);   
-        var tableDataList = component.get("v.tableDataList");
-        console.log(tableDataList);
-        let VendorName = component.get("v.prevVendorInput");
-        console.log("as-->" ,VendorName);
-        var filteredData = [];
-        if (VendorName == '' || VendorName == null) {
-            component.set("v.tableDataList" , tableDataList);
-        }
-
-        for (var i = 0; i < tableDataList.length; i++) {
-            var item = tableDataList[i];
-            if (item.Vendor && item.Vendor.toLowerCase().includes(VendorName)) {
-                filteredData.push(item);
-            }
-        }
-        component.set("v.tableDataList" , filteredData);
-        component.set('v.Spinner', false);
-    }, 
-
     goToEditModalHelper: function(component, event, helper) {
         console.log("CAAALING");
         

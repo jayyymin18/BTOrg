@@ -295,12 +295,13 @@ public without sharing class QuoteTriggerHandler {
 
                     string email = qutrec.OwnerId;
                     OrgWideEmailAddress[] owea = [select Id from OrgWideEmailAddress LIMIT 1];
-                    //log user.email
                     System.debug('Jaimin : Email is '+user.Email);
                     System.debug('Jaimin : Owner is '+user.Name);
                     if(email != null && email != ''){
                         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        mail.setToAddresses(new String[] {email});
+                        // mail.setToAddresses(new String[] {email});
+                        //setToAddresses 
+                        mail.setToAddresses(new String[] {user.Email});
                         if (owea.size() > 0) {
                             mail.setOrgWideEmailAddressId(owea.get(0).Id);
                         }

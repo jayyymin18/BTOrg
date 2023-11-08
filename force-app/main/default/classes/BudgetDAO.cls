@@ -33,7 +33,7 @@ public with sharing class BudgetDAO{
             if (Schema.sObjectType.buildertek__Budget_Line_Group__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Budget_Line_Group__c.fields.Name.isAccessible()){
                 btGroup = [SELECT Id
                            FROM buildertek__Budget_Line_Group__c
-                           WHERE Name = 'No Grouping' ORDER BY 	buildertek__Sort_Id__c ASC NULLS Last,Name ASC];
+                           WHERE Name = 'No Grouping' ORDER BY Name ASC];
             }
             if (btGroup.size() > 0){
                 for (buildertek__Budget_Item__c bItem : budgetItems){
@@ -109,7 +109,7 @@ public with sharing class BudgetDAO{
         buildertek__Budget_Line_Group__c budgetLineGroup = [SELECT Id, Name
                                                             FROM buildertek__Budget_Line_Group__c
                                                             WHERE Name = 'Expense' 
-                                                            ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC
+                                                            ORDER BY Name ASC
                                                             limit 1];
         if (projectId == null || expensebudgetId == null){
             return projectId ;
@@ -150,7 +150,7 @@ public with sharing class BudgetDAO{
         buildertek__Budget_Line_Group__c budgetLineGroup = [SELECT Id, Name
                                                             FROM buildertek__Budget_Line_Group__c
                                                             WHERE Name = 'Expense'
-                                                            ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC
+                                                            ORDER BY Name ASC
                                                             limit 1];
         if (projectId == null || expensebudgetId == null){
             system.debug('haii');
@@ -416,7 +416,7 @@ Throws [Exceptions]:
         List<buildertek__Budget_Line_Group__c> budgetGroup = [SELECT Id
                                                               FROM buildertek__Budget_Line_Group__c
                                                               WHERE Name = :newbudgetllinegroup
-                                                              ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC];
+                                                              ORDER BY Name ASC];
         string nameexist;
         if (budgetGroup.size() > 0){
             nameexist = 'This group Name is exist Please try with another Name';
@@ -478,7 +478,7 @@ Throws [Exceptions]:
             List<buildertek__Budget_Line_Group__c> budGrouping = [SELECT Id
                                                                   FROM buildertek__Budget_Line_Group__c
                                                                   WHERE Name = 'No Grouping'
-                                                                  ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC
+                                                                  ORDER BY Name ASC
                                                                   limit 1];
 
             if (budGrouping.size() > 0){
@@ -506,7 +506,7 @@ Throws [Exceptions]:
                 List<buildertek__Budget_Line_Group__c> budgetGroup = [SELECT Id
                                                                       FROM buildertek__Budget_Line_Group__c
                                                                       WHERE Name = 'No Grouping'
-                                                                      ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC];
+                                                                      ORDER BY Name ASC];
               //  system.debug('budgetGroup ----------> ' + budgetGroup);
                 if (budgetGroup.size() > 0){
                     for (buildertek__Budget_Item__c bItem : budgetItemsToInsert){
@@ -685,7 +685,7 @@ Throws [Exceptions]:
 
         list<PricebookEntry> pList;
 
-        pList = [select id, UnitPrice, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c
+        pList = [select id, UnitPrice, buildertek__Unit_Cost__c, buildertek__Markup__c, buildertek__Discount__c, Product2.buildertek__Cost_Code__c
                 from PricebookEntry
                 where product2Id = :productId and pricebook2Id =: pricebookId];
 
@@ -721,7 +721,7 @@ budgetRec.buildertek__Budget_Line_Group__c = budGroup.Id;
             List<buildertek__Budget_Line_Group__c> budgetGroup = [select Id, Name
                                                                   from buildertek__Budget_Line_Group__c
                                                                   where Name = 'No Grouping'
-                                                                  ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC];
+                                                                  ORDER BY Name ASC];
             if (budgetGroup.size() > 0){
                 budgetRec.buildertek__Group__c = budgetGroup[0].Id;
             } else{
@@ -944,11 +944,11 @@ return getBudgetGroupDetails(budgetId, groupId, 50, 50)[0];
 
         if (groupId != null){
 
-            budgetGroup = Database.query('Select Id, Name from buildertek__Budget_Line_Group__c where Id =: groupId ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC');
+            budgetGroup = Database.query('Select Id, Name from buildertek__Budget_Line_Group__c where Id =: groupId ORDER BY Name ASC');
 
         } else{
 
-            budgetGroup = Database.query('Select Id, Name from buildertek__Budget_Line_Group__c where Id IN: groupIdSet ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC');
+            budgetGroup = Database.query('Select Id, Name from buildertek__Budget_Line_Group__c where Id IN: groupIdSet ORDER BY Name ASC');
 
         }
 
@@ -1318,7 +1318,7 @@ insert s;*/
             List<buildertek__Budget_Line_Group__c> btGroup = [SELECT Id
                                                               FROM buildertek__Budget_Line_Group__c
                                                               WHERE Name = 'No Grouping'
-                                                              ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC];
+                                                              ORDER BY Name ASC];
 
             if (btGroup.size() > 0){
                 for (buildertek__Budget_Item__c bItem : budgetItem){
@@ -1400,7 +1400,7 @@ insert s;*/
         myqueries = 'select buildertek__Group__c ' + aggregateFields + ' from buildertek__Budget_Item__c where Id IN: BudgetItemList Group By buildertek__Group__c';
         childObjGroup = database.query(myqueries);
 
-        string Childs = 'select Id, Name from buildertek__Budget_Line_Group__c where id IN: groupIds order by buildertek__Sort_Id__c ASC NULLS Last, Name ASC';
+        string Childs = 'select Id, Name from buildertek__Budget_Line_Group__c where id IN: groupIds order by Name ASC';
         List<buildertek__Budget_Line_Group__c> childObjGroups;
         childObjGroups = database.query(Childs);
 
@@ -1463,9 +1463,18 @@ insert s;*/
                 aggregateFields += ', ' + sumOfFields;
             }
         }
+
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Budget_Grouping_Data__c
+                                                                                              from buildertek__Admin_Interface_Node_Configuration__c
+                                                                                              WHERE Name = :'Budget Configuration'];
+
         String myqueries = '';
       string myquerie = '';
-                myqueries = 'select buildertek__Budget__c  ' + aggregateFields + ' from buildertek__Budget_Item__c where buildertek__Budget__c =: recordId ORDER BY buildertek__CostCodeDivision__c ASC NULLS LAST, Name Asc limit ' + recordToDisply + ' OFFSET ' + offset;
+                if(adminInterfaceNodeConfigurations.buildertek__Budget_Grouping_Data__c == 'Group By Category'){
+                    myqueries = 'select buildertek__Budget__c  ' + aggregateFields + ' from buildertek__Budget_Item__c where buildertek__Budget__c =: recordId ORDER BY buildertek__Group__r.buildertek__Sorting_Id__c ASC NULLS LAST,buildertek__Group__r.Name ASC, Name Asc limit ' + recordToDisply + ' OFFSET ' + offset;
+                }else{
+                    myqueries = 'select buildertek__Budget__c  ' + aggregateFields + ' from buildertek__Budget_Item__c where buildertek__Budget__c =: recordId ORDER BY buildertek__CostCodeDivision__c ASC NULLS LAST, Name Asc limit ' + recordToDisply + ' OFFSET ' + offset;
+                }
                // myquerie = 'select buildertek__Budget__c  ' + aggregateFields + ' from buildertek__Budget_Item__c where buildertek__Budget__c =: recordId and buildertek__Group_Name__c = No Grouping Order By buildertek__Group_Name__c ASC limit ' + recordToDisply + ' OFFSET ' + offset;
 
            // if(nullspoRecList.size()>0){
@@ -2463,7 +2472,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
                 List<buildertek__Budget_Line_Group__c> budgetGroup = [select Id, Name
                                                                             from buildertek__Budget_Line_Group__c
                                                                             where Name = 'No Grouping'
-                                                                            ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC];
+                                                                            ORDER BY Name ASC];
                     Id nogroupId;
 
                      Map<Id,product2> prdctrec = new Map<Id,product2>([SELECT id, Name, buildertek__Cost_Code__c
@@ -2596,7 +2605,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
 
         if (coLineIds.size() > 0) {
             String budgetGroupId;
-            List<buildertek__Budget_Line_Group__c> budgetLineGroupList = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Change Order' ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC LIMIT 1];
+            List<buildertek__Budget_Line_Group__c> budgetLineGroupList = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Change Order' ORDER BY Name ASC LIMIT 1];
             if (budgetLineGroupList.size() > 0) {
                 budgetGroupId = budgetLineGroupList[0].Id;
             } else{
@@ -2776,7 +2785,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
 
         buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId ORDER BY Name ASC];
 
-        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Expense' ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC limit 1];
+        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Expense' ORDER BY Name ASC limit 1];
 
         String groupId = '';
 
@@ -2818,7 +2827,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         System.debug('CreateLineAddInvoice');
         buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId ORDER BY Name ASC];
 
-        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Invoice (AP)' ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC limit 1];
+        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Invoice (AP)' ORDER BY Name ASC limit 1];
 
         String groupId = '';
         System.debug('budgetLineGroup' + budgetLineGroup);
@@ -2866,7 +2875,7 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         System.debug('CreateLineAddLabor');
         buildertek__Budget__c budgetRec = [SELECT Id, Name, buildertek__Project__c FROM buildertek__Budget__c where Id = :RecId ORDER BY Name ASC];
 
-        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Labor' ORDER BY buildertek__Sort_Id__c ASC NULLS Last, Name ASC limit 1];
+        List<buildertek__Budget_Line_Group__c> budgetLineGroup = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'Labor' ORDER BY Name ASC limit 1];
 
         String groupId = '';
         System.debug('budgetLineGroup' + budgetLineGroup);
@@ -3272,6 +3281,23 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         public Integer total{ get; set; }
     }
 
+    public class fieldsetWrapper {
+        @AuraEnabled
+        public String fieldLabel;
+
+        @AuraEnabled
+        public String fieldType;
+        
+        @AuraEnabled
+        public Object fieldValue;
+
+        public fieldsetWrapper(String label,String fieldType,Object value) {
+            fieldLabel = label;
+            this.fieldType = fieldType;
+            fieldValue = value;
+        }
+    }
+
     @AuraEnabled
     public static List<String> groupingLevels(){
         buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Budget_Grouping_Level_1__c,
@@ -3291,7 +3317,51 @@ buildertek__Budget__c budgetCopy = Database.query(query);*/
         return groupingLevels;
     }   
 
+    @AuraEnabled
+    public static List<buildertek__Cost_Codes__c> getCostCodes(){
+        List<buildertek__Cost_Codes__c> costCodes = [SELECT Id, Name FROM buildertek__Cost_Codes__c ORDER BY Name ASC];
+        return costCodes;
+    }
 
+    // * Return list of wrapper class to display fields from fieldset in view budget line 
+    @AuraEnabled
+    public static List<fieldsetWrapper> getFieldsFromFieldset(String budgetId) {
+        List<fieldsetWrapper> fieldsetWrapperList = new List<fieldsetWrapper>();
+        String ObjectName = 'buildertek__Budget__c';
+        String fieldSetName = 'buildertek__Budget_Compact_Layout';
+        Map<String, Schema.SObjectType> GlobalDescribeMap = Schema.getGlobalDescribe(); 
+        
+        Schema.SObjectType SObjectTypeObj = GlobalDescribeMap.get(ObjectName);
+        Schema.DescribeSObjectResult DescribeSObjectResultObj = SObjectTypeObj.getDescribe();
+        Schema.FieldSet fieldSetObj = DescribeSObjectResultObj.FieldSets.getMap().get(fieldSetName);
+        
+        List<Schema.FieldSetMember> fieldSetMemberList = fieldSetObj.getFields();
+    
+        String query = 'SELECT ';
+        for (Schema.FieldSetMember fieldSetMemberObj : fieldSetMemberList) {
+            query += fieldSetMemberObj.getFieldPath() + ', ';
+        }
+        query = query.removeEnd(', ');
+        query += ' FROM buildertek__Budget__c WHERE Id = :budgetId';
+        
+        List<buildertek__Budget__c> records = Database.query(query);
+       
+        
+        buildertek__Budget__c budgetRecord = records[0];
+        
+        for (Schema.FieldSetMember fieldSetMemberObj : fieldSetMemberList) {
+            String fieldLabel = fieldSetMemberObj.getLabel();
+            String fieldPath = fieldSetMemberObj.getFieldPath();
+            String fieldType = String.valueOf(fieldSetMemberObj.getType());
+            fieldsetWrapper conWrapper = new fieldsetWrapper(fieldLabel, fieldType, budgetRecord.get(fieldPath));
+            fieldsetWrapperList.add(conWrapper);
+            System.debug('conWrapper: ' + conWrapper.fieldLabel);
+        }
+
+        System.debug('fieldsetWrapperList: ' + fieldsetWrapperList);
+
+        return fieldsetWrapperList;
+    }
 
 
 }

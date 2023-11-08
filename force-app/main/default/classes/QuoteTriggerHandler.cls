@@ -269,7 +269,8 @@ public without sharing class QuoteTriggerHandler {
                 System.debug('Jaimin : Quote Id is '+qutrec.Id);
                 System.debug('Jaimin : Quote Owner is '+qutrec.OwnerId);
 
-                if(qutrec.buildertek__Status__c == 'Customer Accepted'  && oldQuotesMap.get(qutrec.id).buildertek__Status__c != qutrec.buildertek__Status__c){
+                // if(qutrec.buildertek__Status__c == 'Customer Accepted'  && oldQuotesMap.get(qutrec.id).buildertek__Status__c != qutrec.buildertek__Status__c){
+                if(false){
                     // string emailbody = '<html><body><h3>  Your Quote has been Accepted </h3>'  + '<br/>';
                     User user = [SELECT Id, Email, Name FROM User WHERE Id =:qutrec.OwnerId];
                     List<EmailTemplate> templates = [SELECT Id, DeveloperName FROM EmailTemplate WHERE DeveloperName = 'QuoteAccepted'];
@@ -295,13 +296,12 @@ public without sharing class QuoteTriggerHandler {
 
                     string email = qutrec.OwnerId;
                     OrgWideEmailAddress[] owea = [select Id from OrgWideEmailAddress LIMIT 1];
+                    //log user.email
                     System.debug('Jaimin : Email is '+user.Email);
                     System.debug('Jaimin : Owner is '+user.Name);
                     if(email != null && email != ''){
                         Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
-                        // mail.setToAddresses(new String[] {email});
-                        //setToAddresses 
-                        mail.setToAddresses(new String[] {user.Email});
+                        mail.setToAddresses(new String[] {email});
                         if (owea.size() > 0) {
                             mail.setOrgWideEmailAddressId(owea.get(0).Id);
                         }

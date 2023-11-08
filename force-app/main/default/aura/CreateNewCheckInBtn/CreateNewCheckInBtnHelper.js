@@ -59,7 +59,8 @@
                             component.set('v.checkInRec.buildertek__Status__c', 'No Issues');
 
                             var recordId = component.get("v.recordId");
-                            if (recordId == null || recordId == undefined) {
+                            var projectId1 = component.get("v.projectId");
+                            if ((recordId == null || recordId == undefined) && (projectId1 == null || projectId1 == undefined)) {
                                 component.set('v.checkInRec.buildertek__Project__c', '');
                             }
 

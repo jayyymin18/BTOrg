@@ -2,44 +2,19 @@
     doInit: function(component, event) {
 
         //projName
-        // var action = component.get("c.getProject");
-        // action.setParams({
-        //     recordId: component.get('v.recordId'),
-        // });
-        // action.setCallback(this, function (response) {
-        //     if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
-        //         if(response.getReturnValue()){
-        //             var scheduleData = response.getReturnValue();
-        //             if(scheduleData.buildertek__Description__c){
-        //                 if(scheduleData.buildertek__Description__c.length > 100){
-        //                     scheduleData.buildertek__Description__c =  scheduleData.buildertek__Description__c.slice(0,100) + "...";
-        //                 }
-        //             }
-        //             component.set("v.projName", scheduleData);
-        //         }
+        var action = component.get("c.getProject");
+        action.setParams({
+            recordId: component.get('v.recordId'),
+        });
+        action.setCallback(this, function (response) {
+            if (response.getState() == 'SUCCESS' && response.getReturnValue()) {
+                if(response.getReturnValue()){
+                    component.set("v.projName", response.getReturnValue());
+                }
 
-        //     }
-        // })
-        // $A.enqueueAction(action);
-
-        var action2 = component.get("c.chekIsOldGantt");
-        action2.setParams({});
-        action2.setCallback(this, function (response) {
-            if (response.getState() == 'SUCCESS') {
-                let result = response.getReturnValue();
-                component.set("v.isOldGantt", result);
-            }else{
-                let toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": "Error!",
-                    "type": "error",
-                    "message": "Something Went Wrong."
-                });
-                toastEvent.fire();
             }
         })
-        $A.enqueueAction(action2);
-
+        $A.enqueueAction(action);
 
         //ObjNameOnInit
         var workspaceAPI = component.find("workspace");
@@ -61,6 +36,9 @@
              if(focusedTab.url.indexOf('buildertek__Schedule__c') > -1 && component.get("v.sobjecttype") == 'buildertek__Schedule__c' && recId) { //focusedTab.title.indexOf('SC-')
                  $A.enqueueAction(action1);
              }
+            /*if(focusedTab.title.indexOf('SC-') == 0 && {
+
+            }*/
        })
         .catch(function(error) {
             console.log(error);

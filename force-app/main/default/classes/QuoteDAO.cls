@@ -707,6 +707,7 @@ public with sharing class QuoteDAO{
         //string Quotename =  QuoteRec.Name;
 
         QuoteLineToInsert.buildertek__Product__c = QuoteRec.buildertek__Product__c;
+        QuoteLineToInsert.buildertek__Item_Name__c = QuoteRec.Name;
         if (QuoteRec.Name != null && QuoteRec.Name.length() > 79){
             QuoteLineToInsert.Name = QuoteRec.Name.left(78);
             QuoteLineToInsert.buildertek__Description__c = QuoteRec.Name;
@@ -1728,7 +1729,7 @@ public with sharing class QuoteDAO{
                 if (field.fieldName == 'id'){
                     Each_record_nested_List_Of_Fields.recordId = (Id)IndividualMember.get(field.fieldName);
                 } else{
-                    if (field.fieldName != null && field.fieldName != 'buildertek__Grouping__c' && field.fieldName != 'Name' && !field.fieldName.contains('__r.Name')){
+                    if (field.fieldName != null && field.fieldName != 'buildertek__Grouping__c' && !field.fieldName.contains('__r.Name')){
                         if (field.fieldType == 'currency'){
                             recList.add(new RecordsList(field.isEditable, (IndividualMember.get(field.fieldName) == null) ? '$0.00' : '$' + IndividualMember.get(field.fieldName), field.fieldName, (IndividualMember.get(field.fieldName) == null) ? '' : IndividualMember.get(field.fieldName), field.fieldType, ''));
                             temp.add((IndividualMember.get(field.fieldName) == null) ? '' : IndividualMember.get(field.fieldName));
@@ -2097,6 +2098,7 @@ public with sharing class QuoteDAO{
             System.debug('Record => ' + qql);
             buildertek__Quote_Item__c newQline = new    buildertek__Quote_Item__c();
             newQline.Name = qql.Name;
+            newQline.buildertek__Item_Name__c = newQline.Name;
             if (newQline.Name.length() > 80){
                 newQline.Name = newQline.Name.substring(0, 79);
             }

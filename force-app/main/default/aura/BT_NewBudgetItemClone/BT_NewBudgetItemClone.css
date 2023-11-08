@@ -101,7 +101,7 @@
 
 .THIS .slds-form-element__label {
     padding-bottom: 1.2rem !important;
-    margin-top: -5px !important;
+    margin-top: -10px !important;
 }
 
 .THIS .slds-form-element_stacked {
@@ -259,7 +259,7 @@
 .THIS .rkclass{
     display: flex;
     flex-direction: row;
-    gap: 25px;
+    gap: 3vw;
 }
 .THIS .rkclasses{
     display: flex;
@@ -349,4 +349,10 @@
 .THIS .rkbudclass{
     height: fit-content !important; 
     max-height: 70vh !important;
+}
+.THIS .hidelabel .slds-form-element__label{
+    display: none !important;
+}
+.THIS .hidelabel .slds-select{
+    height: 35px !important;
 }

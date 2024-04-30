@@ -74,13 +74,13 @@ public without sharing class BillOfMaterialTriggerHandler{
                 }
 
                 //* checking for service category to update tax field on BOM line
-                if ((bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Quartz' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Granite' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Porcelain' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Misc' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Option') && bomLine.buildertek__Tax__c == true) {
-                    bomLine.buildertek__Tax_Percent__c = BOM.buildertek__Tax_Rate_1__c;
-                } else if ((bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Fab' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Edge') && bomLine.buildertek__Tax__c == true && BOM.buildertek__Tax_on_Fabrication_Required__c == true) {
-                    bomLine.buildertek__Tax_Percent__c = BOM.buildertek__Tax_Rate_2__c;
-                } else {
-                    bomLine.buildertek__Tax_Percent__c = 0;
-                }
+                //if ((bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Quartz' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Granite' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Slab - Porcelain' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Misc' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Option') && bomLine.buildertek__Tax__c == true) {
+                //    bomLine.buildertek__Tax_Percent__c = BOM.buildertek__Tax_Rate_1__c;
+                //} else if ((bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Fab' || bomLine.buildertek__BL_SERVICE_CATEGORY__c == 'Edge') && bomLine.buildertek__Tax__c == true && BOM.buildertek__Tax_on_Fabrication_Required__c == true) {
+                //    bomLine.buildertek__Tax_Percent__c = BOM.buildertek__Tax_Rate_2__c;
+                //} else {
+                //    bomLine.buildertek__Tax_Percent__c = 0;
+                //}
             }
             update BomLineList;
         }

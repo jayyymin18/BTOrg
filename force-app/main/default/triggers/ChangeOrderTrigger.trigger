@@ -19,6 +19,9 @@ trigger ChangeOrderTrigger on Change_Order__c (after delete, after insert, after
         else if(Trigger.isInsert && Trigger.isAfter){
             handler.OnAfterInsert(Trigger.new, Trigger.newMap);
             //handler.ManageBudgetLineOnInsert(Trigger.new);
+            
+            handler.AfterInsertRollup(Trigger.new, Trigger.newMap);
+            handler.afterInsertRollupOnPO(Trigger.new);
         }
         
         else if(Trigger.isUpdate && Trigger.isBefore){
@@ -28,19 +31,20 @@ trigger ChangeOrderTrigger on Change_Order__c (after delete, after insert, after
             handler.checkPOBeforeUpdate(Trigger.new);
             handler.checkParentPOBeforeUpdate(Trigger.new);
             handler.UpdateDateApproved(Trigger.new, trigger.oldMap);
-            //handler.BudgetLineUpdate(Trigger.new, trigger.oldMap);            
+            //handler.BudgetLineUpdate(Trigger.new, trigger.oldMap);       
+            handler.updatePicklist(Trigger.new, trigger.oldMap);
         }
         
         else if(Trigger.isUpdate && Trigger.isAfter){
             // handler.OnAfterUpdate(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
-            handler.UpdateContractor(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
             handler.DeleteBudgetLine(Trigger.old,Trigger.new, Trigger.newMap, Trigger.oldMap);
             handler.UpdateProjectValueInChangeOrder(Trigger.new, trigger.oldMap); 
+            handler.UpdateContractor(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
             //handler.ManageBudgetLineOnInsert(Trigger.new);     
             // handler.updateBudgetLineData(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
 
-
-              
+            handler.afterUpdateRollupOnPO(Trigger.new, Trigger.oldMap);
+            handler.AfterUpdateRollup(Trigger.old, Trigger.new, Trigger.newMap, Trigger.oldMap);
         }
         
         else if(Trigger.isDelete && Trigger.isBefore){
@@ -48,7 +52,10 @@ trigger ChangeOrderTrigger on Change_Order__c (after delete, after insert, after
         }
         
         else if(Trigger.isDelete && Trigger.isAfter ){
-          //  handler.OnAfterDelete(Trigger.old); 
+          //  handler.OnAfterDelete(Trigger.old);
+
+          handler.AfterDeleteRollup(Trigger.old);
+          handler.afterDeleteRollupOnPO(Trigger.old);
         }
     }
 }

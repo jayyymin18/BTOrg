@@ -45,12 +45,34 @@ public with sharing class BudgetItemTriggerHandler {
  	}
      
  	public void OnBeforeUpdate(Budget_Item__c[] oldBudgetItems, Budget_Item__c[] updatedBudgetItems, Map<ID, Budget_Item__c> BudgetItemMap){
-     	
+
+		List<Budget_Item__c> bItems = new List<Budget_Item__c>();
+		for(Budget_Item__c bItem: updatedBudgetItems) {
+			if(bItem.buildertek__Group__c == null) { 
+				bItems.add(bItem);
+			}
+		}
+		
+	   system.debug('bItems.isEmpty(): ' + bItems.isEmpty());
+		// Set default Grouping
+		if(!bItems.isEmpty()) BudgetDAO.setDefaultGrouping(bItems);
  	}
      
  	public void OnBeforeDelete(Budget_Item__c[] BudgetItemToDelete, Map<ID, Budget_Item__c> BudgetItemMap){
 		Set<Id> budgetLineIds = BudgetItemMap.keySet();
 		
+		//* for TimeSheet
+		List<buildertek__BT_Time_Sheet__c> timeSheetList = [SELECT Id, Name, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c FROM buildertek__BT_Time_Sheet__c WHERE buildertek__BT_Budget_Line__c IN: budgetLineIds];
+		for (buildertek__BT_Time_Sheet__c timeSheet : timeSheetList) {
+			timeSheet.buildertek__BT_Budget__c = null;
+			timeSheet.buildertek__BT_Budget_Line__c = null;
+		}
+		if (timeSheetList.size() > 0 && blnSkipBudgetItemTrigger == false) {
+			HandlerTimeSheet.blnSkipTimeSheetUpdateTrigger = true;
+			update timeSheetList;
+			HandlerTimeSheet.blnSkipTimeSheetUpdateTrigger = false;
+		}
+
 		//* for expense
      	List<buildertek__Expense__c> expenseList = [SELECT Id, Name, buildertek__Budget__c, buildertek__Budget_Line__c FROM buildertek__Expense__c WHERE buildertek__Budget_Line__c IN: budgetLineIds];
 		for (buildertek__Expense__c expense : expenseList) {
@@ -69,7 +91,7 @@ public with sharing class BudgetItemTriggerHandler {
 			timeCard.buildertek__Budget__c = null;
 			timeCard.buildertek__Budget_Line__c = null;
 		}
-		if (timeCardList.size() > 0) {
+		if (timeCardList.size() > 0 ) {
 			TimeCardTriggerHandler.blnSkipTrigger = true;
 			update timeCardList;
 			TimeCardTriggerHandler.blnSkipTrigger = false;
@@ -119,11 +141,60 @@ public with sharing class BudgetItemTriggerHandler {
 			invoicePo.buildertek__BT_Budget_Line__c = null;
 			invoicePo.buildertek__Budget__c = null;
 		}
-		if(invoicePOList.size() > 0){
+		if(invoicePOList.size() > 0 && blnSkipBudgetItemTrigger == false){
 			AccountPayableHelper.skipInvoicePOUpdate = true;
 			update invoicePOList;
 			AccountPayableHelper.skipInvoicePOUpdate = false;
 		}
+
+		//* for Payment 
+		List<buildertek__BT_Payment__c> paymentList = [SELECT Id, Name, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c FROM buildertek__BT_Payment__c WHERE buildertek__BT_Budget_Line__c IN: budgetLineIds];
+		for (buildertek__BT_Payment__c payment : paymentList) {
+			payment.buildertek__BT_Budget__c = null;
+			payment.buildertek__BT_Budget_Line__c = null;
+		}
+		if (paymentList.size() > 0 && blnSkipBudgetItemTrigger == false) {
+			PaymentTriggerHandler.isSkipExecution = true;
+			update paymentList;
+			PaymentTriggerHandler.isSkipExecution = false;
+		}
+
+		//* for cash disbursement
+		List<buildertek__Payment__c> cashDisbursementList = [SELECT Id, Name, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c FROM buildertek__Payment__c WHERE buildertek__BT_Budget_Line__c IN: budgetLineIds];
+		for (buildertek__Payment__c cashDisbursement : cashDisbursementList) {
+			cashDisbursement.buildertek__BT_Budget__c = null;
+			cashDisbursement.buildertek__BT_Budget_Line__c = null;
+		}
+		if (cashDisbursementList.size() > 0 && blnSkipBudgetItemTrigger == false) {
+			CashDisbursementTriggerHandler.isSkipExecution = true;
+			update cashDisbursementList;
+			CashDisbursementTriggerHandler.isSkipExecution = false;
+		}
+
+		//* for TimeSheetEntry
+		List<buildertek__BT_Time_Sheet_Entry__c> timeSheetEntryList = [SELECT Id, Name, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c FROM buildertek__BT_Time_Sheet_Entry__c WHERE buildertek__BT_Budget_Line__c IN: budgetLineIds];
+		for (buildertek__BT_Time_Sheet_Entry__c timeSheetEntry : timeSheetEntryList) {
+			timeSheetEntry.buildertek__BT_Budget__c = null;
+			timeSheetEntry.buildertek__BT_Budget_Line__c = null;
+		}
+		if (timeSheetEntryList.size() > 0 && blnSkipBudgetItemTrigger == false) {
+			TimeSheetEntryHandler.isExecuting = true;
+			update timeSheetEntryList;
+			TimeSheetEntryHandler.isExecuting = false;
+		}
+
+		//* for Asset History (buildertek__Asset_History__c)
+		List<buildertek__Asset_History__c> assetHistoryList = [SELECT Id, Name, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c FROM buildertek__Asset_History__c WHERE buildertek__BT_Budget_Line__c IN: budgetLineIds];
+		for (buildertek__Asset_History__c assetHistory : assetHistoryList) {
+			assetHistory.buildertek__BT_Budget__c = null;
+			assetHistory.buildertek__BT_Budget_Line__c = null;
+		}
+		if (assetHistoryList.size() > 0 && blnSkipBudgetItemTrigger == false) {
+			AssestManagerHandler.blnSkipAssetHistoryTrigger = true;
+			update assetHistoryList;
+			AssestManagerHandler.blnSkipAssetHistoryTrigger = false;
+		}
+
  	}
      
  	public void OnAfterInsert(Budget_Item__c[] newBudgetItems, Map<ID, Budget_Item__c> newBudgetItemsMap){ 
@@ -134,9 +205,9 @@ public with sharing class BudgetItemTriggerHandler {
     	
  	}
  	
- 	public void OnBeforeUpdate(Budget_Item__c[] newBudgetItems, Map<ID, Budget_Item__c> newBudgetItemsMap){
+ 	// public void OnBeforeUpdate(Budget_Item__c[] newBudgetItems, Map<ID, Budget_Item__c> newBudgetItemsMap){
      
- 	}
+ 	// }
  	
  	public void OnAfterDelete(Budget_Item__c[] oldBudgetItems){
     	

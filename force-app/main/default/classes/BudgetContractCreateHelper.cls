@@ -153,6 +153,7 @@ public without sharing class BudgetContractCreateHelper {
                 intIndex,
                 new buildertek__Budget__c(   
                     Name = curQuote.Name,
+                    buildertek__BT_Quote__c = curQuote.Id,
                     buildertek__Project__c = curQuote.buildertek__Project__c
                 )
             );
@@ -200,6 +201,8 @@ public without sharing class BudgetContractCreateHelper {
                 buildertek__Cost_Code__c = currQuoteLine.buildertek__Cost_Code__c,
                 buildertek__Quantity__c = currQuoteLine.buildertek__Quantity__c,
                 buildertek__Unit_Price__c = currQuoteLine.buildertek__Unit_Cost__c,
+                buildertek__Sort_Id__c = currQuoteLine.buildertek__Priority__c,
+                buildertek__Category__c = currQuoteLine.buildertek__Category__c,
                 //buildertek__Unit_Price__c = currQuoteLine.buildertek__Net_Unit__c,
                 
                 // buildertek__Sales_Price__c = currQuoteLine.buildertek__Net_Total_Price__c, 
@@ -208,7 +211,7 @@ public without sharing class BudgetContractCreateHelper {
                 buildertek__UOM__c = currQuoteLine.buildertek__UOM__c,
                 buildertek__Budget_Line_Group__c = currQuoteLine.buildertek__Grouping__c,
                 buildertek__Group__c = groupMap.get(currQuoteLine.buildertek__Grouping__r.Name),
-                // buildertek__Notes__c=currQuoteLine.buildertek__Notes__c
+                buildertek__Notes__c=currQuoteLine.buildertek__Notes__c,
                 buildertek__Markup__c = currQuoteLine.buildertek__Markup__c
             ));
             if(currQuoteLine.buildertek__Purchase_Order__c!=null){
@@ -271,7 +274,8 @@ public without sharing class BudgetContractCreateHelper {
                             for(buildertek__Purchase_Order_Item__c currPOLine : purchaseOrderRec.buildertek__Purchase_Order_Items__r) {
 
                                 buildertek__PO_Item_To_Budget_Item_Link__c budgetItemLinkRec = new buildertek__PO_Item_To_Budget_Item_Link__c();
-                                budgetItemLinkRec.buildertek__Approved_PO__c=currPOLine.buildertek__Unit_Price__c;
+                                // budgetItemLinkRec.buildertek__Approved_PO__c=currPOLine.buildertek__Unit_Price__c;
+                                budgetItemLinkRec.buildertek__Approved_PO__c=currPOLine.buildertek__Total_Price__c;         // =====> Changes for BUIL-3800
                                     budgetItemLinkRec.buildertek__PO_Item__c=currPOLine.id;
                                  budgetItemLinkRec.buildertek__Budget_Item__c=budgetItemRec.id;
                                 budgetItemLinkRecs.add(budgetItemLinkRec);
@@ -519,7 +523,7 @@ public without sharing class BudgetContractCreateHelper {
             Schema.sObjectType.buildertek__Purchase_Order_Item__c.fields.Id.isAccessible() &&
             Schema.sObjectType.buildertek__Purchase_Order_Item__c.fields.buildertek__Unit_Price__c.isAccessible() &&
              Schema.sObjectType.buildertek__Purchase_Order_Item__c.fields.buildertek__Purchase_Order__c.isAccessible()){
-                purchaseorderlist = [select id,(select id,buildertek__Unit_Price__c from buildertek__Purchase_Order_Items__r) from buildertek__Purchase_Order__c where id In :listPoIds];
+                purchaseorderlist = [select id,(select id,buildertek__Unit_Price__c,buildertek__Total_Price__c from buildertek__Purchase_Order_Items__r) from buildertek__Purchase_Order__c where id In :listPoIds];
         }
         return purchaseorderlist;
     }
@@ -582,9 +586,11 @@ public without sharing class BudgetContractCreateHelper {
                                     buildertek__Net_Total_Price__c, 
                                     buildertek__Notes__c,
                                     buildertek__Tax__c,
-                                     buildertek__Status__c,
+                                    buildertek__Status__c,
+                                    buildertek__Priority__c,
                                     buildertek__Purchase_Order__c, 
-                                    buildertek__Grouping__r.Name
+                                    buildertek__Grouping__r.Name,
+                                    buildertek__Category__c
                                     FROM buildertek__Quote_Item__c
                                     WHERE buildertek__Quote__c IN: quoteIds  And buildertek__Status__c != 'Reject'];      
         

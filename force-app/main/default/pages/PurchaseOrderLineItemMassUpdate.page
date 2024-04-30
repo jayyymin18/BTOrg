@@ -17,6 +17,7 @@
                 "LightningCompContainer",
                 function (component) {
                     component.set("v.recordId", '{!$CurrentPage.parameters.Id}');
+                    console.log('console from vf page' + '{!$CurrentPage.parameters.Id}');
                     $A.eventService.addHandler({ "event": "buildertek:myEvent", "handler": closeTab });
                 });
         });

@@ -9,8 +9,8 @@ public class QBCustomerResponseJSON {
 		public Boolean Taxable;
 		public Boolean Job;
 		public Boolean BillWithParent;
-		public Decimal Balance;
-		public Decimal BalanceWithJobs;
+		public Double Balance;
+		public Double BalanceWithJobs;
 		public CurrencyRef CurrencyRef;
 		public String PreferredDeliveryMethod;
 		public Boolean IsProject;
@@ -46,6 +46,13 @@ public class QBCustomerResponseJSON {
 		public String Address;
 	}
 
+	public QueryResponse QueryResponse;
+	public class QueryResponse{
+		public Integer startPosition;
+		public Integer maxResults;
+		public list<Customer> Customer;
+		public Integer totalCount;
+	}
 	
 	public static QBCustomerResponseJSON parse(String json) {
 		return (QBCustomerResponseJSON) System.JSON.deserialize(json, QBCustomerResponseJSON.class);

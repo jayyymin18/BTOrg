@@ -92,14 +92,14 @@
                     <div style="float:right;padding-right:10px;">
                         <lightning:buttonGroup>
                             <aura:if isTrue="{!v.enableMassUpdate}">
-                    <lightning:button iconName="utility:save"  iconPosition="left" onclick="{!c.onClickMassUpdate}" label="Save" class="sldsButtonGroup"/>
-                    <lightning:button iconName="utility:close"  iconPosition="left" onclick="{!c.onClickMassUpdateCancel}" label="Cancel" class="sldsButtonGroup"/>
+                    <lightning:button iconName="utility:save"  iconPosition="left" onclick="{!c.onClickMassUpdate}" label="Save" class="sldsButtonGroup btn"/>
+                    <lightning:button iconName="utility:close"  iconPosition="left" onclick="{!c.onClickMassUpdateCancel}" label="Cancel" class="sldsButtonGroup btn"/>
                     <aura:set attribute="else">
-                        <lightning:button iconName="utility:edit"  iconPosition="left" onclick="{!c.onClickMassUpdate}" label="Mass Update" class="sldsButtonGroup"/>
+                        <lightning:button iconName="utility:edit"  iconPosition="left" onclick="{!c.onClickMassUpdate}" label="Mass Update" class="sldsButtonGroup btn"/>
                             <!-- <lightning:button iconName="utility:add" iconPosition="left" onclick="{!c.newGroup}" label="Add Group" class="sldsButtonGroup"/> -->
                         </aura:set>
                 </aura:if>
-					<lightning:button label="Delete" onclick="{!c.deleteSelectedContractItem}" class="sldsButtonGroup"/>
+					<lightning:button label="Delete" onclick="{!c.deleteSelectedContractItem}" class="sldsButtonGroup btn"/>
                         </lightning:buttonGroup>
                     </div>
                     <br/>

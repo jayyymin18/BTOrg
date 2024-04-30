@@ -8,8 +8,16 @@
         dbAction.setCallback(this, function (response) {
             var state = response.getState();
             if (state === "SUCCESS") {
-                console.log(response.getReturnValue());
-                component.set("v.templates", response.getReturnValue());
+                var templates = response.getReturnValue();
+                if (templates.length === 1) {
+                    component.set("v.selectedTemplate", templates[0].Id);
+                    component.set("v.isTemplateSelected", true);
+                    $A.enqueueAction(component.get('c.preiewEmailTemplate'));
+                }
+                component.set("v.templates", templates);
+                component.set("v.Spinner", false);
+            } else {
+                console.error("Failed to retrieve templates");
                 component.set("v.Spinner", false);
             }
         });
@@ -77,9 +85,23 @@
             var ccIds = [];
             var to = component.get("v.selectedToContact");
             var cc = component.get("v.selectedCcContact");
+            var subject =component.get("v.subject");
             to.forEach(function (v) { toIds.push(v.Id) });
             cc.forEach(function (v) { ccIds.push(v.Id) });
+            var subject = component.get( "v.subject" );
+
             if (toIds.length != 0) {
+               if (!subject || subject == ""){
+                    component.set("v.Spinner", false);
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                    "title": "Error!",
+                    "type": 'error',
+                    "message": "Please  enter a Subject for the email."
+                });
+                toastEvent.fire();
+                return;
+            }
                 // console.log("convertedFiles ==> ",{convertedFiles});
                 var action = component.get("c.sendProposal");
                 action.setParams({
@@ -90,6 +112,7 @@
                     cc: ccIds,
                     fileid: component.get("v.fileimageId"),
                     attacheDocs: Files,
+                    emailSubject:subject
                 });
                 action.setCallback(this, function (response) {
                     var state = response.getState();
@@ -156,7 +179,20 @@
         var cc = component.get("v.selectedCcContact");
         to.forEach(function (v) { toIds.push(v.Id) });
         cc.forEach(function (v) { ccIds.push(v.Id) });
+        var subject = component.get( "v.subject" );
+
         if (toIds.length != 0) {
+        if (!subject || subject == ""){
+             component.set("v.Spinner", false);
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Error!",
+                    "type": 'error',
+                    "message": "Please  enter a Subject for the email."
+                });
+                toastEvent.fire();
+                return;
+         }            
             if (!signaturePad.isEmpty()) {
                 helper.AcceptSignature(component, event);
             } else {

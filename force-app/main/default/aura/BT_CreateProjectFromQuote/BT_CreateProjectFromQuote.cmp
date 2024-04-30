@@ -26,8 +26,9 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
     
     
-    <ltng:require styles="{!$Resource.ModalPreviewCSS}"/>
-         <aura:html tag="style">
+    <!-- <ltng:require styles="{!$Resource.ModalPreviewCSS}"/> -->
+    <!-- *** if we use static_resource for css, it also override other standard component's css. So please use aura:html for css *** -->
+    <aura:html tag="style">
         .cuf-content {
         padding:  0rem !important;
         }
@@ -36,6 +37,15 @@
         }
         .slds-modal__content {
             overflow: hidden !important;
+        }
+        .slds-modal__content {
+            height: unset !important;
+            max-height: unset !important;
+        }
+        
+        .slds-modal__container {
+            max-width: 60rem !important;
+            width: 70% !important;
         }
     </aura:html>
 

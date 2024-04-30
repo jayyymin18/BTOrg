@@ -199,7 +199,17 @@ public static List<ListView> getListViews() {
         return createCO;
     }   
 
+    @AuraEnabled
+    public static List<RecordType> getRecordType(){
+        List<RecordType> sovRecordType  = new List<RecordType> ();
+        sovRecordType = [select Id, Name from RecordType where sObjectType='buildertek__Change_Order__c'];
+        return sovRecordType;
+    }
 
-
+    @AuraEnabled
+    public static string getBudgetprojectId(String RecordId){
+        buildertek__Budget__c budgetRec = [Select Id, Name, buildertek__Project__c from buildertek__Budget__c where Id =: RecordId];
+        return budgetRec.buildertek__Project__c;
+    } 
 
 }

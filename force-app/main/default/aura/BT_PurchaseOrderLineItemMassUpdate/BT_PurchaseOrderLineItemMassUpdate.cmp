@@ -103,7 +103,7 @@
                     </h2>
                 </header>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <p>Are you sure you want to delete {!v.quoteLineName} ?</p>
+                    <p style="display:flex; justify-content: center;">Are you sure you want to delete {!v.quoteLineName} ?</p>
                 </div>
                 <footer class="slds-modal__footer">
                     <lightning:button variant="neutral" label="Cancel" title="Cancel" onclick="{! c.handleCancel }" />
@@ -120,12 +120,12 @@
                 <header class="slds-modal__header">
                     <lightning:buttonIcon iconName="utility:close" onclick="{!c.closeCancelModal}"
                         alternativeText="close" size="medium" variant="bare-inverse" class="slds-modal__close" />
-                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Cancel Changes
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" >Cancel Changes
                         Confirmation
                     </h2>
                 </header>
                 <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                    <p>Are you sure you want to Cancel?</p>
+                    <p style="display:flex; justify-content: center;">Are you sure you want to Cancel?</p>
                 </div>
                 <footer class="slds-modal__footer">
                     <lightning:button variant="neutral" label="No" title="No" onclick="{! c.closeCancelModal }" />
@@ -140,4 +140,5 @@
     <aura:if isTrue="{!v.isLoading}">
         <lightning:spinner alternativeText="Loading" variant="brand" size="large" />
     </aura:if>
+
 </aura:component>

@@ -653,9 +653,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
                   } else {
                     if (record.endDate < new Date() && record.percentDone < 100 && record._data.type != "Project" && record._data.name != "Milestone Complete" && record._data.type != "Phase") {
                       record.set("eventColor", 'red');
-                    } else {
-                      record.set("eventColor", 'green');
-                    }
+                    } 
                     return `<i class="b-action-item ${action.cls}"></i>`;
                   }
                 } else {
@@ -756,6 +754,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
           type: "startdate",
           draggable: false,
           allowedUnits: "datetime",
+
           renderer: (record) => {
             if (record.record.endDate < new Date() && record.record.percentDone < 100 && record.record._data.type != "Project" && record.record._data.name != "Milestone Complete" && record.record._data.type != "Phase") {
               record.cellElement.style.color = 'red';
@@ -799,6 +798,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
               let projectStartDate = new Date(record.record.startDate);
               let projectEndDate = new Date(record.record.endDate);
               let projectDuration = calcBusinessDays(projectStartDate, projectEndDate);
+              console.log('projectDuration ',projectDuration);
               return projectDuration + ' days';
             }
             if (record.record._data.type == "Phase") {
@@ -1118,10 +1118,10 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
     });
 
     gantt.on('startCellEdit', (editorContext) => {
-      if (editorContext.editorContext.column.type == 'resourceassignment') {
+      if ( editorContext.editorContext.column.type == 'resourceassignment' ) {
         editorContext.editorContext.editor.inputField.store.clearFilters();
         let contractorId = editorContext.editorContext.record._data.contractorId;
-        editorContext.editorContext.editor.inputField.picker.onShow = ({ source }) => {
+                editorContext.editorContext.editor.inputField.picker.onShow = ({source}) => {
           source.store.filter(record => (record.resource.type == 'Internal Resources' || record.resource.contractorId == contractorId));
         };
         // editorContext.editorContext.editor.inputField.store.filter(record => (record.resource.type == 'Internal Resources') || record.resource.contractorId == contractorId);

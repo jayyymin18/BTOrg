@@ -12,7 +12,7 @@ public with sharing class PreviewPurchaseOrderController {
             nameList.add('Purchase Order Approved Template');
 
           // temrec = [Select Id, Name, folder.name from Emailtemplate where folder.name = 'BT PO' and Name !=:'Purchase Order Line Template'];
-           temrec = [Select Id, Name, folder.name from Emailtemplate where folder.name = 'BT PO' and Name !=: nameList and  DeveloperName !=:'Purchase_Order_Template'];
+           temrec = [Select Id, Name, folder.name,DeveloperName from Emailtemplate where folder.name = 'BT PO' and Name !=: nameList and  DeveloperName !=:'Purchase_Order_Template'];
            }
        return temrec;
    }
@@ -68,24 +68,25 @@ public with sharing class PreviewPurchaseOrderController {
    }
    
    @AuraEnabled
-   public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc,String fileid, List<Id> attacheDocs){
+   public static String sendProposal(String htmlBody, String recordId, String templateId, List<String> to, List<String> cc,String fileid, List<Id> attacheDocs, String emailSubject){
        try{
 
            System.debug('attacheDocs ==> '+attacheDocs);
            String body = '';
            //String subject = 'Purchase Order';
-           String subject = ''; 
+           String subject = emailSubject; 
+           System.debug(subject);
            string templateBody1 = '';
            Blob filebody;
            list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id,
                                                                                                 buildertek__Quote_Configuration__c,buildertek__Email_Subject__c 
                                                                                                 from buildertek__Admin_Interface_Node_Configuration__c
                                                                                                 WHERE Name=:'Purchase Order Configuration' and buildertek__Email_Subject__c !=null limit 1];
-          if(adminInterfaceNodeConfigurations.size()>0){
-              subject = adminInterfaceNodeConfigurations[0].buildertek__Email_Subject__c;
-          }else{
-              subject = 'Purchase Order'; 
-          } 
+        //   if(adminInterfaceNodeConfigurations.size()>0){
+        //       subject = adminInterfaceNodeConfigurations[0].buildertek__Email_Subject__c;
+        //   }else{
+        //       subject = 'Purchase Order'; 
+        //   } 
           List<buildertek__ConfirmationPageSiteURL__c> confirmationurl = buildertek__ConfirmationPageSiteURL__c.getall().values();
            string SiteUrl;
            if(confirmationurl.size() > 0){
@@ -158,8 +159,8 @@ public with sharing class PreviewPurchaseOrderController {
         //    body += '<a href='+ SiteUrl +'buildertek__ConfirmationPage?Id='+recordId+'&templateId='+templateId+'>Click here</a>';
         //    body += '&nbsp;to confirm your Purchase Order details.' ;
            mail.setReplyTo(fromAddress);
-           subject = subject +'[ref:'+recordId+']'; 
-           mail.setSubject(subject);
+        //    subject = subject +'[ref:'+recordId+']'; 
+           mail.setSubject(subject+'[ref:'+recordId+']');
            mail.setHTMLBody(templateBody1);
            mail.setSaveAsActivity(false);
            List<Messaging.Emailfileattachment> fileAttachments = new List<Messaging.Emailfileattachment>();
@@ -263,16 +264,16 @@ public with sharing class PreviewPurchaseOrderController {
         try{
             String body = '';
            // String subject = 'Purchase Order';
-            String subject='';
+            String subject=Emailsubject;
             list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id,
                                                                                                  buildertek__Quote_Configuration__c,buildertek__Email_Subject__c 
                                                                                                  from buildertek__Admin_Interface_Node_Configuration__c
                                                                                                  WHERE Name=:'Purchase Order Configuration' and buildertek__Email_Subject__c !=null limit 1];
-           if(adminInterfaceNodeConfigurations.size()>0){
-               subject = adminInterfaceNodeConfigurations[0].buildertek__Email_Subject__c;
-           }else{
-               subject = 'Purchase Order'; 
-           } 
+        //    if(adminInterfaceNodeConfigurations.size()>0){
+        //        subject = adminInterfaceNodeConfigurations[0].buildertek__Email_Subject__c;
+        //    }else{
+        //        subject = 'Purchase Order'; 
+        //    } 
              List<buildertek__ConfirmationPageSiteURL__c> confirmationurl = buildertek__ConfirmationPageSiteURL__c.getall().values();
             string SiteUrl;
             if(confirmationurl.size() > 0){
@@ -324,8 +325,8 @@ public with sharing class PreviewPurchaseOrderController {
             body += '<a href='+ SiteUrl +'buildertek__ConfirmationPage?Id='+recordId+'&templateId='+templateId+'>Click here</a>';
             body += '&nbsp;to confirm your Purchase Order details.' ;
             mail.setReplyTo(fromAddress);
-            subject = subject +'[ref:'+recordId+']'; 
-            mail.setSubject(subject);
+            // subject = subject +'[ref:'+recordId+']'; 
+            mail.setSubject(subject+'[ref:'+recordId+']');
             mail.setHTMLBody(body);
             List<Messaging.Emailfileattachment> fileAttachments = new List<Messaging.Emailfileattachment>();
             Messaging.Emailfileattachment efa = new Messaging.Emailfileattachment();
@@ -562,5 +563,18 @@ public with sharing class PreviewPurchaseOrderController {
        }
        
    } 
+   @AuraEnabled
+    public static String getBlobBody(String recordId, String templateId, String fileid){
+
+        pagereference pdf;
+        pdf = Page.buildertek__BT_GenerateQuotePDF;
+        system.debug('*********'+pdf);
+        pdf.getParameters().put('recordId', recordId);
+        pdf.getParameters().put('templateId', templateId);
+        pdf.getParameters().put('fileId', fileId);
+        pdf.setRedirect(true);
+
+        return EncodingUtil.base64Encode(pdf.getContent());
+    }
    
 }

@@ -14,7 +14,7 @@ public without sharing class importScheduleLineController {
         }
 
         list<buildertek__Project_Task__c> existedScheduleitems = new list<buildertek__Project_Task__c>();
-        existedScheduleitems = [select Id, buildertek__Completion__c, buildertek__Full_Name__c,buildertek__Contractor__c, buildertek__Contractor_Resource__c, buildertek__Duration__c, buildertek__Finish__c, buildertek__Resource__c, buildertek__Lag__c, buildertek__Milestone__c, buildertek__Notes__c, buildertek__Order__c, buildertek__Original_End_Date__c, buildertek__Original_Start_Date__c, buildertek__Phase__c, buildertek__Type__c, buildertek__Dependency__c, buildertek__Project__c, buildertek__Purchase_Order__c, buildertek__Reason_for_Date_Change__c, buildertek__Reason_for_Date_Change_PL__c, buildertek__Required_Completion_Date__c, buildertek__Schedule__c, buildertek__Start__c, Name
+        existedScheduleitems = [select Id, buildertek__Completion__c, buildertek__Full_Name__c,buildertek__Contractor__c, buildertek__Contractor_Resource__c, buildertek__Duration__c, buildertek__Finish__c, buildertek__Resource__c, buildertek__Lag__c, buildertek__Milestone__c, buildertek__Notes__c, buildertek__BT_Category__c, buildertek__Order__c, buildertek__Original_End_Date__c, buildertek__Original_Start_Date__c, buildertek__Phase__c, buildertek__Type__c, buildertek__Dependency__c, buildertek__Project__c, buildertek__Purchase_Order__c, buildertek__Reason_for_Date_Change__c, buildertek__Reason_for_Date_Change_PL__c, buildertek__Required_Completion_Date__c, buildertek__Schedule__c, buildertek__Start__c, Name
                                 from buildertek__Project_Task__c
                                 where buildertek__Schedule__c  =:recordId AND buildertek__Milestone__c =: false order by buildertek__Order__c,CreatedDate NULLS LAST];
 
@@ -32,6 +32,38 @@ public without sharing class importScheduleLineController {
         }
 
         String businessHourId = [SELECT Id, IsDefault, IsActive FROM BusinessHours WHERE IsDefault = true LIMIT 1].Id;
+        
+        Map<String, buildertek__Cost_Codes__c> existingCostCodeMap = new Map<String, buildertek__Cost_Codes__c>();
+        List<buildertek__Cost_Codes__c> costCodeList =  [SELECT Id, Name FROM buildertek__Cost_Codes__c];
+        for (buildertek__Cost_Codes__c costCodeRec : costCodeList) {
+            existingCostCodeMap.put(costCodeRec.Name, costCodeRec);
+        }
+        System.debug('existingCostCodeMap: ' + existingCostCodeMap);
+        
+        Map<String, buildertek__Trade_Type__c> existingTradeTypeMap = new Map<String, buildertek__Trade_Type__c>();
+        List<buildertek__Trade_Type__c> tradeTypeList =  [SELECT Id, Name FROM buildertek__Trade_Type__c];
+        for (buildertek__Trade_Type__c tradeTypeRec : tradeTypeList) {
+            existingTradeTypeMap.put(tradeTypeRec.Name, tradeTypeRec);
+        }
+        System.debug('existingTradeTypeMap: ' + existingTradeTypeMap);
+
+        List<buildertek__BT_Grouping__c> groupingList = [SELECT Id, Name FROM buildertek__BT_Grouping__c];
+        Map<String, buildertek__BT_Grouping__c> groupingMap = new Map<String, buildertek__BT_Grouping__c>();
+        for (buildertek__BT_Grouping__c groupingRec : groupingList) {
+            groupingMap.put(groupingRec.Name, groupingRec);
+        }
+
+        List<Account> vendorList = [Select Id, Name from Account WHERE buildertek__BT_Account_Type__c = 'Vendor'];
+        Map<String, Account> vendorMap = new Map<String, Account>();
+        for (Account vendorRec : vendorList) {
+            vendorMap.put(vendorRec.Name, vendorRec);
+        }
+        
+        Map<String, buildertek__Category__c> existingCategoryMap = new Map<String, buildertek__Category__c>();
+        List<buildertek__Category__c> categoryList =  [SELECT Id, Name FROM buildertek__Category__c];
+        for (buildertek__Category__c categoryRec : categoryList) {
+            existingCategoryMap.put(categoryRec.Name, categoryRec);
+        }
 
         for (fieldWrapper wrapper : datalist){
             if (wrapper.Name != null && String.isNotBlank(wrapper.Name)){
@@ -47,6 +79,32 @@ public without sharing class importScheduleLineController {
                 schItem.buildertek__Full_Name__c = wrapper.Name;
                 schItem.buildertek__Schedule__c = recordId;
                 schItem.buildertek__Completion__c = wrapper.percentComplete;
+                System.debug('CostCode: ' + wrapper.costCode);
+                if (wrapper.costCode != null && String.isNotBlank(wrapper.costCode) && existingCostCodeMap.containsKey(wrapper.costCode)) {
+                    schItem.buildertek__Cost_Code__c = existingCostCodeMap.get(wrapper.costCode).Id;
+                    System.debug('CostCode: Mapped Value' + existingCostCodeMap.get(wrapper.costCode).Id);
+                }
+
+                if (wrapper.tradeType != null && String.isNotBlank(wrapper.tradeType) && existingTradeTypeMap.containsKey(wrapper.tradeType)) {
+                    schItem.buildertek__Trade_Type__c = existingTradeTypeMap.get(wrapper.tradeType).Id;
+                    System.debug('TradeType: Mapped Value' + existingTradeTypeMap.get(wrapper.tradeType).Id);
+                }
+                                
+                if (wrapper.Phase2 != null && String.isNotBlank(wrapper.Phase2) && groupingMap.containsKey(wrapper.Phase2)) {
+                    schItem.buildertek__BT_Grouping__c = groupingMap.get(wrapper.Phase2).Id;
+                }
+                
+                if (wrapper.Phase3 != null && String.isNotBlank(wrapper.Phase3) && groupingMap.containsKey(wrapper.Phase3)) {
+                    schItem.buildertek__BT_Phase3__c = groupingMap.get(wrapper.Phase3).Id;
+                }
+
+                if (wrapper.Vendor != null && String.isNotBlank(wrapper.Vendor) && vendorMap.containsKey(wrapper.Vendor)) {
+                    schItem.buildertek__Contractor__c = vendorMap.get(wrapper.Vendor).Id;
+                }
+                
+                if (wrapper.Category != null && String.isNotBlank(wrapper.Category) && existingCategoryMap.containsKey(wrapper.Category)) {
+                    schItem.buildertek__BT_Category__c = existingCategoryMap.get(wrapper.Category).Id;
+                }
 
                 Date startDate = system.today();
 
@@ -57,8 +115,18 @@ public without sharing class importScheduleLineController {
                 }
 
                 if (String.isEmpty(wrapper.Dependency) && String.isBlank(wrapper.Dependency)) {
+                    startDate = Date.valueOf(Date.valueOf(wrapper.StartDate));
+                }
+
+                if (String.isEmpty(wrapper.Dependency) && String.isBlank(wrapper.Dependency)) {
                     startDate = Date.valueOf(wrapper.StartDate);
                 }
+
+                // if (wrapper.StartDate != null) {
+                //     startDate = Date.valueOf(wrapper.StartDate);
+                // } else if(mainScheduleRec.buildertek__Initial_Start_Date__c != null){
+                //     startDate = mainScheduleRec.buildertek__Initial_Start_Date__c;
+                // }
 
                 // if (wrapper.StartDate != null) {
                 //     startDate = Date.valueOf(wrapper.StartDate);
@@ -188,6 +256,12 @@ public without sharing class importScheduleLineController {
         public String Phase;
         public String Notes;
         public String Lag;
+        public String costCode;
+        public String tradeType;
+        public String Phase2;
+        public String Phase3;
+        public String Vendor;
+        public String Category;
     }
 
 }

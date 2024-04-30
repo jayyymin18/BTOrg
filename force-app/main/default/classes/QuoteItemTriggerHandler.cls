@@ -10,6 +10,7 @@ Date: 11-Mar-2020
 public with sharing class QuoteItemTriggerHandler {
     //Boolean variable to allow skipping execution of trigger in certain scenarios
     public static Boolean blnSkipQuoteItemTrigger = false;
+    public static Boolean isInsertCostCodeExecuted = true;
      
     private boolean m_isExecuting = false;
     private integer BatchSize = 0;
@@ -99,34 +100,36 @@ public with sharing class QuoteItemTriggerHandler {
     }
 // Changes for BUIL-3608 starts from here
     public void insertCostCode(List<Quote_Item__c> newQuoteItems) {
-		try {
-			List<String> productIds = new List<String>();
-		
-			// Collect Product IDs from Budget Lines
-			for (Quote_Item__c quoteItem : newQuoteItems) {
-				productIds.add(quoteItem.buildertek__Product__c);
-			}
-			System.debug('karan test-->'+productIds);
-		
-			// Query the Product2 object to retrieve cost codes
-			Map<String, Product2> productCostCodes = new Map<String, Product2>();
-			for (Product2 product : [SELECT Id, buildertek__Cost_Code__c FROM Product2 WHERE Id IN :productIds AND buildertek__Cost_Code__c != null]) {
-				productCostCodes.put(product.Id, product);
-			}
-		
-			// Update the Budget Line Records
-			for (Quote_Item__c quoteItem : newQuoteItems) {
-				Product2 product = productCostCodes.get(quoteItem.buildertek__Product__c);
-				if (product != null) {
-					if (quoteItem.buildertek__Cost_Code__c == null) {
-						quoteItem.buildertek__Cost_Code__c = product.buildertek__Cost_Code__c;
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.debug('error--->'+e.getMessage());
-			System.debug('error line--->'+e.getLineNumber());
-		}
-	}    // Changes for BUIL-3608 ends here
+        if (isInsertCostCodeExecuted) {
+            try {    
+                List<String> productIds = new List<String>();
+            
+                // Collect Product IDs from Budget Lines
+                for (Quote_Item__c quoteItem : newQuoteItems) {
+                    productIds.add(quoteItem.buildertek__Product__c);
+                }
+                System.debug('karan test-->'+productIds);
+            
+                // Query the Product2 object to retrieve cost codes
+                Map<String, Product2> productCostCodes = new Map<String, Product2>();
+                for (Product2 product : [SELECT Id, buildertek__Cost_Code__c FROM Product2 WHERE Id IN :productIds AND buildertek__Cost_Code__c != null]) {
+                    productCostCodes.put(product.Id, product);
+                }
+            
+                // Update the Budget Line Records
+                for (Quote_Item__c quoteItem : newQuoteItems) {
+                    Product2 product = productCostCodes.get(quoteItem.buildertek__Product__c);
+                    if (product != null) {
+                        if (quoteItem.buildertek__Cost_Code__c == null) {
+                            quoteItem.buildertek__Cost_Code__c = product.buildertek__Cost_Code__c;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.debug('error--->'+e.getMessage());
+                System.debug('error line--->'+e.getLineNumber());
+            }
+        }
+    }
 
 }

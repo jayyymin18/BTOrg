@@ -8,15 +8,16 @@
 trigger PurchaseOrderTrigger on Purchase_Order__c(after delete, after insert, after undelete, after update, before delete, before insert, before update ){
     System.debug('In trigger');
 
-    if (!BT_Utils.isTriggerDeactivate('Purchase_Order__c') && !PurchaseOrderTriggerHandler.blnSkipPurchaseOrderUpdateTrigger){
+    PurchaseOrderTriggerHandler handler = new PurchaseOrderTriggerHandler(Trigger.isExecuting, Trigger.size);
 
-        PurchaseOrderTriggerHandler handler = new PurchaseOrderTriggerHandler(Trigger.isExecuting, Trigger.size);
+    if (!BT_Utils.isTriggerDeactivate('Purchase_Order__c') && !PurchaseOrderTriggerHandler.blnSkipPurchaseOrderUpdateTrigger){
 
         if (Trigger.isInsert && Trigger.isBefore){
             handler.OnBeforeInsert(Trigger.new);
         } else if (Trigger.isInsert && Trigger.isAfter){
             handler.OnAfterInsert(Trigger.new, Trigger.newMap);
             handler.updateTotalCostOnBudgetLine(Trigger.new, Trigger.newMap,trigger.oldMap);
+            handler.updateprojectonpoinsert(Trigger.new);
         } else if (Trigger.isUpdate && Trigger.isBefore){
         //    handler.OnBeforeUpdate(Trigger.old, Trigger.new, Trigger.oldMap, Trigger.newMap);
            handler.OnBeforeUpdate(Trigger.old, Trigger.new, Trigger.newMap, Trigger.oldMap);
@@ -36,13 +37,25 @@ trigger PurchaseOrderTrigger on Purchase_Order__c(after delete, after insert, af
         // }
 
         } else if (Trigger.isUpdate && Trigger.isAfter ){
-                 handler.updateTotalCostOnBudgetLine(Trigger.new, Trigger.newMap,trigger.oldMap);
+            handler.updateTotalCostOnBudgetLine(Trigger.new, Trigger.newMap,trigger.oldMap);
             handler.OnAfterUpdate(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap);
+            handler.updateAmountonProject(Trigger.new, Trigger.oldMap);
+            handler.removePOFromBudgetLine(Trigger.new, Trigger.oldMap);
             //handler.afterUpdate(Trigger.old, Trigger.new, Trigger.oldMap, Trigger.newMap);
         } else if (Trigger.isDelete && Trigger.isBefore){
-            handler.OnBeforeDelete(Trigger.old, Trigger.oldMap);
+            PurchaseOrder_handler.handledelete(Trigger.old);
         } else if (Trigger.isDelete && Trigger.isAfter){
             handler.OnAfterDelete(Trigger.old);
+            handler.updateprojectonpodelete(Trigger.old);
         } 
+    } else {
+        if (Trigger.isInsert && Trigger.isAfter){
+            handler.updateprojectonpoinsert(Trigger.new);
+        } else if (Trigger.isUpdate && Trigger.isAfter ){
+            handler.updateAmountonProject(Trigger.new, Trigger.oldMap);
+            handler.removePOFromBudgetLine(Trigger.new, Trigger.oldMap);
+        } else if (Trigger.isDelete && Trigger.isAfter){
+            handler.updateprojectonpodelete(Trigger.old);
+        }
     }
 }

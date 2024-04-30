@@ -6,6 +6,18 @@
  Date: 19/09/2017
  */
 public without sharing class PurchaseOrderDAO{
+
+    @AuraEnabled
+    public static Boolean Checkifpaid(String recId){
+        buildertek__Purchase_Order__c po = [SELECT Id, buildertek__Status__c FROM buildertek__Purchase_Order__c WHERE Id =: recId];
+            if(po.buildertek__Status__c == 'Paid'){
+                return true;
+            }
+            else{
+                return false;
+            }
+     }
+  
     /**********************************************************************************************************************
      Purpose: This method is used to create a link between PO Item and Budget Item
      Parameters: List<Purchase_Order_Item__c> purchaseOrderItems
@@ -219,11 +231,12 @@ public without sharing class PurchaseOrderDAO{
     }
 
     @AuraEnabled
-    public static ResponseBase createLinesForExistedPO (String poRecordID, String poItemsJson, String budgetlineid, list<string>addbudgetlineids){
+    public static ResponseBase createLinesForExistedPO (String poRecordID, String poItemsJson, String budgetlineid, list<string> addbudgetlineids){
         ResponseBase res = new ResponseBase();
         //try{
         List<buildertek__Purchase_Order_Item__c> purchaseOrderItemList = new List<buildertek__Purchase_Order_Item__c>();
             List<buildertek__Purchase_Order_Item__c> poItems = new List<buildertek__Purchase_Order_Item__c>();
+            System.debug('poItemsJson :: ' + poItemsJson);
             List<POLineItemsClass> POItemsList = (List<POLineItemsClass>)System.JSON.deserialize(poItemsJson, List<POLineItemsClass>.class);
             system.debug('POItemsList ------------> ' + POItemsList);
             SET<ID> productIdSet = new SET<ID>();
@@ -307,7 +320,7 @@ public without sharing class PurchaseOrderDAO{
         string accountPaybleId = createAP([Select Id, Name, Project__c, Vendor__c, Period__c, Tax__c, buildertek__Status__c, buildertek__Description__c
                                            from purchase_order__c
                                            where Id = :poid]);
-        createAPItems([Select Id, Name, Tax__c, purchase_order__c, Item_Name__c, Description__c, Cost_Code__c, Product__c, Quantity__c, Unit_Price__c
+        createAPItems([Select Id, Name, Tax__c, purchase_order__c, Item_Name__c, Description__c, Cost_Code__c, Product__c, Quantity__c, Unit_Price__c, buildertek__Quantity_Remaining__c, buildertek__Quantity_Received__c
                        from Purchase_Order_Item__c
                        where purchase_order__c = :poid]);
 
@@ -315,7 +328,7 @@ public without sharing class PurchaseOrderDAO{
     }
 
     /**********************************************************************************************************************
-     Purpose: This method is used to create a AP from PO
+     Purpose: This method is used to create an AP from a PO
      Parameters: List<Purchase_Order__c> pos
      Returns: NA
      Throws [Exceptions]:
@@ -324,28 +337,22 @@ public without sharing class PurchaseOrderDAO{
         system.debug('Inside createAP');
         Map<Id, Account_Payable__c> PoIdbyAp = new Map<Id, Account_Payable__c>();
         Id posRecId;
-        for (Purchase_Order__c po : pos){
-            /* if(Schema.sObjectType.buildertek__Account_Payable__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Purchase_Order__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Project__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Vendor__c.isCreateable()&&
-             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Tax__c.isCreateable()){*/
-
+        
+        for (Purchase_Order__c po : pos){           
             Account_Payable__c ap = new Account_Payable__c();
-            //ap.Name = po.Name;
             ap.Purchase_Order__c = po.id;
             System.debug('purchase order iD => ' + ap.Purchase_Order__c);
             ap.Project__c = po.Project__c;
-            ap.Vendor__c = po.Vendor__c;
-
+            ap.Vendor__c = po.Vendor__c;            
+        
             if(po.Tax__c != null){
                 ap.Tax__c = po.Tax__c;
             }
+            
             ap.buildertek__Description__c = po.buildertek__Description__c;
             PoIdbyAp.put(po.id, ap);
             posRecId = po.id;
         }
-        /* }*/
         insert PoIdbyAp.values();
         return PoIdbyAp.get(posRecId).Id;
     }
@@ -364,11 +371,11 @@ public without sharing class PurchaseOrderDAO{
                                       where Purchase_Order__c IN :poIds]){
             PoIdbyAp.put(ap.Purchase_Order__c, ap);
         }
+        System.debug('PoIdbyAp---->' +  PoIdbyAp);
 
         List<buildertek__Account_Payable_Item__c> apItems = new List<buildertek__Account_Payable_Item__c>();
-        system.debug('poItems-----' + poItems);
-        for (Purchase_Order_Item__c poItem : poItems){
-
+        for (Purchase_Order_Item__c poItem : poItems){        
+            System.debug('poItem.purchaseorder--->' + PoIdbyAp.get(poItem.Purchase_Order__c));
             Account_Payable_Item__c apItem = new Account_Payable_Item__c();
             apItem.Account_Payable__c = PoIdbyAp.get(poItem.Purchase_Order__c).Id;
             apItem.Name = poItem.Name;
@@ -377,7 +384,8 @@ public without sharing class PurchaseOrderDAO{
             apItem.Cost_Code__c = poItem.Cost_Code__c;
             apItem.Product__c = poItem.Product__c;
             apItem.Purchase_Order_Item__c = poItem.Id;
-            apItem.Quantity__c = poItem.Quantity__c;
+            apItem.Quantity__c = poItem.Quantity_Remaining__c;
+            
             if(poItem.Unit_Price__c != null){
                 apItem.Unit_Price__c = poItem.Unit_Price__c;
             }
@@ -385,21 +393,7 @@ public without sharing class PurchaseOrderDAO{
                 apItem.Tax__c = poItem.Tax__c;
             }
             apItems.add(apItem);
-        }
-        /* if(Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Id.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Account_Payable__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Name.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Item_Title__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Description__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Cost_Code__c.isCreateable()&&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Product__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Purchase_Order_Item__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Quantity__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Unit_Price__c.isCreateable() &&
-         Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Tax__c.isCreateable()){
-        insert apItems;*/
-        /*}*/
-        //system.debug('apItems--->' + apItems);
+        }      
         insert apItems;
     }
 
@@ -418,21 +412,7 @@ public without sharing class PurchaseOrderDAO{
         }
         return null;
     }
-
-    // @AuraEnabled
-    // public static Map<String, String> getpricebooks(String recordId){
-    //     Map<String, String> options = new Map<String, String>();
-
-    //     list<pricebook2> PriceList;
-    //     if (Schema.sObjectType.pricebook2.fields.Id.isAccessible() && Schema.sObjectType.pricebook2.fields.Name.isAccessible()){
-    //         PriceList = [select Id, Name from pricebook2 WHERE Name != null ORDER BY Name ASC];
-    //     }
-    //     for (pricebook2 p : PriceList){
-    //         //Put Picklist Value & Label in Map
-    //         options.put(p.name, p.Id);
-    //     }
-    //     return options;
-    // }
+  
     public class pricebookWrapper{
         @AuraEnabled
         public List<pricebook2> priceWrapList;
@@ -517,13 +497,6 @@ public without sharing class PurchaseOrderDAO{
             throw new AuraHandledException(e.getMessage());
         }
         return pickListValuesList;
-    }
-
-    @AuraEnabled
-    public static string testfromLax(String productId){
-        System.debug('########pricebook' + productId);
-
-        return 'ok';
     }
 
     @AuraEnabled

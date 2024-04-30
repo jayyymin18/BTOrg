@@ -1673,4 +1673,53 @@ public with sharing class ManagePOlinesController {
         }
     }
     
+    @AuraEnabled
+    public static String getFieldSet(String objectName, String fieldSetName){
+        String result = '';
+        List<String> pickListValuesList = new List<String>();
+        try{
+            SObjectType objToken = Schema.getGlobalDescribe().get(objectName);
+            Schema.DescribeSObjectResult d = objToken.getDescribe();
+            Map<String, Schema.FieldSet> FsMap = d.fieldSets.getMap();
+            if (FsMap.containsKey(fieldSetName)){
+                for (Schema.FieldSetMember f : FsMap.get(fieldSetName).getFields()){
+                    if (result != ''){
+                        result += ',';
+                    }
+                    String jsonPart = '{';
+                    jsonPart += '"label":"' + f.getLabel()+'",';
+                    jsonPart += '"required":"' + (f.getDBRequired() || f.getRequired())+'",';
+                    jsonPart += '"type":"' + (f.getType())+'",';
+                    jsonPart += '"name":"' + f.getFieldPath()+'"';
+                    if (String.valueOf(f.getType()) == 'PICKLIST'){
+                        pickListValuesList = getDropDown(objectName, String.valueOf(f.getFieldPath()));
+                        jsonPart += ',"pickListValuesList":' + JSON.serialize(pickListValuesList);
+                    }
+                    jsonPart += '}';
+                    result += jsonPart;
+                }
+            }
+            
+            return '[' + result + ']';
+        } catch (Exception e){
+            result += e.getLineNumber()+' : ' + e.getMessage();
+            System.debug('Error::' + e.getMessage());
+            System.debug('Error At Line::' + e.getLineNumber());
+            return null;
+        }
+
+    }
+    
+    @AuraEnabled
+    public static string updateBOMLinesRecord(String updatedData, String recordID){
+        try {
+            buildertek__Select_Sheet__c UpdatedRecord = (buildertek__Select_Sheet__c) JSON.deserialize(updatedData, buildertek__Select_Sheet__c.class);
+            UpdatedRecord.Id = recordID;
+            update UpdatedRecord;
+            return 'Updated Record : ' + UpdatedRecord.Name;
+        } catch (Exception e) {
+            System.debug('exception in updateBOMLinesRecord : ' + e);
+            return null;
+        }
+    }
 }

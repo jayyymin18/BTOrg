@@ -5,8 +5,16 @@
  * @last modified on  : 07-18-2023
  * @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
 **/
-trigger AccountPayableTrigger on buildertek__Account_Payable__c (before insert,before update,before delete, after insert, after update) {
+trigger AccountPayableTrigger on buildertek__Account_Payable__c (before insert,before update,before delete, after insert, after update, after delete) {
+    if(Trigger.isUpdate && Trigger.isBefore){
+        AccountPayableHelper.updateforBudgetLine(Trigger.new , Trigger.oldMap);
+    }
     if (Trigger.isBefore) {
+
+        if(Trigger.isInsert){
+            AccountPayableHelper.onbeforeInsert(Trigger.new);
+        }
+
         System.debug('AccountPayableTrigger Before Trigger');
 
         if(Trigger.isInsert || Trigger.isUpdate) {
@@ -26,27 +34,30 @@ trigger AccountPayableTrigger on buildertek__Account_Payable__c (before insert,b
             AccountPayableHelper.onbeforeUpdate(trigger.new);
            
             if(Trigger.isUpdate){
-                AccountPayableHelper.RestrictToUpdateCashDisbursement(Trigger.new, Trigger.newMap ,Trigger.oldMap);
-                AccountPayableHelper.updateBudgetAndBudgetLine(Trigger.new, Trigger.newMap ,Trigger.oldMap);
+                // AccountPayableHelper.RestrictToUpdateCashDisbursement(Trigger.new, Trigger.newMap ,Trigger.oldMap);       // -->>>>> Changes for BUIL-3675 --> commnent by Brian to disable RestrictToUpdateCashDisbursement Functionality...
+                // AccountPayableHelper.updateBudgetAndBudgetLine(Trigger.new, Trigger.newMap ,Trigger.oldMap); added a new method above
             }
 
 
 
         }else if(Trigger.isDelete){
-            AccountPayableHelper.beforeDelete(Trigger.old);    
+            AccountPayableHelper.beforeDelete(Trigger.old); 
+            AccountPayableHelper.handleDeleteforBL(Trigger.old );   
+
         }
     } else if (Trigger.isAfter) {
         // System.debug('After Trigger');
-        system.debug('Id => ' + Trigger.New[0].Id);
-
         if (Trigger.isInsert) {
             System.debug(' AccountPayableTrigger After Trigger insert');
             AccountPayableHelper.OnAfterInsert(Trigger.new, Trigger.newMap); 
         } else if(Trigger.isUpdate){
             System.debug(' AccountPayableTrigger After Trigger update');
-            AccountPayableHelper.afterUpdate(Trigger.old, Trigger.new, Trigger.newMap, trigger.oldMap); 
-            AccountPayableHelper.DeleteBudgetLine(Trigger.old ,Trigger.new , Trigger.oldMap , Trigger.newMap);
+            AccountPayableHelper.afterUpdate(Trigger.old, Trigger.new, Trigger.newMap, Trigger.oldMap); 
+            // AccountPayableHelper.DeleteBudgetLine(Trigger.old ,Trigger.new , Trigger.oldMap , Trigger.newMap);
+            AccountPayableHelper.UpdateCOntractorInvoiceStatus(Trigger.new , Trigger.oldMap);
 
+        } else if(Trigger.isDelete){
+            AccountPayableHelper.onAfterDelete(Trigger.old); 
         }
     }
 }

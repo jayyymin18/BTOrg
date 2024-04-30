@@ -1,15 +1,15 @@
 public with sharing class ImportMasterQuotes {
     
     @AuraEnabled
-    public static object getMasterQuotes(String searchKeyword){
+    public static object getMasterQuotes(String recordId, String searchKeyword){
         list<buildertek__Master_Quote__c> masterQuoteList;
         String searchString = '%' + searchKeyword + '%';
         If(Schema.sObjectType.buildertek__Master_Quote__c.fields.Name.isAccessible() &&
               Schema.sObjectType.buildertek__Master_Quote__c.fields.Id.isAccessible() &&
               Schema.sObjectType.buildertek__Master_Quote__c.fields.buildertek__Type__c.isAccessible() &&
               Schema.sObjectType.buildertek__Master_Quote__c.fields.buildertek__Quote_Amount__c.isAccessible()){
-               masterQuoteList= [select id, Name, buildertek__Type__c, buildertek__Quote_Amount__c 
-                                                                        from buildertek__Master_Quote__c WHERE Name LIKE:searchString  ORDER BY Name ASC limit 50000];
+               masterQuoteList= [select id, Name, buildertek__Type__c, buildertek__Project__r.Name, buildertek__Quote_Amount__c 
+                                                                        from buildertek__Master_Quote__c WHERE Name LIKE:searchString AND ID != :recordId ORDER BY Name ASC limit 50000];
               }
             System.debug('masterQuoteList--->>>'+masterQuoteList);                                               
         List<MasterQuotesClass> MasterQuotesClassList = new List<MasterQuotesClass>();
@@ -19,12 +19,6 @@ public with sharing class ImportMasterQuotes {
             MasterQuotesClassRecord.quoteCheck = false;
             MasterQuotesClassList.add(MasterQuotesClassRecord);
         }
-        string type1 = 'Master';
-        String query= 'SELECT Id, Name, buildertek__Project__r.Name, buildertek__Quote_Amount__c FROM buildertek__Master_Quote__c ';
-        if ( searchKeyword != '' && searchKeyword != null ) {
-            query = query + ' WHERE Name LIKE \'' + searchKeyword + '%\'';
-        }
-        masterQuoteList = Database.query(query); 
 
         List<buildertek__Quote__c> quotesList;
         If(Schema.sObjectType.buildertek__Quote__c.fields.Name.isAccessible() &&
@@ -39,7 +33,7 @@ public with sharing class ImportMasterQuotes {
                                         buildertek__Project__r.Name,
                                         buildertek__Type__c
                                         FROM buildertek__Quote__c
-                                        WHERE buildertek__Type__c = 'Master' AND Name LIKE:searchString ORDER BY Name ASC];    
+                                        WHERE buildertek__Type__c = 'Master' AND Name LIKE:searchString AND ID != :recordId ORDER BY Name ASC];    
         
               }
         for(buildertek__Quote__c qut : quotesList){
@@ -215,7 +209,8 @@ public with sharing class ImportMasterQuotes {
                                                     buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
                                                     buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
                                                     buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
-                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XX__c, 
+                                                    buildertek__Section_XXI__c, buildertek__Section_XXII__c,
                                                     buildertek__Footer__c 
                                                   FROM buildertek__Quote__c WHERE Id =:recordId];
 
@@ -267,7 +262,8 @@ public with sharing class ImportMasterQuotes {
                                                     buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
                                                     buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
                                                     buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
-                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                    buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XX__c, 
+                                                    buildertek__Section_XXI__c, buildertek__Section_XXII__c,
                                                     buildertek__Footer__c 
                                               FROM buildertek__Quote__c WHERE Id =:recordId];
                                                     
@@ -276,7 +272,8 @@ public with sharing class ImportMasterQuotes {
                                                         buildertek__Section_VI__c, buildertek__Section_VII__c, buildertek__Section_VIII__c, buildertek__Section_X__c, 
                                                         buildertek__Section_IX__c, buildertek__Section_XI__c, buildertek__Section_XII__c, buildertek__Section_XIII__c,
                                                         buildertek__Section_XIV__c, buildertek__Section_XV__c, buildertek__Section_XVI__c, buildertek__Section_XVII__c,
-                                                        buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XXI__c, buildertek__Section_XXII__c,
+                                                        buildertek__Section_XVIII__c, buildertek__Section_XIX__c, buildertek__Section_XX__c, 
+                                                        buildertek__Section_XXI__c, buildertek__Section_XXII__c,
                                                         buildertek__Footer__c 
                                                      FROM buildertek__Quote__c WHERE Id =:quoteIds];
                                                      

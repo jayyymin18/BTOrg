@@ -176,6 +176,7 @@
         helper.getCostCodes(component, event, helper);
         helper.getFieldsFromFieldset(component, event, helper);
 
+        helper.getFieldsFromFieldset(component, event, helper);
     },
 
     checkToogle: function (component, event, helper) {
@@ -460,6 +461,7 @@
                                 var pageSize = component.get("v.pageSize");
                                 component.set("v.isExistingTc", true);
                                 helper.gettcList(component, pageNumber, pageSize);
+                                helper.gettsList(component, pageNumber, pageSize);
                             }
                         }
                     });
@@ -504,6 +506,7 @@
                 var pageSize = component.get("v.pageSize");
                 component.set("v.isExistingTc", true);
                 helper.gettcList(component, pageNumber, pageSize);
+                helper.gettsList(component, pageNumber, pageSize);
     
             }
         }
@@ -2042,6 +2045,11 @@
 
         component.set('v.addInvoicePOSection', false);
 
+        component.set("v.chooseLabor", true);
+        component.set("v.selectedLabor", "");
+        component.set("v.chooseTimeCard", false);
+        component.set("v.chooseTimeSheet", false);
+
 
         // $A.get('e.force:refreshView').fire();
     },
@@ -2072,11 +2080,60 @@
         component.set("v.addcosection", false);
         component.set("v.addExpenseSection", false);
 
+        
+        
+
 
         // $A.get('e.force:refreshView').fire();
 
         helper.getBudgetGroups(component, event, helper, page, function () { });
     },
+
+    movetoLabor: function (component, event, helper) {
+        var selectedLabor = component.get("v.selectedLabor");
+        console.log('selectedLabor--->>>'+  selectedLabor);
+        if(selectedLabor == 'Time Sheet'){
+            component.set("v.chooseTimeCard", false);
+            component.set("v.chooseTimeSheet", true);
+            component.set("v.chooseLabor", false);
+            var selectedRec = component.get('v.selectedRecs');
+            console.log('selectedRec--->>>'+  selectedRec);
+        }else{
+            component.set("v.chooseTimeCard", true);
+            component.set("v.chooseTimeSheet", false);
+            component.set("v.chooseLabor", false);
+        }
+        // }else{
+        //     var toastEvent = $A.get("e.force:showToast");
+        //     toastEvent.setParams({
+        //         title: "Error",
+        //         message: "Please Select Labor",
+        //         type: "error"
+        //     });
+        //     toastEvent.fire();
+        // }
+    },
+
+    backtoChooseLabor: function (component, event, helper) {
+        component.set("v.chooseTimeCard", false);
+        component.set("v.chooseTimeSheet", false);
+        component.set("v.chooseLabor", true);
+        component.set("v.selectedLabor", "Time Card");
+
+        //make check box false
+        var recordList = component.get("v.recordList");
+        recordList.forEach(function (element) {
+            element.Selected = false;
+        });
+        component.set("v.recordList", recordList);
+
+        var timeSheetList = component.get("v.timeSheetList");
+        timeSheetList.forEach(function (element) {
+            element.Selected = false;
+        });
+        component.set("v.timeSheetList", timeSheetList);
+    },
+
     onSaveSuccess: function (component, event, helper) {
         if (event) {
             if (event.getParams().message && event.getParams().message.indexOf('Budget Item') != -1 && event.getParams().message.indexOf('was saved') != -1) {
@@ -2817,7 +2874,10 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 });
                 action.setCallback(this, function (response) {
                     var state = response.getState();
-                    if (state === "SUCCESS") {
+                    let result = response.getReturnValue();
+                    debugger;
+                    console.log('result:',result);
+                    if (result === "success") {
                         component.set("v.isBudgetlinedelete", false);
                         $A.get("e.force:refreshView").fire();
 
@@ -2854,6 +2914,17 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                             toastEvent.fire();
                         });
                     }
+                    } else {
+                        component.find('notifLib').showNotice({
+                            "variant": "error",
+                            "header": "Error!",
+                            "message": result,
+                            closeCallback: function () {
+                                $A.get("e.c:BT_SpinnerEvent").setParams({
+                                    "action": "HIDE"
+                                }).fire();
+                            }
+                        });
                     }
                 });
                 $A.enqueueAction(action);
@@ -4523,8 +4594,120 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         component.find("selectAllTimeCards").set("v.checked", checkedAll);
         component.set("v.selectedExistingTC", existingId);
 
+    },
+
+    checkAllTimeSheets: function(component, event, helper){
+        var value = component.find("selectAllTimeSheets").get("v.checked");
+        console.log('value', value);
+        let listOfRecords = component.get("v.timeSheetList");
+        console.log('listOfRecords ', listOfRecords);
+        var existingId = [];
+
+        listOfRecords.forEach(function (element) {
+            element.Selected = value;
+            existingId.push(element.Id);
+
+        });
+        console.log('listOfRecords ', listOfRecords);
+        console.log('existingId ', existingId);
+        component.set("v.timeSheetList", listOfRecords);
+        component.set("v.selectedExistingTS", existingId);
+
+    },
+
+    checkTimeSheet: function(component, event, helper) {
+        let listOfRecords = component.get("v.timeSheetList");
+        let checkedAll = true;
+        var existingId = [];
+
+        listOfRecords.forEach(function (element) {
+            if (!element.Selected) {
+                checkedAll = false;
+            } else {
+                existingId.push(element.Id);
+                console.log(existingId);
+            }
+        });
+        component.find("selectAllTimeSheets").set("v.checked", checkedAll);
+        component.set("v.selectedExistingTS", existingId);
+
+    },
+
+    updateTimesheet: function (component, event, helper){
+        $A.get("e.c:BT_SpinnerEvent").setParams({
+            "action": "SHOW"
+        }).fire();
 
 
+        var selectedTimeSheetRecords = component.get("v.timeSheetList");
+        console.log('selectedTimeSheetRecords ', selectedTimeSheetRecords);
+        var selectedRecords = component.get('v.selectedRecs');
+        selectedRecords = selectedRecords.toString();
+        console.log('selectedRecords', selectedRecords);
+        let selectedTimeSheetList = [];
+        selectedTimeSheetRecords.forEach(element => {
+            if (element.Selected) {
+                element.buildertek__BT_Budget__c = component.get("v.recordId");
+                element.buildertek__BT_Budget_Line__c = selectedRecords;
+                selectedTimeSheetList.push(element);
+            }
+        });
+        console.log('selectedTimeSheetList', selectedTimeSheetList);
+        debugger;
+
+        if (selectedTimeSheetList.length > 0) {
+
+            var action = component.get("c.updateTimeSheetEntry");
+            action.setParams({
+                "timeSheetEntryList": selectedTimeSheetList
+            });
+            action.setCallback(this, function (response) {
+                $A.get("e.c:BT_SpinnerEvent").setParams({
+                    "action": "HIDE"
+                }).fire();
+                var state = response.getState();
+                if (state === "SUCCESS") {
+                    var responseValue = response.getReturnValue();
+                    console.log('responseValue', responseValue);
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        type: 'SUCCESS',
+                        message: 'TimeSheet Entry updated Successfully',
+                        duration: '5000',
+                    });
+                    toastEvent.fire();
+                    //call doCancel from controller
+                    var a = component.get('c.doCancel');
+                    $A.enqueueAction(a);
+                    //refresh the view
+                    var action1 = component.get("c.doInit");
+                    $A.enqueueAction(action1);
+                } else {
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        type: 'ERROR',
+                        message: 'Something Went Wrong',
+                        duration: '5000',
+                    });
+                    toastEvent.fire();
+                }
+            });
+            $A.enqueueAction(action);
+
+        } else {
+
+            $A.get("e.c:BT_SpinnerEvent").setParams({
+                "action": "HIDE"
+            }).fire();
+
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                type: 'ERROR',
+                message: 'please select records.',
+                duration: '5000',
+            });
+            toastEvent.fire();
+        }
     },
 
     updateBLPO: function (component, event, helper) {
@@ -4707,28 +4890,23 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
     addInvoicePO:function (component, event, helper) {
         if(component.get("v.HaveCreateAccess")){
             console.log('add Invoice po button click......');
-            var selectedRecords = component.get('v.selectedRecs');
-    
             $A.get("e.c:BT_SpinnerEvent").setParams({
                 "action": "SHOW"
             }).fire();
-    
-            if(selectedRecords.length < 1){
-    
+            var selectedRecords = component.get('v.selectedRecs');
+            console.log('selectedRecords-->',{selectedRecords});
+            if(selectedRecords.length == 0 || selectedRecords.length == 1){
                 helper.addInvoicePOHelper(component, event, helper);
-    
-            }else{
-                component.find('notifLib').showNotice({
-                    "variant": "error",
-                    "header": "Budget Lines selected.",
-                    "message": "You can only add a Invoice PO at the budget level.",
-                    closeCallback: function () { }
-                });
-    
+            } else {
                 $A.get("e.c:BT_SpinnerEvent").setParams({
                     "action": "HIDE"
                 }).fire();
-    
+                component.find('notifLib').showNotice({
+                    "variant": "error",
+                    "header": "Too many Budget Lines selected.",
+                    "message": "Please Select only 1 Budget Line to Create Invoice.",
+                    closeCallback: function () { }
+                });
             }
         }
         else{
@@ -4745,6 +4923,61 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
         }
 
 
+    },
+
+    importPO: function (component, event, helper) {
+        if (component.get("v.HaveCreateAccess")) {
+            $A.createComponents(
+                [
+                    [
+                        "aura:html",
+                        {
+                            HTMLAttributes: {
+                                class: "slds-text-heading_medium slds-hyphenate",
+                            },
+                        },
+                    ],
+                    [
+                        "c:ImportPurchaseOrderFromBudget",
+                        {
+                            recordId: component.get("v.recordId"),
+                            onCancel: function () {
+                                component.get("v.modalPromise").then(function (modal) {
+                                    modal.close();
+                                });
+                            },
+                            onSuccess: function () {
+                                component.get("v.modalPromise").then(function (modal) {
+                                    modal.close();
+                                });
+                                $A.get("e.force:refreshView").fire();
+                            },
+                        },
+                    ],
+                ],
+                function (components, status) {
+                    console.log('status', status);
+                    if (status === "SUCCESS") {
+                        var modalPromise = component.find("overlay").showCustomModal({
+                            body: components[1],
+                        });
+                        component.set("v.modalPromise", modalPromise);
+                    }
+                }
+            );
+        }
+        else {
+            component.find('notifLib').showNotice({
+                "variant": "error",
+                "header": "Error!",
+                "message": "You don\'t have the necessary privileges to Create record.",
+                closeCallback: function () {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "HIDE"
+                    }).fire();
+                }
+            });
+        }
     },
 
     checkAllInvoicePO:function (component, event, helper) {
@@ -4785,62 +5018,108 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
             });
     
             console.log({selectedInvoiceList});
+            console.log({selectedInvoiceIdList});
+            console.log(typeof(selectedInvoiceIdList));
     
             if(selectedInvoiceList.length > 0){
+                if (selectedRecords.length > 0) {
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "SHOW"
+                    }).fire();
+                    selectedRecords = selectedRecords.toString();
+                    selectedInvoiceIdList = selectedInvoiceIdList.toString();
+                    var action = component.get("c.updateContractorInvoicePrice");
+                    action.setParams({
+                        recordId: selectedInvoiceIdList,
+                        budgeLineIds: selectedRecords
+                    });
+                    action.setCallback(this, function (response) {
+                        var state = response.getState();
+                        var result = response.getReturnValue();
+                        var error = response.getError();
+                        console.log('result--> ',result);
+                        console.log('error--> ',error);
+                        if (result === 'Success') {
+                            component.set('v.selectedRecs', []);
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            helper.showToast(component, event, helper, 'Success', 'Invoice Price updated successfully', 'success');
     
-                $A.get("e.c:BT_SpinnerEvent").setParams({
-                    "action": "SHOW"
-                }).fire();
-                var BudgetId = component.get('v.recordId');
-                var action = component.get("c.addInvoicePOToBudget");
-                action.setParams({
-                    'invoicePoList': selectedInvoiceIdList,
-                    'BudgetId': BudgetId
-                })
-                action.setCallback(this, function (response) {
-                    if (response.getState() == 'SUCCESS') {
-                        $A.get("e.c:BT_SpinnerEvent").setParams({
-                            "action": "HIDE"
-                        }).fire();
-                        if (response.getReturnValue() == 'HasDisburshment') {   // Changes for BUIL-3498 END
+                            var action1 = component.get("c.doInit");
+                            $A.enqueueAction(action1);
+                        } else if (result === 'null') {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            helper.showToast(component, event, helper, 'Error', 'Please Select Invoice', 'error');
+                        }
+                        else {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            helper.showToast(component, event, helper, 'Error', 'something goes wrong', 'error');
+                        }
+    
+                    });
+                    $A.enqueueAction(action);
+    
+                    var a = component.get('c.doCancel');
+                    $A.enqueueAction(a);
+                }else{
+                    $A.get("e.c:BT_SpinnerEvent").setParams({
+                        "action": "SHOW"
+                    }).fire();
+                    var BudgetId = component.get('v.recordId');
+                    var action = component.get("c.addInvoicePOToBudget");
+                    action.setParams({
+                        'invoicePoList': selectedInvoiceIdList,
+                        'BudgetId': BudgetId
+                    })
+                    action.setCallback(this, function (response) {
+                        if (response.getState() == 'SUCCESS') {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            if (response.getReturnValue() == 'HasDisburshment') {   // Changes for BUIL-3498 END
+                                var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    type: 'ERROR',
+                                    message: 'You are trying to add Invoice which has Cash Disburshment associated with it.',
+                                    duration: '5000',
+                                });
+                                toastEvent.fire();
+                                component.set("v.addInvoicePOSection", false); // to close popup
+                            }else{
                             var toastEvent = $A.get("e.force:showToast");
                             toastEvent.setParams({
-                                type: 'ERROR',
-                                message: 'You are trying to add Invoice which has contentDisburshment associated with it.',
+                                type: 'SUCCESS',
+                                message: 'Invoice (PO)  added Successfully',
                                 duration: '5000',
                             });
                             toastEvent.fire();
                             component.set("v.addInvoicePOSection", false); // to close popup
-                        }else{
-                        var toastEvent = $A.get("e.force:showToast");
-                        toastEvent.setParams({
-                            type: 'SUCCESS',
-                            message: 'Invoice (PO)  added Successfully',
-                            duration: '5000',
-                        });
-                        toastEvent.fire();
-                        component.set("v.addInvoicePOSection", false); // to close popup
-                        $A.get("e.force:refreshView").fire();
-                        document.location.reload(true);    
+                            $A.get("e.force:refreshView").fire();
+                            document.location.reload(true);    
+                            }
                         }
-                    }
-                    else if (response.getState() == 'ERROR') {
-                        $A.get("e.c:BT_SpinnerEvent").setParams({
-                            "action": "HIDE"
-                        }).fire();
-                        var toastEvent = $A.get("e.force:showToast");
-                            toastEvent.setParams({
-                                type: 'ERROR',
-                                message: 'Something went wrong.',
-                                duration: '5000',
-                            });
-                            toastEvent.fire();
-                            component.set("v.addInvoicePOSection", false); // to close popup
-                        console.log('Error to Add Sales Invoice => ', response.getError());
-                    } // Changes for BUIL-3498 END
-                });
-                $A.enqueueAction(action);
-    
+                        else if (response.getState() == 'ERROR') {
+                            $A.get("e.c:BT_SpinnerEvent").setParams({
+                                "action": "HIDE"
+                            }).fire();
+                            var toastEvent = $A.get("e.force:showToast");
+                                toastEvent.setParams({
+                                    type: 'ERROR',
+                                    message: 'Something went wrong.',
+                                    duration: '5000',
+                                });
+                                toastEvent.fire();
+                                component.set("v.addInvoicePOSection", false); // to close popup
+                            console.log('Error to Add Sales Invoice => ', response.getError());
+                        } // Changes for BUIL-3498 END
+                    });
+                    $A.enqueueAction(action);
+                }
         
             }else{
                 var toastEvent = $A.get("e.force:showToast");
@@ -4887,6 +5166,7 @@ $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();
                 {label: "Phase", value:"buildertek__Group__c"},
                 {label: "Sub Group", value:"buildertek__Sub_Grouping__c"},
                 {label: "Cost Code", value:"buildertek__Cost_Code_Name__c"},
+                {label: "Category", value:"buildertek__Category__c"},
             ]
             component.set("v.GroupingOptions", opts);
         }

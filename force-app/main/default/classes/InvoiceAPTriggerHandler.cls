@@ -2,6 +2,7 @@ public class InvoiceAPTriggerHandler {
 
     public static Boolean isFirstTime = true;
     public static Boolean skipDeleteMethod = false;
+    // public static boolean skipInvoicePayableUpdate = false;
 
 
     public void OnAfterInsert(buildertek__Account_Payable_Clone__c[] invoiceList, Map<Id, buildertek__Account_Payable_Clone__c> invoiceNewMap){
@@ -20,10 +21,19 @@ public class InvoiceAPTriggerHandler {
                 update transactionList;
             }
         }
+
+        Set<Id> ProjectIds = new Set<Id>();
+        for (buildertek__Account_Payable_Clone__c invoice : invoiceList) {
+            if (invoice.buildertek__Project__c != null) {
+                ProjectIds.add(invoice.buildertek__Project__c);
+            }
+        }
+        if (ProjectIds.size() > 0) {
+            updateTotalAmountOnProject(ProjectIds);
+        }
     }
 
     public void OnAfterUpdate(buildertek__Account_Payable_Clone__c[] invoiceList, Map<Id, buildertek__Account_Payable_Clone__c> invoiceNewMap, Map<Id, buildertek__Account_Payable_Clone__c> invoiceOldMap){
-
         Set<Id> budgetIdSet = new Set<Id>();
         Set<Id> invoiceIds = new Set<Id>();
 
@@ -36,9 +46,11 @@ public class InvoiceAPTriggerHandler {
 
 
             //* Nishit suthar playground start
-            
-            if (invoice.buildertek__Budget__c != null) {
+            if (invoice.buildertek__Budget__c == null && invoice.buildertek__Budget_Line__c == null && oldInvoiceData.buildertek__Budget__c != null && oldInvoiceData.buildertek__Budget_Line__c != null ) {
+                AddBudgetLineItemOnPayableInvoice.updateBudgetLineSub(invoice.Id, oldInvoiceData.buildertek__Budget__c, oldInvoiceData.buildertek__Budget_Line__c);
+            }
 
+            if (invoice.buildertek__Budget__c != null) {
                 //* covering scenario 1 here
                 if (invoice.buildertek__Budget__c != null && invoice.buildertek__Budget_Line__c == null && invoice.buildertek__Budget__c != oldInvoiceData.buildertek__Budget__c) {
                     AddBudgetLineItemOnPayableInvoice.createNewBudgetLineItem(invoice.Id);
@@ -46,7 +58,7 @@ public class InvoiceAPTriggerHandler {
 
                 //* covering scenario 1 a&b here
                 if (oldInvoiceData.buildertek__Budget_Line__c != invoice.buildertek__Budget_Line__c) {
-                    if (skipDeleteMethod) {
+                    if (!skipDeleteMethod) {
                         AddBudgetLineItemOnPayableInvoice.deleteBudgetItem(invoice.Id, oldInvoiceData.buildertek__Budget_Line__c);
                     }
                     AddBudgetLineItemOnPayableInvoice.updateBudgetLineSub(invoice.Id, invoice.buildertek__Budget__c, oldInvoiceData.buildertek__Budget_Line__c);
@@ -112,6 +124,21 @@ public class InvoiceAPTriggerHandler {
             update budgetItemList;
         } */
 
+        Set<Id> ProjectIds = new Set<Id>();
+        for (buildertek__Account_Payable_Clone__c invoice : invoiceList) {
+            buildertek__Account_Payable_Clone__c oldInvoiceData = invoiceOldMap.get(invoice.Id);
+            if (invoice.buildertek__Project__c != oldInvoiceData.buildertek__Project__c || invoice.buildertek__Payment_Amount__c != oldInvoiceData.buildertek__Payment_Amount__c) {
+                if (invoice.buildertek__Project__c != null) {
+                    ProjectIds.add(invoice.buildertek__Project__c);
+                }
+                if (oldInvoiceData.buildertek__Project__c != null) {
+                    ProjectIds.add(oldInvoiceData.buildertek__Project__c);
+                }
+            }
+        }
+        if (ProjectIds.size() > 0) {
+            updateTotalAmountOnProject(ProjectIds);
+        }
     }
 
     public void RestrictToUpdatePI(buildertek__Account_Payable_Clone__c[] invoiceList, Map<Id, buildertek__Account_Payable_Clone__c> invoiceNewMap, Map<Id, buildertek__Account_Payable_Clone__c> invoiceOldMap){
@@ -127,6 +154,60 @@ public class InvoiceAPTriggerHandler {
         //     }
         // }
 
+    }
+
+
+    public void onAfterDelete(List<buildertek__Account_Payable_Clone__c> oldInvoiceList) {
+        try {
+            Set<Id> ProjectIds = new Set<Id>();
+            for (buildertek__Account_Payable_Clone__c invoice : oldInvoiceList) {
+                if (invoice.buildertek__Project__c != null) {
+                    ProjectIds.add(invoice.buildertek__Project__c);
+                }
+            }
+            if (ProjectIds.size() > 0) {
+                updateTotalAmountOnProject(ProjectIds);
+            }
+        } catch (Exception ex) {
+            System.debug('Error: ' + ex.getMessage());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
+        }
+    }
+
+    public void updateTotalAmountOnProject(Set<Id> ProjectIds) {
+        try {
+            Map<Id, AggregateResult> totalAmountMap = new Map<Id, AggregateResult>();
+            for (AggregateResult aggregatedResult : [SELECT buildertek__Project__c, SUM(buildertek__Payment_Amount__c) totalAmount FROM buildertek__Account_Payable_Clone__c WHERE buildertek__Project__c IN :ProjectIds GROUP BY buildertek__Project__c]){
+                Id ProjectId = (Id)aggregatedResult.get('buildertek__Project__c');
+                totalAmountMap.put(ProjectId, aggregatedResult);
+            }
+            List<buildertek__Project__c> projectToUpdate = new List<buildertek__Project__c>();
+            
+            for (Id projectId :ProjectIds) {
+                buildertek__Project__c project = new buildertek__Project__c(Id = projectId);
+                if(totalAmountMap.containsKey(projectId)) {
+                    AggregateResult aggregatedResult = totalAmountMap.get(projectId);
+                    Decimal totalAmount = (Decimal)aggregatedResult.get('totalAmount');
+                    project.buildertek__Total_Payments__c = totalAmount;
+                } else {
+                    project.buildertek__Total_Payments__c = 0;
+                }
+                projectToUpdate.add(project);
+            }
+            if (!projectToUpdate.isEmpty()) {
+                update projectToUpdate;
+            }
+
+        } catch (Exception ex) {
+            System.debug('Error: ' + ex.getMessage());
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true) {
+                BT_ExceptionHandler.Store_Exception(ex);
+            }
+        }
     }
 
 }

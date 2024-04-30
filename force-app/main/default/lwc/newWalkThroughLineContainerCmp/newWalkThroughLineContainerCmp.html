@@ -1,0 +1,78 @@
+<template>
+  <lightning-card>
+    <div class="bg">
+      <div class="parent">
+        <span class="parent_span">
+          <lightning-button-menu class="menu" alternative-text="Category Menu"
+            variant="border-filled">
+            <template for:each={categories} for:item="category">
+              <lightning-menu-item key={category.Id} value={category.Id} label={category.Name}
+                onclick={handleCategorySelect}></lightning-menu-item>
+            </template>
+          </lightning-button-menu>
+          <b><span class="text">{selectedCategoryLabel}</span></b>
+        </span>
+      </div>
+
+      <div class="field_container">
+        <div class="fields slds-grid slds-wrap">
+          <template for:each={fieldDetails} for:item="fieldDetail">
+            <div class="slds-col slds-size_1-of-2" key={fieldDetail.fieldLabel}>
+              <div class="label-float">
+                <input type={fieldDetail.fieldType} data-fieldname={fieldDetail.fieldName} object-api-name="buildertek__Walk_Through_List__c"
+                  record-id={recordId} value={fieldDetail.fieldValue} onkeyup={inputValueIsChanged}/>
+                <label>{fieldDetail.fieldLabel}</label>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div if:true={isButtonVisible} class="save_cancle_btn">
+          <button class="save_btn" onclick={saveChanges}>Save</button>
+          <button class="cancle_btn" onclick={revertChanges}>Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <template if:true={dataAvailable}>
+      <lightning-card>
+        <div class="padding_class">
+          <div class="header_css">
+            <div class="heading_bt">BT Walk Through Line Items</div>
+            <div class="button_group">
+              <button onclick={handlePlusButtonClick}>
+                <svg width="12" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 5.71429H5.71429V10H4.28571V5.71429H0V4.28571H4.28571V0H5.71429V4.28571H10V5.71429Z"
+                    fill="#0176D3" />
+                </svg>
+              </button>
+              <button onclick={refreshTheDataTable}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\
+                    <path d="M21 3L15.6 3C15.2686 3 15 3.26863 15 3.6V3.6L15 9" stroke="#0176D3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> 
+                    <path d="M15.5 3.5C18.7983 4.80851 21 8.29825 21 12C21 16.8715 16.9706 21 12 21C7.02944 21 3 16.8715 3 12C3 8.73514 4.80989 5.52512 7.5 4" stroke="#0176D3" stroke-width="2" stroke-linecap="round"></path> 
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="datatable_class" if:true={isColumnsDataAvailable}>
+            <template if:true={reloadVar}>
+              <div class="inside_dt_cls">
+                <lightning-datatable key-field="id" data={data} columns={columns} hide-checkbox-column
+                  draft-values={fldsItemValues} show-row-number-column onrowaction={handleRowAction}>
+                </lightning-datatable>
+              </div>
+            </template>
+          </div>
+          <div class="noData_class" if:false={isColumnsDataAvailable}>
+            <p>No Walk Through Line Available for this Category.</p>
+          </div>
+        </div>
+      </lightning-card>
+    </template>
+  </lightning-card>
+  <template if:true={showNewModel}>
+    <c-new-walk-through-line-cmp walk-through-id={recordId} category-id={selectedCategory} onclose={handleClose}></c-new-walk-through-line-cmp>
+  </template>
+  <template if:true={isLoading}>
+    <c-show-spinner-in-gantt-component></c-show-spinner-in-gantt-component>
+</template>
+</template>

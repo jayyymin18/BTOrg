@@ -17,6 +17,11 @@
     </head>
 
     <style>
+
+    .dateFormat {
+    display: none;
+    }
+
     .customPopup1 {
     background-color: white;
     border-style: solid;
@@ -518,7 +523,7 @@
                 </script>
             </apex:outputPanel>
         </apex:outputPanel>
-        <div class="slds-scope" style="width:80%;margin: 0 auto;padding: 50px;">
+        <div class="slds-scope" style="width:80%;margin: 0 auto;">
 
             <apex:outputPanel >
                 <apex:pagemessages id="pageLoadErrorMessage" />
@@ -540,7 +545,8 @@
                             <center>
                                 <b>
                                     <ul>
-                                        <h2 style="font-size: 1.3rem;text-transform: uppercase;text-decoration: underline;margin-top: -25px;">SUBMIT YOUR QUOTE TO {!rfqToVendor.RFQ__r.Name}</h2>
+                                        <h2 style="font-size: 1.8rem; text-transform: uppercase; margin-top: -25px;color: #009beb;">
+                                            RFQ: {!rfqToVendor.RFQ__r.Name}</h2>
                                     </ul>
                                 </b>
                             </center>
@@ -588,7 +594,15 @@
                             <!--<apex:inputField value="{!rfqToVendor.Notes__c}" styleClass="slds-input" rendered="{!rfqToVendor.Status__c != 'Quote Submitted'}"/>
                             <apex:outputField value="{!rfqToVendor.Notes__c}" styleClass="slds-input" rendered="{!rfqToVendor.Status__c == 'Quote Submitted'}"/>-->
                             <apex:outputField value="{!rfqToVendor.Notes__c}" />
+                            
+                         <apex:inputField ignoreEditPermissionForRendering="true" style="width: 6rem;" value="{!rfqToVendor.Anticipated_Start_Date__c}" 
+                 rendered="{!rfqToVendor.Status__c != 'Quote Submitted' && rfqToVendor.Status__c != 'Awarded' && rfqToVendor.Status__c != 'Accepted'}" />
+                         <apex:inputField ignoreEditPermissionForRendering="true" style="width: 6rem;" value="{!rfqToVendor.Anticipated_Finish_Date__c}" 
+                 rendered="{!rfqToVendor.Status__c != 'Quote Submitted' && rfqToVendor.Status__c != 'Awarded' && rfqToVendor.Status__c != 'Accepted'}" />
 
+                            
+                            <apex:outputField value="{!rfqToVendor.Anticipated_Start_Date__c}"  rendered="{!rfqToVendor.Status__c == 'Quote Submitted'}" />
+                            <apex:outputField value="{!rfqToVendor.Anticipated_Finish_Date__c}"  rendered="{!rfqToVendor.Status__c == 'Quote Submitted'}"/>
                             <apex:outputField value="{!rfqToVendor.Submitted_Date__c}" rendered="{!rfqToVendor.Status__c == 'Quote Submitted'}" />
 
                         </apex:pageBlockSection>
@@ -618,8 +632,12 @@
                                     <th scope="col" width="10%">
                                         Estimated Work (Days)
                                     </th>
-                                     <th scope="col" width="23%">
+                                     <th scope="col" width="21%">
                                         Vendor Note
+                                    </th>
+                                    
+                                     <th scope="col" width="2%">
+                                        Public Folder
                                     </th>
                                     <th scope="col" width="4%">
                                         Delete
@@ -674,9 +692,20 @@
                                             <apex:inputTextArea value="{!item.Vendor_Note__c}" styleClass="slds-input" rendered="{!rfqToVendor.Status__c != 'Quote Submitted' && rfqToVendor.Status__c != 'Awarded' && rfqToVendor.Status__c != 'Accepted'}"
                                             />
                                         </td>
+                                        <td> 
+                                            <center> 
+                                            <apex:outputLink value="{!forceSiteURL}/apex/buildertek__DisplayPublicFolderPage?Id={!item.buildertek__RFQ_Item__r.Public_Folder__c}" target="_blank" disabled="{!item.buildertek__RFQ_Item__r.Public_Folder__c == null}"> 
+                                            <span class="slds-icon_container slds-icon-standard-call" title="Public folder">
+                                                <svg style="fill: {!IF(item.buildertek__RFQ_Item__r.buildertek__Public_folder__c == null, 'gray', '#009beb')}; background:#ffffff" class="slds-icon" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/apexpages/slds/latest/assets/icons/standard-sprite/svg/symbols.svg#folder" />
+                                                </svg>
+                                        </span>
+                                        </apex:outputLink>
+                                        </center>
+                                        </td> 
                                         <td>
-                                            <!-- <apex:commandButton styleclass="slds-button slds-button_neutral slds-m-top--small" title="Delete" value="X" action="{!addNewRowToAccList}" Status="status" immediate="true" />
-                                        -->
+                                            <apex:commandButton styleclass="slds-button slds-button_neutral slds-m-top--small" title="Delete" value="X" action="{!addNewRowToAccList}" Status="status" immediate="true" />
+                                       
                                         </td>
 
                                     </tr>

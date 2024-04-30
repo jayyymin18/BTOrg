@@ -9,6 +9,9 @@ public class ResourceCalendarWrap{
 	public String ContractresourceId{ get; set; }
 
 	@AuraEnabled
+	public String resourceType{ get; set; } 		// Changes for BUIL-3932
+
+	@AuraEnabled
 	public String tasks{ get; set; }
 
 	@AuraEnabled
@@ -79,6 +82,9 @@ public class ResourceCalendarWrap{
 
 		@AuraEnabled
 		public String Eid{ get; set; }
+
+		@AuraEnabled
+		public String ProjId{ get; set; }
 
 		@AuraEnabled
 		public String Model{ get; set; }

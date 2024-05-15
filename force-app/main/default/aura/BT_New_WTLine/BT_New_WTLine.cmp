@@ -2,7 +2,7 @@
 access="global" controller="New_WTLine_Controller">
 
 <aura:attribute name="recordId" type="String" />
-<aura:attribute name="Spinner" type="Boolean" default="false" />
+<aura:attribute name="Spinner" type="Boolean" default="true" />
 <aura:attribute name="isOptionModal" type="Boolean" default="true" />
 <aura:attribute name="recordTypeList" type="List" />
 <aura:attribute name="selectedRecordTypeId" type="String" />
@@ -14,6 +14,20 @@ access="global" controller="New_WTLine_Controller">
 
 <aura:attribute name="pricebookName" type="String" default="" />
 <aura:attribute name="pricebookoptions" type="List" />
+
+<aura:attribute name="Message" type="String"  />
+<aura:attribute name="productfamily" type="string" />
+<aura:attribute name="productfamilyoptions" type="List" />
+<aura:attribute name="listofproductfamily" type="List" />
+<aura:attribute name="listOfFields" type="List" />
+<aura:attribute name="selectedLookUpRecord" type="string" />
+<aura:attribute name="productId" type="string" />
+<aura:attribute name="productName" type="string" />
+<aura:attribute name="UnitPrice" type="String" />
+<aura:attribute name="description" type="String" />
+<aura:attribute name="notes" type="String" />
+
+<aura:handler name="SelectedRecordEvent" event="c:BT_LightningLookupEvent" action="{!c.handleComponentEvents}" />
 
 
 <ltng:require styles="{!$Resource.MOdalPreviewWidth72}" />
@@ -105,7 +119,7 @@ access="global" controller="New_WTLine_Controller">
                         <div class="slds-p-around_medium" style="background-color:white;">
                             <lightning:layout multipleRows="true">
                                 <aura:iteration items="{!v.fieldSetValues}" var="field">
-                                    <aura:if isTrue="{!field.name!='buildertek__Product__c' &amp;&amp; field.name!='buildertek__Description__c' &amp;&amp; field.name!='buildertek__Walk_Through_List__c'}">
+                                    <aura:if isTrue="{!field.name!='buildertek__Product__c' &amp;&amp; field.name!='buildertek__Description__c' &amp;&amp; field.name!='buildertek__Walk_Through_List__c' &amp;&amp; field.name!='buildertek__Price_Book__c' &amp;&amp; field.name!='buildertek__Price__c' &amp;&amp; field.name!='buildertek__Notes__c' &amp;&amp; field.name!='buildertek__Walk_Through_List__c'}">
                                         <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
                                             <lightning:inputField fieldName="{!field.name}" aura:id="field"  />
                                         </lightning:layoutItem>
@@ -114,17 +128,14 @@ access="global" controller="New_WTLine_Controller">
                                                 <aura:if isTrue="{!v.selectedRecordTypeName == 'Product'}">
                                                     <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
                                                         <label class="slds-form-element__label slds-no-flex">Pricebook</label>
-                                                        <ui:inputSelect value="{! v.pricebookName }" change="{!c.changeEvent}" class="pricebook-class">
-                                                        <aura:iteration var="option" items="{! v.pricebookoptions }">
-                                                            <option value="{! option.value }"  selected="{!option.value == v.pricebookName}">{!option.key }</option>
-                                                        </aura:iteration>
-                                                    </ui:inputSelect>
-        
+                                                        <ui:inputSelect value="{!v.pricebookName}" change="{!c.changeEvent}" class="pricebook-class">
+                                                            <aura:iteration var="option" items="{! v.pricebookoptions }">
+                                                                <option value="{! option.value }"  selected="{!option.value == v.pricebookName}">{!option.key }</option>
+                                                            </aura:iteration>
+                                                        </ui:inputSelect>
                                                     </lightning:layoutItem>
-                                                    
-        
+
                                                     <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
-        
                                                         <label class="slds-form-element__label slds-no-flex">Product Family</label>
                                                         <ui:inputSelect value="{!v.productfamily}" change="{!c.changefamily}"
                                                             class="pricebook-class">
@@ -143,23 +154,34 @@ access="global" controller="New_WTLine_Controller">
                                                             parentId="{! v.pricebookName }" prodctfamly="{!v.productfamily}" />
                                                     </lightning:layoutItem> 
 
-                                                    <!-- <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
-                                                        <lightning:inputField fieldName="{!field.name}" aura:id="field"  />
-                                                    </lightning:layoutItem> -->
-
                                                 </aura:if>
                                             </aura:if>  
                                             <aura:if isTrue="{!field.name=='buildertek__Description__c'}">
-                                                <aura:if isTrue="{!v.selectedRecordTypeName == 'No Product'}">
-                                                    <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
-                                                        <lightning:inputField fieldName="{!field.name}" aura:id="field"  />
-                                                    </lightning:layoutItem>
-                                                </aura:if>
+                                                <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
+                                                    <lightning:inputField fieldName="{!field.name}" aura:id="field"  value="{!v.description}"/>
+                                                </lightning:layoutItem>
+                                            </aura:if>  
+                                            <aura:if isTrue="{!field.name=='buildertek__Notes__c'}">
+                                                <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
+                                                    <lightning:inputField fieldName="{!field.name}" aura:id="field"  value="{!v.notes}"/>
+                                                </lightning:layoutItem>
                                             </aura:if>  
                                             <aura:if isTrue="{!field.name=='buildertek__Walk_Through_List__c'}">
                                                 <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
-                                                    <lightning:inputField fieldName="{!field.name}" aura:id="field" value="{!v.recordId}" />
+                                                    <lightning:inputField fieldName="{!field.name}" aura:id="field" value="{!v.recordId}" disabled="true"/>
                                                 </lightning:layoutItem>
+                                            </aura:if>
+                                            <aura:if isTrue="{!field.name =='buildertek__Price__c'}">
+                                                <aura:if isTrue="{!v.UnitPrice}">
+                                                    <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
+                                                        <lightning:inputField fieldName="{! field.name }" value="{!if(UnitPrice != '',v.UnitPrice)}" aura:id="field" />
+                                                    </lightning:layoutItem>
+                                                    <aura:set attribute="else">
+                                                        <lightning:layoutItem size="6" mediumDeviceSize="6" padding="around-small">
+                                                            <lightning:inputField fieldName="{! field.name }" aura:id="field"  />
+                                                        </lightning:layoutItem>                                     
+                                                    </aura:set>
+                                                </aura:if>
                                             </aura:if>
                                         </aura:set>
                                     </aura:if>
@@ -167,15 +189,6 @@ access="global" controller="New_WTLine_Controller">
                             </lightning:layout>
                         </div>
                     </div>
-                    <!-- <footer aura:id="footer" class="slds-modal__footer">
-                        <lightning:button variant="neutral" title="Cancel" label="Cancel" onclick="{! c.closeModel }" />
-                        <lightning:button variant="neutral"
-                                    label="Back"
-                                    title="Back"
-                                    onclick="{!c.pageOne}"/>
-                        <lightning:button variant="brand" type="submit" name="save" label="Save"  />
-                    </footer>
-                -->
             </div>
             <!--Modal/Popup Box Footer Starts here-->
             <footer class="slds-modal__footer">

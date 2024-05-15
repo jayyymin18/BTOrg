@@ -15,14 +15,18 @@ private class bryntumGanttControllerTest {
         buildertek__Schedule__c schedule = new buildertek__Schedule__c();
         schedule.buildertek__Description__c='Test Description';
         schedule.buildertek__Type__c='Standard';
+        schedule.buildertek__Initial_Start_Date__c=Date.today();
         insert schedule;
 
         ProjectTaskTriggerHandler.blnSkipTaskTrigger=true;
 
+        Date today = Date.today();
+        Date twoDaysLater = today.addDays(2);
         buildertek__Project_Task__c scheduleItem = new buildertek__Project_Task__c();
         scheduleItem.buildertek__Schedule__c = schedule.Id;
         scheduleItem.Name='Test';
         scheduleItem.buildertek__Start__c = Date.today();
+        scheduleItem.buildertek__Finish__c = twoDaysLater;
         scheduleItem.buildertek__Phase__c='Carpet/Cleaning';
         scheduleItem.buildertek__Duration__c=2;
         insert scheduleItem;
@@ -44,7 +48,7 @@ private class bryntumGanttControllerTest {
         scheduleRec.buildertek__Project__c=project.Id;
         insert scheduleRec;
 
-            
+
         Test.startTest();
         bryntumGanttController.getScheduleWrapperAtLoading(schedule.Id);
         // bryntumGanttController.getAccounts(1,2,'Test' , 'Test');
@@ -56,7 +60,7 @@ private class bryntumGanttControllerTest {
         bryntumGanttController.searchUsers('Buildertek');
         bryntumGanttController.getScheduleItemList(scheduleRec.Id);
         bryntumGanttController.createNewSchedule('Test' , project.Id , date.today(),'Standard' , userId , scheduleRec.Id);
-        bryntumGanttController.createScheduleLineFromMasterSchedule(scheduleRec.Id , schedule.Id , date.today());
+        bryntumGanttController.createScheduleLineFromMasterSchedule(scheduleRec.Id , schedule.Id , date.today(), False);
         // bryntumGanttController.addDaysSkippingWeekends('Test' , date.today() , 3);
         Test.stopTest();
     }

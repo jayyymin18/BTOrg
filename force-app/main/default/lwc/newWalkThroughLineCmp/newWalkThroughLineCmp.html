@@ -11,7 +11,6 @@
                 <div class="hd-txt-main">
                     <div lwc:if={step1} class="hd-txt-line">Choose Record Type</div>
                     <div lwc:if={step2} class="hd-txt-line">New BT Walk Through Line Item</div>
-                    <!-- <div lwc:if={step2} class="hd-txt-line">{recordTypeName}</div> -->
                 </div>
             </div>
             <lightning-record-edit-form object-api-name={objectApiName} onsubmit={handleSave}>
@@ -49,83 +48,23 @@
                                 </lightning-record-picker>
                             </div>
                             <template if:true={isProduct}>
-                                <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small"></div>
-                                    <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="combobox-id-62" >Pricebook</label>
-                                        <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container">
-                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
-                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                        <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input"
-                                                            aria-labelledby="combobox-label-id-136 combobox-id-62-selected-value"
-                                                             aria-controls="listbox-id-32" aria-expanded="false"
-                                                            aria-haspopup="listbox">
-                                                            <span class="slds-truncate" >Select an Option…</span>
-                                                        </div>
-                                                        <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                    <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox"
-                                                        tabindex="0" aria-busy="false">
-                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                            <li role="presentation" class="slds-listbox__item">
-                                                                <div id="option764"
-                                                                    class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
-                                                                    role="option">
-                                                                    <span class="slds-media__figure slds-listbox__option-icon"></span>
-                                                                    <span class="slds-media__body">
-                                                                        <span class="slds-truncate" title="Accounts">Accounts</span>
-                                                                    </span>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small">
+                                    <lightning-combobox
+                                        label="Price Book"
+                                        value={selectedPriceBook}
+                                        placeholder="Select Progress"
+                                        options={priceBookListOrdered}
+                                        onchange={searchPriceBook}>
+                                    </lightning-combobox>
                                 </div>
-                                <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small"></div>
-                                    <div class="slds-form-element">
-                                        <label class="slds-form-element__label" for="combobox-id-62" id="combobox-label-id-136">Pricebook</label>
-                                        <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container">
-                                                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click">
-                                                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                        <div role="combobox" tabindex="0" class="slds-input_faux slds-combobox__input"
-                                                            aria-labelledby="combobox-label-id-136 combobox-id-62-selected-value"
-                                                             aria-controls="listbox-id-32" aria-expanded="false"
-                                                            aria-haspopup="listbox">
-                                                            <span class="slds-truncate" >Select an Option…</span>
-                                                        </div>
-                                                        <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
-                                                            <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
-                                                                <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#down"></use>
-                                                            </svg>
-                                                        </span>
-                                                    </div>
-                                                    <div class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" role="listbox"
-                                                        tabindex="0" aria-busy="false">
-                                                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                            <li role="presentation" class="slds-listbox__item">
-                                                                <div
-                                                                    class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
-                                                                    role="option">
-                                                                    <span class="slds-media__figure slds-listbox__option-icon"></span>
-                                                                    <span class="slds-media__body">
-                                                                        <span class="slds-truncate" title="Accounts">Accounts</span>
-                                                                    </span>
-                                                                </div>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small">
+                                    <lightning-combobox
+                                        label="Product Family"
+                                        value={selectedProductFamily}
+                                        placeholder="Select Progress"
+                                        options={pflistOrdered}
+                                        onchange={searchProductFamily} >
+                                    </lightning-combobox>
                                 </div>
                             </template>
                         </div>
@@ -134,69 +73,29 @@
                                 <div class="fields slds-grid slds-wrap">
                                     <template if:true={isProduct}>
                                         <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small">
-                                            <div class="slds-form-element">
-                                                <label class="slds-form-element__label" for="combobox-id-14" id="combobox-label-id-144">Product</label>
-                                                <div class="slds-form-element__control">
-                                                    <div class="slds-combobox_container">
-                                                        <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open">
-                                                            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
-                                                                <input type="text" class="slds-input slds-combobox__input slds-has-focus slds-combobox__input-value"
-                                                                    id="combobox-id-14" aria-activedescendant="option0" aria-autocomplete="list"
-                                                                    aria-controls="listbox-id-16" aria-expanded="true" aria-haspopup="listbox" 
-                                                                    role="combobox" placeholder="Search..." value="salesforce" />
-                                                                <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
-                                                                    <svg class="slds-icon slds-icon slds-icon_x-small slds-icon-text-default" aria-hidden="true">
-                                                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                                    </svg>
-                                                                </span>
-                                                            </div>
-                                                            <div id="listbox-id-16" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid"
-                                                            role="listbox"  tabindex="0" aria-busy="false">
-                                                                <ul class="slds-listbox slds-listbox_vertical" role="presentation">
-                                                                    <li role="presentation" class="slds-listbox__item">
-                                                                        <div aria-selected="true" id="option0"
-                                                                            class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus"
+                                            <div class="slds-card">
+                                                <div class="slds-form-element">
+                                                    <div class="slds-form-element__control">
+                                                        <lightning-input label="Product" type="search" onfocus={showProductOptions}
+                                                            onchange={searchProduct} value={selectedProductValue} onblur={clearProductResults}>
+                                                        </lightning-input>
+                                                        <div if:true={searchProductResults} class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid"
+                                                            role="listbox" onmousedown={preventHide}>
+                                                            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                                                <template for:each={searchProductResults} for:item="searchResult">
+                                                                    <li key={searchResult.value} data-value={searchResult.value} role="presentation"
+                                                                        onclick={selectProductResult} class="slds-listbox__item">
+                                                                        <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small "
                                                                             role="option">
-                                                                            <span class="slds-media__figure slds-listbox__option-icon">
-                                                                                <span class="slds-icon_container slds-icon-utility-search"
-                                                                                    title="Search for term: ">
-                                                                                    <svg class="slds-icon slds-icon_x-small slds-icon-text-default"
-                                                                                        aria-hidden="true">
-                                                                                        <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#search"></use>
-                                                                                    </svg>
-                                                                                    <span class="slds-assistive-text">Search for term: </span>
-                                                                                </span>
-                                                                            </span>
                                                                             <span class="slds-media__body">
-                                                                                <span
-                                                                                    class="slds-listbox__option-text slds-listbox__option-text_entity">salesforce</span>
+                                                                                <span class="slds-truncate" title={searchResult.label}>
+                                                                                    {searchResult.label}
+                                                                                </span>
                                                                             </span>
                                                                         </div>
                                                                     </li>
-                                                                    <li role="presentation" class="slds-listbox__item">
-                                                                        <div id="option792"
-                                                                            class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta"
-                                                                            role="option">
-                                                                            <span class="slds-media__figure slds-listbox__option-icon">
-                                                                                <span class="slds-icon_container slds-icon-standard-account">
-                                                                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
-                                                                                        <use xlink:href="/assets/icons/standard-sprite/svg/symbols.svg#account">
-                                                                                        </use>
-                                                                                    </svg>
-                                                                                </span>
-                                                                            </span>
-                                                                            <span class="slds-media__body">
-                                                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">
-                                                                                    <span>
-                                                                                        <mark>Salesforce</mark>.com</span>
-                                                                                </span>
-                                                                                <span class="slds-listbox__option-meta slds-listbox__option-meta_entity">Account •
-                                                                                    San Francisco, CA</span>
-                                                                            </span>
-                                                                        </div>
-                                                                    </li>
-                                                                </ul>
-                                                            </div>
+                                                                </template>
+                                                            </ul>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -206,7 +105,6 @@
                                     <template for:each={fieldsForSelectedRecordType} for:item="field">
                                         <div class="slds-col slds-size_1-of-2 slds-p-around_xx-small" key={field.name}>
                                             <lightning-input-field field-name={field.name} variant="label-stacked" data-field={field.name}></lightning-input-field>
-                                            <!-- <label>{field.label}</label> -->
                                         </div>
                                     </template>
                                 </div>
@@ -221,12 +119,13 @@
                     </template>
                     <template if:true={step2}>
                         <lightning-button  label="Cancel" onclick={handleClose}></lightning-button>
-                        <!-- <lightning-button  label="Save & New" onclick={handleSaveAndNext}></lightning-button> -->
                         <lightning-button  variant="brand" label="Save" type="submit" ></lightning-button>
                     </template>
                 </div>
             </lightning-record-edit-form>
         </div>
+        <lightning-spinner if:true={spinner} alternative-text="Loading" class="spins" size="large" variant="brand"></lightning-spinner>
     </section>
+
     <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
 </template>

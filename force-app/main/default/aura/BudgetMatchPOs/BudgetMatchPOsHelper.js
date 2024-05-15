@@ -76,7 +76,8 @@
                 let result = response.getReturnValue();
                 console.log('result: ' + JSON.stringify(result));
                 helper.showToast('success', 'Success', 'POs assigned successfully', '3000');
-                $A.get("e.force:closeQuickAction").fire();
+                // $A.get("e.force:closeQuickAction").fire();
+                window.location.reload();
             } else {
                 let error = response.getError();
                 console.error('Error =>', error);

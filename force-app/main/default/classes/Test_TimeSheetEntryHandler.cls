@@ -12,6 +12,10 @@ private class Test_TimeSheetEntryHandler {
         con.buildertek__Hourly_Rate__c = 10;
         insert con;
 
+        buildertek__Project__c project = new buildertek__Project__c();
+        project.Name = 'Test Project';
+        insert project;
+        
         buildertek__Budget_Item__c budgetItem = new buildertek__Budget_Item__c();
         budgetItem.buildertek__Budget__c = testbudget.Id;
         budgetItem.Name = 'Test Budget Item';
@@ -28,6 +32,8 @@ private class Test_TimeSheetEntryHandler {
         timeSheetEntry.buildertek__BT_Time_Sheet__c = timeSheet.Id;
         timeSheetEntry.buildertek__Start_Time__c = Datetime.now();
         timeSheetEntry.buildertek__End_Time__c = Datetime.now().addHours(2);
+        timeSheetEntry.buildertek__BT_Project__c = project.Id;
+        timeSheetEntry.buildertek__Contact__c = con.Id;
         insert timeSheetEntry;
 
         // Call the method to be tested

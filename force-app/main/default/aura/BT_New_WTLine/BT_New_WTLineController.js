@@ -1,7 +1,5 @@
 ({
     doInit : function(component, event, helper) {
-        component.set("v.spinner", true); 
-        console.log('doInit');
         helper.getRecordType(component);
         helper.getFields(component);
         helper.getPriceBook(component);
@@ -43,11 +41,14 @@
     handleSubmit : function (component, event, helper) {
         component.set("v.Spinner", true);
         event.preventDefault(); 
+        var productId = component.get("v.productId");
+        var priceookId = component.get("v.pricebookName");
+        var description = component.get("v.description");
         var fields = event.getParam("fields");
-        var allData = JSON.parse(JSON.stringify(fields)); 
         var recordType = component.get("v.selectedRecordTypeName");
+
         if(recordType === 'Product'){
-            if(allData.buildertek__Product__c === undefined || allData.buildertek__Product__c === '' || allData.buildertek__Product__c === null){
+            if(productId === undefined || productId === '' || productId === null){
                 component.set("v.Spinner", false);
                 var toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams({
@@ -57,10 +58,12 @@
                 });
                 toastEvent.fire();
                 return;
+            } else {
+                fields["buildertek__Product__c"] = productId;
+                fields["buildertek__Price_Book__c"] = priceookId;
             }
-        }
-        if(recordType === 'No Product'){
-            if(allData.buildertek__Description__c === undefined || allData.buildertek__Description__c === '' || allData.buildertek__Description__c === null){
+        } else if(recordType === 'No Product'){
+            if(description === undefined || description === '' || description === null){
                 component.set("v.Spinner", false);
                 var toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams({
@@ -72,6 +75,7 @@
                 return;
             }
         }
+        var allData = JSON.stringify(fields);; 
         console.log('allData: ' , allData);
         var action = component.get("c.saveData");
         action.setParams({
@@ -84,7 +88,15 @@
                 console.log({result});
                 component.set("v.Spinner", false);
                 $A.get("e.force:closeQuickAction").fire();
-                $A.get('e.force:refreshView').fire();
+                var navEvt = $A.get("e.force:navigateToSObject");
+                navEvt.setParams({
+                    "recordId": result,
+                    "slideDevName": "Detail"
+                });
+                navEvt.fire();
+            } else {
+                console.log('error-->',response.getError());
+                component.set("v.Spinner", false);
             }
         });
         $A.enqueueAction(action);
@@ -92,7 +104,31 @@
     },
 
     changeEvent : function(component, event, helper) {
-        console.log('changeEvent in controller');
+        var product = component.get('v.selectedLookUpRecord');
+        var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
+        compEvent.setParams({
+            "recordByEvent": product
+        });
+        compEvent.fire();
         helper.changeEvent(component, event);
+    },
+
+    changefamily: function (component, event, helper) {
+
+        var product = component.get('v.selectedLookUpRecord');
+        var compEvent = $A.get('e.c:BT_CLearLightningLookupEvent');
+        compEvent.setParams({
+            "recordByEvent": product
+        });
+        compEvent.fire();
+
+    },
+
+    handleComponentEvents: function (component, event, helper) {
+        console.log('handleComponentEvents');
+        var selectedAccountGetFromEvent = event.getParam("recordByEvent");
+        component.set("v.productId", selectedAccountGetFromEvent.Id);
+        component.set("v.productName", selectedAccountGetFromEvent.Name);
+        helper.getProductDetails(component, event, helper);
     },
 })

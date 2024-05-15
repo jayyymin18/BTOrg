@@ -7,11 +7,8 @@ public without sharing class  RFQAcceptedRejected{
     
     public RFQAcceptedRejected(){
 
-    buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [SELECT Id,buildertek__Color_code__c
-                                                                                              FROM buildertek__Admin_Interface_Node_Configuration__c
-                                                                                              WHERE Name=:'RFQ Configuration'];
-      colorr=adminInterfaceNodeConfigurations.buildertek__Color_code__c;
-      System.debug(colorr);         
+    buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [SELECT Id,buildertek__Color_code__c FROM buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'RFQ Configuration'];
+      colorr=adminInterfaceNodeConfigurations.buildertek__Color_code__c;       
         
         rfqTemplateSettings = buildertek__RFQ_Template_Settings__c.getOrgDefaults();
         system.debug('rfqTemplateSettings'+rfqTemplateSettings);

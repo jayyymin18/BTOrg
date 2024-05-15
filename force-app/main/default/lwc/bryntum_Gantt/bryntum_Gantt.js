@@ -1306,6 +1306,7 @@ export default class Gantt_component extends NavigationMixin(LightningElement) {
   }
 
   connectedCallback() {
+    console.log('check check');
     this.phaseFunction();
 
     // event ot show toast message

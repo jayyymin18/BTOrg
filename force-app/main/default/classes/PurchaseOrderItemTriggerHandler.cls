@@ -59,6 +59,7 @@ public with sharing class PurchaseOrderItemTriggerHandler {
 				buildertek__PO_Item_To_Budget_Item_Link__c potobudgetRec = new buildertek__PO_Item_To_Budget_Item_Link__c();
 				potobudgetRec.buildertek__Budget_Item__c = POToJunctionMap.get(PO.Id).buildertek__Budget_Item__c;
 				potobudgetRec.buildertek__PO_Item__c = PO.Purchase_Order_Items__r[0].Id;
+				potobudgetRec.buildertek__Purchase_Order__c = PO.Id;
 				potobudgetRec.buildertek__Approved_PO__c =PO.buildertek__PO_Total__c;
 				budgetItemLinkRecs.add(potobudgetRec);
 			}

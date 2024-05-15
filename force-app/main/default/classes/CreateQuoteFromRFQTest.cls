@@ -8,7 +8,7 @@ private class CreateQuoteFromRFQTest {
 	    
 	    buildertek__RFQ__c rfq = new buildertek__RFQ__c();
 	    rfq.buildertek__Project__c = proj.Id;
-	    rfq.buildertek__Status__c = 'Awarded';
+	    rfq.buildertek__Status__c = 'New';
 	    rfq.buildertek__Description__c = 'Test Description';
 	    insert rfq;
 	    

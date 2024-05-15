@@ -15,63 +15,63 @@
                              'buildertek__Start__c': null,
                              'buildertek__Budget_Line__c':null,
                              'buildertek__Finish__c': null}" />
-    
+
     <aura:attribute name="scheduleItemsToInsert" type="List" />
     <aura:attribute name="scheduleRecordsItems" type="List" default="[]"/>
     <aura:attribute name="singleselectedScheduleRecord" type="String" default="" />
     <aura:attribute name="cancelCallback" type="object" access="public" />
     <aura:attribute name="saveCallback" type="Aura.Action" access="public" />
     <aura:attribute name="newSchedule" type="Schedule__c" default="{ 'sobjectType': 'Schedule__c' }" access="public" />
-    
+
     <aura:attribute name="Spinner" type="Boolean" />
     <div aura:id="btspinner" class="slds-hide" style="position: relative; height: 80px;">
         <lightning:spinner alternativeText="Loading" size="medium" variant="brand" />
     </div>
-    
+
     <div aura:id="scheduleItemContainer" class="c-container slds-scrollable">
         <div aura:id="scheduleItemComp">
             <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
                 <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
-                    Schedule Details</span>
-               
+                    Schedule Details jon</span>
+
             </h3>
-            <!-- recordId -->  
+            <!-- recordId -->
             <aura:if isTrue="{!!v.isCreateNewScheduleAttr}">
-                <!--  <lightning:recordForm recordId="{!v.singleselectedScheduleRecord}"   
+                <!--  <lightning:recordForm recordId="{!v.singleselectedScheduleRecord}"
                                           objectApiName="buildertek__Schedule__c"
                                           layout-type="full"
                                           mode="readonly"
-                                          columns="2"        
+                                          columns="2"
                                           fields="{!v.fields}" /> -->
                 <aura:iteration items="{!v.scheduleRecordsItems}" var="item" indexVar="index">
-                   
-                     <lightning:recordForm recordId="{!item}"   
+
+                     <lightning:recordForm recordId="{!item}"
                                           objectApiName="buildertek__Schedule__c"
                                           layout-type="full"
                                           mode="readonly"
-                                          columns="2"        
+                                          columns="2"
                                           fields="{!v.fields}" />
                     <br/>
                 </aura:iteration>
-               
-            
+
+
                 <aura:set attribute="else">
                     <lightning:layout multipleRows="true">
-                        
+
                         <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                             <lightning:input aura:id="description" label="Description" value="{!v.newSchedule.buildertek__Description__c}"/>
                         </lightning:layoutItem>
-                        
+
                         <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                             <lightning:recordEditForm aura:id="scheduleCreateForm" objectApiName="buildertek__Schedule__c" >
                                 <lightning:messages />
-                                
+
                                 <lightning:inputField fieldName="buildertek__Project__c" value="{!v.projectID}" ></lightning:inputField>
-                                
+
                             </lightning:recordEditForm>
                         </lightning:layoutItem>
-                        
-                        
+
+
                         <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                             <lightning:select aura:id="selectScheduleType" name="select" label="Type" onchange="{! c.onChangScheduleType }">
                                 <option value="None">None</option>
@@ -79,27 +79,27 @@
                                 <option value="Master">Master</option>
                             </lightning:select>
                         </lightning:layoutItem>
-                        
-                        
-                        
+
+
+
                         <lightning:layoutItem size="12" mediumDeviceSize="6" padding="around-small">
                             <lightning:input aura:id="Initial Start Date" type="Date" label="Initial Start Date" value="{!v.newSchedule.buildertek__Initial_Start_Date__c}"/>
                         </lightning:layoutItem>
-                         
-                        
+
+
                     </lightning:layout>
-                    
-                  
-                    
+
+
+
                 </aura:set>
             </aura:if>
-            
+
             &nbsp; &nbsp; &nbsp; &nbsp;
             <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder test-id__section-header-container">
                 <span class="test-id__section-header-title section-header-title slds-p-horizontal--small slds-truncate">
                     Schedule item(s)</span>
-            </h3>  
-            
+            </h3>
+
             <table class="slds-table slds-table_bordered slds-table_cell-buffer">
                 <thead>
                     <tr class="slds-text-title_caps">
@@ -130,8 +130,8 @@
                                                      value="{!item.Name}" />
                                 </div>
                             </td>
-                            
-                            
+
+
                             <td>
                                 <div class="slds-truncate" title="{!item.buildertek__Duration__c}" style="margin-bottom: 20px;">
                                     <lightning:input name="" label=""
@@ -140,7 +140,7 @@
                             </td>
                             <td>
                                 <div class="slds-truncate" title="{!item.buildertek__Start__c}" style="margin-bottom: 20px;">
-                                    <lightning:input name="" label="" type="date" 
+                                    <lightning:input name="" label="" type="date"
                                                      value="{!item.buildertek__Start__c}" />
                                 </div>
                             </td>
@@ -159,12 +159,12 @@
                 </tbody>
             </table>
         </div>
-        
+
         <div aura:id="footer" style="display:none">
             <button class="slds-button slds-button_neutral" onclick="{!c.doCancel}">Cancel</button>
             <button class="slds-button slds-button_brand" onclick="{!c.doSave}">Save</button>
         </div>
-        
+
         <aura:if isTrue="{!v.Spinner}">
             <div aura:id="spinnerId" class="slds-spinner_container">
                 <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">

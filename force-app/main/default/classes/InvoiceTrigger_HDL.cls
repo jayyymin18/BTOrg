@@ -3,6 +3,8 @@ public with sharing class InvoiceTrigger_HDL {
     public InvoiceTrigger_HDL(){
         
     }
+
+
     public void OnAfterInsert(buildertek__Billings__c[] newInvoiceList, Map<ID, buildertek__Billings__c> newInvoiceMap){ 
         Set<Id> invoiceIds = new Set<Id>();
         for (buildertek__Billings__c invoice : newInvoiceList) {

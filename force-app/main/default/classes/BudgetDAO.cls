@@ -11,7 +11,7 @@ public with sharing class BudgetDAO{
     public static boolean isCreateExpense = false;
     /*Method to used to set default grouping in Budget item*/
     public static void setDefaultGrouping(List<Budget_Item__c> budgetItems){
-        // system.debug(budgetItems);
+       // system.debug(budgetItems);
         set<Id> budgetIds = new set<Id>();
         SET<Id> groupIds = new SET<Id>();
         map<String, String> budgetIdByGroupId = new map<String, String>();
@@ -33,8 +33,7 @@ public with sharing class BudgetDAO{
             if (Schema.sObjectType.buildertek__Budget_Line_Group__c.fields.Id.isAccessible() && Schema.sObjectType.buildertek__Budget_Line_Group__c.fields.Name.isAccessible()){
                 btGroup = [SELECT Id
                            FROM buildertek__Budget_Line_Group__c
-                           WHERE Name = 'No Grouping'
-                           ORDER BY Name ASC];
+                           WHERE Name = 'No Grouping' ORDER BY Name ASC];
             }
             if (btGroup.size() > 0){
                 for (buildertek__Budget_Item__c bItem : budgetItems){
@@ -1297,17 +1296,25 @@ public with sharing class BudgetDAO{
 
     @AuraEnabled
     public static buildertek__Budget_Item__c deleteBudgetLineItem(String budgetId){
-        System.debug('========== deleteBudgetLineItem ========= ');
-        buildertek__Budget_Item__c budgetItem;
-        if (Schema.sObjectType.buildertek__Budget_Item__c.fields.Id.isAccessible()){
-            budgetItem = [SELECT Id
-                          FROM buildertek__Budget_Item__c
-                          WHERE Id = :budgetId];
+        try {
+            buildertek__Budget_Item__c budgetItem;
+            if (Schema.sObjectType.buildertek__Budget_Item__c.fields.Id.isAccessible()){
+                budgetItem = [SELECT Id FROM buildertek__Budget_Item__c WHERE Id = :budgetId];
+                if (budgetItem != null) {
+                    Database.DeleteResult deleteResult = Database.delete(budgetItem, false);
+                    if (!deleteResult.isSuccess()) {
+                        return null;
+                    }
+                }
+            }
+            return budgetItem;
+        } catch (Exception e) {
+            List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
+            if (!StoreExcCustomSetting.isEmpty() && StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true){
+                BT_ExceptionHandler.Store_Exception(e);
+            }
+            return null;
         }
-        if (buildertek__Budget_Item__c.sObjectType.getDescribe().isDeletable()){
-            delete budgetItem;
-        }
-        return budgetItem;
     }
 
     @AuraEnabled
@@ -1350,7 +1357,6 @@ public with sharing class BudgetDAO{
     @AuraEnabled
     public static String deleteSelectedItems(List<String> recordIds){
         try {
-
             List<buildertek__Budget_Item__c> budgetItemLists;
             if (Schema.sObjectType.buildertek__Budget_Item__c.fields.Id.isAccessible()){
                 budgetItemLists = [select id
@@ -1358,11 +1364,14 @@ public with sharing class BudgetDAO{
                                    where id IN:recordIds];
             }
             if (budgetItemLists.size() > 0){
-                Database.delete(budgetItemLists, false);
+                Database.DeleteResult[] deletedBudgetLineList = Database.delete(budgetItemLists, false);
+                for (Database.DeleteResult dr : deletedBudgetLineList) {
+                    if (!dr.isSuccess()) {
+                        return 'There are records associated with one of the Budget Lines you are trying to delete.  Please remove the associated record and try again.';
+                    }
+                }
             }
-
             return 'success';
-
         } catch (Exception e) {
             List<buildertek__Exception_Log_Store_Option__c> StoreExcCustomSetting = [SELECT Id, buildertek__Store_Exception_Log_in_Object__c FROM buildertek__Exception_Log_Store_Option__c];
             if(StoreExcCustomSetting[0].buildertek__Store_Exception_Log_in_Object__c == true){
@@ -2123,7 +2132,7 @@ public with sharing class BudgetDAO{
         // List<buildertek__BT_Time_Sheet__c> timeSheetList = [SELECT Id, Name, buildertek__BT_Project__c, buildertek__Status__c,buildertek__Total_Labor_Cost__c FROM buildertek__BT_Time_Sheet__c where buildertek__BT_Project__c = :BudgetRec.buildertek__Project__c and buildertek__BT_Budget_Line__c = null];
         List<buildertek__BT_Time_Sheet_Entry__c> timesheetEntryList = [SELECT Id, Name, buildertek__BT_Project__r.Name, buildertek__Status__c, buildertek__BT_Budget__c, buildertek__BT_Budget_Line__c, buildertek__Total_Labor_Costs__c, buildertek__BT_Time_Sheet__r.Name
                                                                        FROM buildertek__BT_Time_Sheet_Entry__c
-                                                                       where buildertek__BT_Project__c = :BudgetRec.buildertek__Project__c and buildertek__BT_Budget_Line__c = null];
+                                                                       where buildertek__BT_Project__c = :BudgetRec.buildertek__Project__c and buildertek__BT_Budget_Line__c = null and buildertek__Status__c = 'Approved'];
 
         return timesheetEntryList;
     }
@@ -3590,5 +3599,4 @@ public with sharing class BudgetDAO{
             return 'Error';
         }
     }
-
 }

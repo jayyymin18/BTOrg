@@ -202,6 +202,11 @@ public with sharing class bryntumGanttController {
 
         dataTableDtls.listOfContractorAndResources = [SELECT Id, Name, (SELECT Id, Name, LastName, FirstName FROM Contacts) FROM Account WHERE buildertek__BT_Account_Type__c = 'Vendor' ORDER BY Name ASC];
         dataTableDtls.listOfInternalResources = [SELECT Id, Name FROM User WHERE isActive = TRUE ORDER BY Name ASC LIMIT 10000];
+        List<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [SELECT Id, buildertek__Include_Weekend__c FROM buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Schedule Configuration'];
+
+        if (adminInterfaceNodeConfigurations.size() > 0) {
+            dataTableDtls.includeWeekend = adminInterfaceNodeConfigurations[0].buildertek__Include_Weekend__c;
+        }
 
         return dataTableDtls;
     }
@@ -378,13 +383,18 @@ public with sharing class bryntumGanttController {
         System.debug('type: ' + type);
         System.debug('user: ' + user);
         System.debug('masterId: ' + masterId);
+        List<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [SELECT Id, buildertek__Include_Weekend__c FROM buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Schedule Configuration'];
+        Boolean checkIncludeWeekendSettings = false;
+        if (adminInterfaceNodeConfigurations.size() > 0) {
+            checkIncludeWeekendSettings = adminInterfaceNodeConfigurations[0].buildertek__Include_Weekend__c;
+        }
 
         if(initialStartDate == null ){
             initialStartDate = Date.Today();
             System.debug('initialStartDate: ' + initialStartDate);
         }
 
-        initialStartDate = getInitialStartDate(initialStartDate);
+        initialStartDate = checkIncludeWeekendSettings ? initialStartDate : getInitialStartDate(initialStartDate);
 
         System.debug('initialStartDate: outif' + initialStartDate);
 
@@ -399,7 +409,7 @@ public with sharing class bryntumGanttController {
         String pageUrl = schedule.Id;
 
         if(masterId != null && masterId != ''){
-            createScheduleLineFromMasterSchedule(schedule.Id, masterId, initialStartDate);
+            createScheduleLineFromMasterSchedule(schedule.Id, masterId, initialStartDate, checkIncludeWeekendSettings);
         }
 
         return pageUrl;
@@ -411,7 +421,7 @@ public with sharing class bryntumGanttController {
      */
 
     @AuraEnabled
-    public static void createScheduleLineFromMasterSchedule (String recordId, String masterId, Date initialStartDate){
+    public static void createScheduleLineFromMasterSchedule (String recordId, String masterId, Date initialStartDate, Boolean checkIncludeWeekendSettings){
 
         buildertek__Schedule__c masterSchedule = [SELECT Id, Name, buildertek__Start_Date__c, buildertek__Initial_Start_Date__c FROM buildertek__Schedule__c WHERE Id =: masterId];
         String businessHourId = [SELECT Id, IsDefault, IsActive FROM BusinessHours WHERE IsDefault = true LIMIT 1].Id;
@@ -420,7 +430,7 @@ public with sharing class bryntumGanttController {
         if (masterStartDate == null) {
             masterStartDate = System.today();
         }
-        initialStartDate = getInitialStartDate(initialStartDate);
+        initialStartDate = checkIncludeWeekendSettings ? initialStartDate : getInitialStartDate(initialStartDate);
         DateTime oldDate = DateTime.newInstance(masterStartDate.year(), masterStartDate.month(),masterStartDate.day());
         DateTime newDate = DateTime.newInstance(initialStartDate.year(), initialStartDate.month(),initialStartDate.day());
 
@@ -598,6 +608,8 @@ public with sharing class bryntumGanttController {
         public boolean hideScheduleFromUser;
         @AuraEnabled
         public string profileName;
+        @AuraEnabled
+        public Boolean includeWeekend = false;
     }
 
     public class NotesAttachmet{

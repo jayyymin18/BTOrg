@@ -26,22 +26,49 @@ public without sharing class PurchaseOrderDAO{
      **********************************************************************************************************************/
     public static boolean isInvoiceCreated = false;
     public static void createPurchaseOrderItemToBudgetItemLink(List<Purchase_Order_Item__c> purchaseOrderItems){
+        List<PO_Item_To_Budget_Item_Link__c> POItemToBudgetItemLinks = new List<PO_Item_To_Budget_Item_Link__c>();
 
-        List<PO_Item_To_Budget_Item_Link__c> POItemToBudgeetItemLinks = new List<PO_Item_To_Budget_Item_Link__c>();
+        Set<Id> purchaseOrderIds = new Set<Id>();
+        for (Purchase_Order_Item__c item : purchaseOrderItems) {
+            purchaseOrderIds.add(item.buildertek__Purchase_Order__c);
+        }
 
-        for (Purchase_Order_Item__c POItem : purchaseOrderItems){
-            if (POItem.Budget_Item__c != null){
-                if (Schema.sObjectType.PO_Item_To_Budget_Item_Link__c.fields.PO_Item__c.isCreateable() && Schema.sObjectType.PO_Item_To_Budget_Item_Link__c.fields.Budget_Item__c.isCreateable()){
-                    PO_Item_To_Budget_Item_Link__c POItemToBudgeetItemLink = new PO_Item_To_Budget_Item_Link__c();
-                    POItemToBudgeetItemLink.PO_Item__c = POItem.Id;
-                    POItemToBudgeetItemLink.Budget_Item__c = POItem.Budget_Item__c;
-                    POItemToBudgeetItemLinks.add(POItemToBudgeetItemLink);
+        Map<Id, buildertek__Purchase_Order__c> poMap = new Map<Id, buildertek__Purchase_Order__c>();
+        for (buildertek__Purchase_Order__c po : [SELECT Id, buildertek__Budget_Line__c, buildertek__PO_Total__c FROM buildertek__Purchase_Order__c WHERE Id IN :purchaseOrderIds]) {
+            poMap.put(po.Id, po);
+        }
+
+        Set<Id> existingBudgetItemIds = new Set<Id>();
+        List<PO_Item_To_Budget_Item_Link__c> existingBudgetItemLinks = [SELECT Budget_Item__c FROM PO_Item_To_Budget_Item_Link__c WHERE PO_Item__c IN :purchaseOrderItems OR buildertek__Purchase_Order__c IN :purchaseOrderIds];
+        for (PO_Item_To_Budget_Item_Link__c existingLink : existingBudgetItemLinks) {
+            existingBudgetItemIds.add(existingLink.Budget_Item__c);
+        }
+
+        for (Purchase_Order_Item__c POItem : purchaseOrderItems) {
+            if (POItem.Budget_Item__c != null && 
+                !existingBudgetItemIds.contains(POItem.Budget_Item__c) && 
+                (poMap.containsKey(POItem.buildertek__Purchase_Order__c) && poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__Budget_Line__c != null)) {
+                
+                if (Schema.sObjectType.PO_Item_To_Budget_Item_Link__c.fields.PO_Item__c.isCreateable() && Schema.sObjectType.PO_Item_To_Budget_Item_Link__c.fields.Budget_Item__c.isCreateable()) {
+                    PO_Item_To_Budget_Item_Link__c POItemToBudgetItemLink = new PO_Item_To_Budget_Item_Link__c();
+                    POItemToBudgetItemLink.PO_Item__c = POItem.Id;
+                    POItemToBudgetItemLink.Budget_Item__c = POItem.Budget_Item__c;
+                    POItemToBudgetItemLink.buildertek__Purchase_Order__c = POItem.buildertek__Purchase_Order__c;
+                    POItemToBudgetItemLink.buildertek__Approved_PO__c = poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__PO_Total__c;
+                    POItemToBudgetItemLinks.add(POItemToBudgetItemLink);
                 }
+            } else if (poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__Budget_Line__c != null && !existingBudgetItemIds.contains(poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__Budget_Line__c)) {
+                PO_Item_To_Budget_Item_Link__c poLineTOBudgetLineLink = new PO_Item_To_Budget_Item_Link__c();
+                poLineTOBudgetLineLink.PO_Item__c = POItem.Id;
+                poLineTOBudgetLineLink.Budget_Item__c = poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__Budget_Line__c;
+                poLineTOBudgetLineLink.buildertek__Purchase_Order__c = POItem.buildertek__Purchase_Order__c;
+                poLineTOBudgetLineLink.buildertek__Approved_PO__c = poMap.get(POItem.buildertek__Purchase_Order__c).buildertek__PO_Total__c;
+                POItemToBudgetItemLinks.add(poLineTOBudgetLineLink);
             }
         }
 
-        if (!POItemToBudgeetItemLinks.isEmpty()){
-            insert POItemToBudgeetItemLinks;
+        if (!POItemToBudgetItemLinks.isEmpty()){
+            insert POItemToBudgetItemLinks;
         }
     }
 
@@ -236,7 +263,6 @@ public without sharing class PurchaseOrderDAO{
         //try{
         List<buildertek__Purchase_Order_Item__c> purchaseOrderItemList = new List<buildertek__Purchase_Order_Item__c>();
             List<buildertek__Purchase_Order_Item__c> poItems = new List<buildertek__Purchase_Order_Item__c>();
-            System.debug('poItemsJson :: ' + poItemsJson);
             List<POLineItemsClass> POItemsList = (List<POLineItemsClass>)System.JSON.deserialize(poItemsJson, List<POLineItemsClass>.class);
             system.debug('POItemsList ------------> ' + POItemsList);
             SET<ID> productIdSet = new SET<ID>();

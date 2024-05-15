@@ -1,9 +1,11 @@
 import { LightningElement, api, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import getFields from '@salesforce/apex/New_WTLine_Controller.getFieldSet';
-import getRecordType from '@salesforce/apex/New_WTLine_Controller.getRecordType';
-import saveData from '@salesforce/apex/New_WTLine_Controller.saveData';
-
+import getFields from '@salesforce/apex/walkThroughController.getFieldSet';
+import getRecordType from '@salesforce/apex/walkThroughController.getRecordType';
+import saveData from '@salesforce/apex/walkThroughController.saveData';
+import getPricebookList from '@salesforce/apex/walkThroughController.getPricebookList';
+import getProductfamilyRecords from '@salesforce/apex/walkThroughController.getProductfamilyRecords';
+import getProductsthroughPriceBook2 from '@salesforce/apex/walkThroughController.getProductsthroughPriceBook2';
 
 export default class NewWalkThroughLineCmp extends LightningElement {
 
@@ -19,16 +21,26 @@ export default class NewWalkThroughLineCmp extends LightningElement {
     @track fieldsForSelectedRecordType = [];
 
     @track isProduct = false;
+    @track spinner = false;
 
+    // PriceBook
+    selectedPriceBook
+    priceBookListOrdered;
+    searchResults;
+    selectedSearchResult;
+
+    // ProductFamily
+    selectedProductFamily
+    pflistOrdered;
+    searchProductFamilyResults;
+    selectedPFSearchResult;
+
+    
     objectApiName = 'buildertek__Walk_Through_Line_Items__c';
 
     connectedCallback() {
         this.getRecordTypeValues();
         this.getFieldsetFields();
-
-        console.log(this.categoryId);
-        console.log(this.walkThroughId);
-
     }
 
     getRecordTypeValues(){
@@ -36,6 +48,7 @@ export default class NewWalkThroughLineCmp extends LightningElement {
         .then(result =>{
             this.recordTypeOptions =result.map((item) => Object.assign({}, item, { label: item.Name, value: item.Id }));
             this.selectedRecordType = this.recordTypeOptions[0].value;
+            this.recordTypeName = this.recordTypeOptions[0].Name;
 
         })
         .catch(error => {
@@ -60,7 +73,6 @@ export default class NewWalkThroughLineCmp extends LightningElement {
             this.selectedRecordType = event.detail.value;
             var recordTypeLabel = this.recordTypeOptions.find(item => item.value === this.selectedRecordType).label;
             this.recordTypeName = recordTypeLabel;
-            console.log(this.recordTypeName);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -72,50 +84,55 @@ export default class NewWalkThroughLineCmp extends LightningElement {
 
     handleSave(event){
         try{
-            if (this.selectedRecordTypeName === 'Product') {
-                if (!this.allData.buildertek__Product__c) {
-                    this.showToast('Error', 'Please select a Product', 'error');
-                    return;
-                }
-            } else if (this.selectedRecordTypeName === 'No Product') {
-                if (!this.allData.buildertek__Description__c) {
-                    this.showToast('Error', 'Please enter a Description', 'error');
-                    return;
-                }
-            }
+            event.preventDefault();
+            this.spinner = true;
+            const fields = {};
 
-            event.preventDefault(); // Prevent default form submission
-            const fields = {}; // Object to hold field values
             this.fieldsForSelectedRecordType.forEach(field => {
                 fields[field.name] = this.template.querySelector(`[data-field="${field.name}"]`).value;
             });
 
-            // add a record type field and its value
-            fields['RecordTypeId'] = this.selectedRecordType;
-            fields['buildertek__Walk_Through_List__c'] = this.walkThroughId;
-            fields['buildertek__BT_Category__c'] = this.categoryId;
+            if (this.recordTypeName === 'Product') {
+                if (this.selectedProductResult == undefined) {
+                    this.spinner = false;
+                    this.showToast('Error', 'Please select a Product', 'error');
+                    return;
+                } else {
+                    fields['RecordTypeId'] = this.selectedRecordType;
+                    fields['buildertek__Walk_Through_List__c'] = this.walkThroughId;
+                    fields['buildertek__BT_Category__c'] = this.categoryId;
+                    fields['buildertek__Product__c'] = this.selectedProductResult.value ;
+                    fields['buildertek__Price_Book__c'] = this.selectedPriceBook ;
+                }
+            } else if (this.recordTypeName === 'No Product') {
+                if (fields['buildertek__Description__c'] == null || fields['buildertek__Description__c'] == '') {
+                    this.spinner = false;
+                    this.showToast('Error', 'Please enter a Description', 'error');
+                    return;
+                } else {
+                    fields['RecordTypeId'] = this.selectedRecordType;
+                    fields['buildertek__Walk_Through_List__c'] = this.walkThroughId;
+                    fields['buildertek__BT_Category__c'] = this.categoryId;
+                }
+            }
+
             console.log('Fields:', fields);
 
             saveData({ allData: fields})
             .then(result =>{
+                this.spinner = false;
                 console.log('result', result);
                 this.dispatchEvent(new CustomEvent("close"));
                 this.showToast('Success', 'Record Created Successfully', 'success');
             }).catch(error => {
+                this.spinner = false;
                 console.error('Error:', error);
             })
 
         }catch(error){
+            this.spinner = false;
             console.error('error', error);
             this.showToast('Error', 'Something Went Wrong', 'error');
-        }   
-    }
-
-    handleSaveAndNext(){
-        try{
-
-        }catch(error){
-            console.error('error', error);
         }   
     }
 
@@ -128,11 +145,23 @@ export default class NewWalkThroughLineCmp extends LightningElement {
             fieldsForSelectedRecord.forEach(field => {
                 if(field.name === 'buildertek__Product__c' && this.recordTypeName =='Product'){
                     this.isProduct = true;
-                }else if(field.name === 'buildertek__Product__c' && this.recordTypeName !='Product'){
+                }
+                if((field.name === 'buildertek__Product__c' || field.name === 'buildertek__Price_Book__c' )){
                     fieldsForSelectedRecord.splice(fieldsForSelectedRecord.indexOf(field), 1);
                 }
             });
             this.fieldsForSelectedRecordType = fieldsForSelectedRecord;
+
+            if(this.isProduct){
+                getPricebookList({recordId : this.walkThroughId}).then((result) => {
+                    this.priceBookListOrdered = result[0].priceWrapList.map((item) => Object.assign({}, item, { label: item.Name, value: item.Id }));
+                    this.selectedPriceBook = this.priceBookListOrdered[0].value; 
+                    this.getProductFamilyPicklistValues(this.selectedPriceBook);
+                })
+                .catch(error => {
+                    console.error('Error:', error);       
+                })
+            }
 
         }catch(error){
             console.error('error', error);
@@ -147,5 +176,126 @@ export default class NewWalkThroughLineCmp extends LightningElement {
         });
         this.dispatchEvent(event);
     }
+
+    searchPriceBook(event) {
+        this.selectedPriceBook = event.detail.value;
+        this.selectedProductResult = null;
+        this.template.querySelector(`[data-field='buildertek__Price__c']`).value = 0;
+        this.template.querySelector(`[data-field='buildertek__Notes__c']`).value = null;
+        this.template.querySelector(`[data-field='buildertek__Description__c']`).value = null;
+        this.getProductFamilyPicklistValues(this.selectedPriceBook);
+    }
+ 
+
+    searchProductFamily(event){
+        this.selectedProductFamily = event.detail.value;
+        this.getProductList(this.selectedPriceBook, this.selectedProductFamily, '');
+    }
+
+    getProductFamilyPicklistValues(pricebookId) {
+        try {
+            this.spinner = true;
+            getProductfamilyRecords({ ObjectName: 'Product2', parentId: pricebookId })
+                .then(result => {
+                    this.pflistOrdered = result.map((item) => Object.assign({}, item, { label: item.productfamilyvalues, value: item.productfamilyvalues}));
+                    this.selectedProductFamily = this.pflistOrdered[0].value;
+                    this.getProductList(pricebookId, this.selectedProductFamily, '' );
+                    this.spinner = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching product family records', error);
+                    this.spinner = false;
+                });
+
+        } catch(error){
+            console.error(error);
+        }
+    }
+
+    getProductList(pricebookId, productFamilyLabel, searchProducts){
+        this.spinner = true;
+        getProductsthroughPriceBook2({
+            priceBookId: pricebookId, productFamilyLabel : productFamilyLabel , searchProduct : searchProducts
+        })
+        .then(result => {
+            console.log('PFresult --->' );
+            console.log(result);
+            this.productList = result;
+            this.productListMain=result.map((item) => Object.assign({}, item, { label: item.Name, value: item.Id }));
+            this.spinner = false;
+        }).catch(error => {
+            console.error('Error in getProductList', error);
+            this.spinner = false;
+        })
+    }
+
+    productListMain;
+    productList;
+    searchProductResults;
+    selectedProductResult;
+
+    get selectedProductValue(){
+        return this.selectedProductResult ? this.selectedProductResult.label : null;
+    }
+
+
+    searchProduct(event){
+        const input = event.detail.value.toLowerCase();
+        if (input == '') {
+            this.selectedProductResult = null;
+            this.template.querySelector(`[data-field='buildertek__Price__c']`).value = 0;
+            this.template.querySelector(`[data-field='buildertek__Notes__c']`).value = null;
+            this.template.querySelector(`[data-field='buildertek__Description__c']`).value = null;
+        } else {
+            const result = this.productListMain.filter((picklistOption) =>
+            picklistOption.label.toLowerCase().includes(input)
+            );
+            this.searchProductResults = result;
+        }
+        
+    }
+    
+    selectProductResult(event){
+        const selectedValue = event.currentTarget.dataset.value;
+        this.selectedProductResult = this.productListMain.find(
+            (picklistOption) => picklistOption.value === selectedValue
+        );
+        this.getUnitPrice();
+        this.clearProductResults();
+    }
+
+    
+    clearProductResults() {
+        this.searchProductResults = null;
+    }
+    
+    showProductOptions(){
+        if (!this.searchProductResults) {
+            this.searchProductResults = this.productListMain;
+        }
+    }
+
+    getUnitPrice(){
+        if(this.selectedProductResult.value){
+            this.productList.forEach(item => {
+                if(item.Id == this.selectedProductResult.value){
+                    this.template.querySelector(`[data-field='buildertek__Price__c']`).value = item.UnitCost || item.UnitPrice;
+                    this.template.querySelector(`[data-field='buildertek__Notes__c']`).value = item.Instructions ? this.convertToPlain(item.Instructions) : null;
+                    this.template.querySelector(`[data-field='buildertek__Description__c']`).value = item.Description || item.Name;
+                }
+            })
+        }
+    }
+    
+    preventHide(event) {
+        event.preventDefault();
+    }
+
+    convertToPlain(html){
+        var tempDivElement = document.createElement("div");
+        tempDivElement.innerHTML = html;
+        return tempDivElement.textContent || tempDivElement.innerText || "";
+    }
+
 
 }

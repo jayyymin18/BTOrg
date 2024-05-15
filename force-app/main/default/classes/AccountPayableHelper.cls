@@ -161,12 +161,16 @@ public with sharing class AccountPayableHelper {
         }
 
         //if toDeleteBudgetItems
-        if(toDeleteBudgetItems.size() > 0){
+        if(toDeleteBudgetItems.size() > 0  && skipInvoicePOUpdate == false ){
             List<buildertek__Budget_Item__c> allBudgetItems = [SELECT Id, Name, buildertek__Budget__c, buildertek__Invoice_PO__c FROM buildertek__Budget_Item__c WHERE Id IN :toDeleteBudgetItems.keySet()];
             for(buildertek__Budget_Item__c budgetItem : allBudgetItems){
-                budgetItem.buildertek__Invoice_PO__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Net_Amount__c;
+                if(toDeleteBudgetItems.containsKey(budgetItem.Id)){
+                    budgetItem.buildertek__Invoice_PO__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Net_Amount__c;
+                }
             }
-            update allBudgetItems;
+            if (allBudgetItems.size() > 0){
+                update allBudgetItems;
+            }
         }
     }
    

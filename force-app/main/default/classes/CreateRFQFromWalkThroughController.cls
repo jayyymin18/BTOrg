@@ -555,7 +555,7 @@ public class CreateRFQFromWalkThroughController{
         //Create a map of ContentDistribution Id and Public File Id
         Map<Id, Id> mapOfContentDistributionIdAndPublicFileId = new Map<Id, Id>();
         for (buildertek__Public_File__c publicFile : publicFileList){
-            mapOfContentDistributionIdAndPublicFileId.put(publicFile.buildertek__Content_Distrubution__c, publicFile.Id);
+            mapOfContentDistributionIdAndPublicFileId.put(publicFile.buildertek__Content_Distrubution__c, publicFile.Id);`
         }
 
         //Create a map of RelatedRecordId and List of Public File Id

@@ -1,5 +1,6 @@
 public with sharing class AccountPayableHelper {
-
+    
+    public static boolean bypassTrigger = false;        
     public static boolean skipInvoicePOUpdate = false;
 
 
@@ -161,16 +162,12 @@ public with sharing class AccountPayableHelper {
         }
 
         //if toDeleteBudgetItems
-        if(toDeleteBudgetItems.size() > 0  && skipInvoicePOUpdate == false ){
+        if(toDeleteBudgetItems.size() > 0){
             List<buildertek__Budget_Item__c> allBudgetItems = [SELECT Id, Name, buildertek__Budget__c, buildertek__Invoice_PO__c FROM buildertek__Budget_Item__c WHERE Id IN :toDeleteBudgetItems.keySet()];
             for(buildertek__Budget_Item__c budgetItem : allBudgetItems){
-                if(toDeleteBudgetItems.containsKey(budgetItem.Id)){
-                    budgetItem.buildertek__Invoice_PO__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Net_Amount__c;
-                }
+                budgetItem.buildertek__Invoice_PO__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Net_Amount__c;
             }
-            if (allBudgetItems.size() > 0){
-                update allBudgetItems;
-            }
+            update allBudgetItems;
         }
     }
    
@@ -300,6 +297,7 @@ public with sharing class AccountPayableHelper {
 
     //onbeforeInsert
     public static void onbeforeInsert(buildertek__Account_Payable__c[] invoiceList){
+        if (true) {
         String budgetLineGroupId ;
         list<buildertek__Budget_Line_Group__c> budgetLineGroups = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name LIKE '%Invoice (PO)%'];
         if (budgetLineGroups.size() == 0){
@@ -313,7 +311,7 @@ public with sharing class AccountPayableHelper {
 
         List<buildertek__Budget_Item__c> toInsertBudgetItems = new List<buildertek__Budget_Item__c>();
         for(buildertek__Account_Payable__c invoice : invoiceList){
-            if(invoice.buildertek__Budget__c != null){
+            if(invoice.buildertek__Budget__c != null && invoice.buildertek__BT_Budget_Line__c == null){
                 buildertek__Budget_Item__c budgetItem = new buildertek__Budget_Item__c();
                 if (invoice.buildertek__Description__c != '' && invoice.buildertek__Description__c != null) {
                     if(invoice.Name.length() + invoice.buildertek__Description__c.length() <= 80){
@@ -349,6 +347,7 @@ public with sharing class AccountPayableHelper {
         }
 
     }
+}
 
 
     public static void UpdateCOntractorInvoiceStatus(List<buildertek__Account_Payable__c> newAccountPayList, Map<Id, buildertek__Account_Payable__c> oldAccountPayMap) {
@@ -398,6 +397,7 @@ public with sharing class AccountPayableHelper {
             
         }
     }
+    
 
     public static void OnAfterInsert(buildertek__Account_Payable__c[] invoiceList, Map<Id, buildertek__Account_Payable__c> invoiceNewMap){
 

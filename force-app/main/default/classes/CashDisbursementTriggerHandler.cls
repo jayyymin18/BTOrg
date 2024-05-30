@@ -1,9 +1,8 @@
 public with sharing class CashDisbursementTriggerHandler {
     public static Boolean isSkipExecution = false;
-
+    
     public static void onBeforeInsert(List<buildertek__Payment__c> newcashDisbursement){
         String budgetLineGroupId ;
-        
         List<buildertek__Budget_Line_Group__c> budgetLineGroups = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name = 'No Grouping' LIMIT 1];
         
         if(budgetLineGroups.size() == 0){
@@ -116,7 +115,9 @@ public with sharing class CashDisbursementTriggerHandler {
         if(toDeleteBudgetItems.size() > 0){
             List<buildertek__Budget_Item__c> toDeleteBudgetItemsList = [SELECT Id, Name, buildertek__Contractor_Invoice_Payments__c FROM buildertek__Budget_Item__c WHERE Id IN: toDeleteBudgetItems.keySet()];
             for(buildertek__Budget_Item__c budgetItem : toDeleteBudgetItemsList){
-                budgetItem.buildertek__Contractor_Invoice_Payments__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Payment_Amount__c;
+                if(toDeleteBudgetItems.get(budgetItem.Id).buildertek__Payment_Amount__c != null){
+                    budgetItem.buildertek__Contractor_Invoice_Payments__c -= toDeleteBudgetItems.get(budgetItem.Id).buildertek__Payment_Amount__c;
+                }
             }
             update toDeleteBudgetItemsList;
         }
@@ -183,8 +184,7 @@ public with sharing class CashDisbursementTriggerHandler {
             if(CD.buildertek__BT_Budget_Line__c != null){
                 budgetItemIds.add(CD.buildertek__BT_Budget_Line__c);
             }
-        }
-
+        } 
         if(budgetItemIds.size() > 0){
             recalculateBudgetItems(budgetItemIds);
         }

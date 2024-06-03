@@ -193,10 +193,10 @@ access="global" controller="New_WTLine_Controller">
             <!--Modal/Popup Box Footer Starts here-->
             <footer class="slds-modal__footer">
                 <lightning:button variant="neutral" title="Cancel" label="Cancel" onclick="{! c.closeModel }" />
-                <lightning:button variant="neutral"
+                <!-- <lightning:button variant="neutral"
                                     label="Back"
                                     title="Back"
-                                    onclick="{!c.pageOne}"/>
+                                    onclick="{!c.pageOne}"/> -->
                 <lightning:button variant="brand" type="submit" name="save" label="Save"  />
             </footer>
         </div>

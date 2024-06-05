@@ -22,8 +22,7 @@
     <aura:attribute name="pricebookName" type="string" />
     <aura:attribute name="costCode" type="string" />
     <aura:attribute name="costCodeFilter" type="string" />
-    <aura:attribute name="newSalesInvoiceLine" type="Billable_Lines__c"
-        default="{'sobjectType':'Billable_Lines__c','buildertek__Quantity__c':1}" access="global" />
+    <aura:attribute name="newSalesInvoiceLine" type="Billable_Lines__c" default="{'sobjectType':'Billable_Lines__c','buildertek__Quantity__c':1}" access="global" />
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     <aura:html tag="style">

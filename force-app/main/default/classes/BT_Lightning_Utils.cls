@@ -575,7 +575,7 @@ public with sharing class BT_Lightning_Utils{
         List<Account> accounts = new List<Account>();
         
         if(vendorName != '' || tradeType != '' || ratingValue != ''){
-            String queryList = 'Select Id, Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Bid_Rating__c, buildertek__Cost_Code__c,buildertek__Insurance__c, (select Id, Name, Email,buildertek__Primary_Contact__c from contacts where buildertek__Primary_Contact__c =true and Email != null) from Account';
+            String queryList = 'Select Id, Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Bid_Rating__c, buildertek__Cost_Code__c,buildertek__Insurance__c, buildertek__Primary_Contact__c, (select Id, Name, Email,buildertek__Primary_Contact__c from contacts where buildertek__Primary_Contact__c =true and Email != null) from Account';
             /*if (rfq.buildertek__Trade_Type__c != null){
                 if (Schema.sObjectType.Account.fields.Id.isAccessible() && Schema.sObjectType.Account.fields.Name.isAccessible() && Schema.sObjectType.Account.fields.buildertek__Cost_Code__c.isAccessible()){
                     queryList = queryList +  ' where (Id NOT IN :Ids AND buildertek__BT_Account_Type__c = \'Vendor\' and buildertek__Trade_Type_Lookup__c =: rfqtradetype) ';
@@ -610,12 +610,12 @@ public with sharing class BT_Lightning_Utils{
             if (Schema.sObjectType.Account.fields.id.isAccessible() && Schema.sObjectType.Account.fields.Name.isAccessible() && Schema.sObjectType.Account.fields.buildertek__Cost_Code__c.isAccessible() && Schema.sObjectType.Account.fields.BT_Account_Type__c.isAccessible()){
                 if(adminInterfaceNodeConfigurations.size()>0){
                     if(adminInterfaceNodeConfigurations[0].buildertek__Is_Pre_Qualified__c == true){ 
-                        acclst = [Select Id,Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Insurance__c,buildertek__Pre_Qualified__c,
+                        acclst = [Select Id,Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Insurance__c,buildertek__Pre_Qualified__c, buildertek__Primary_Contact__c,
                                   (select Id, Name, Email,buildertek__Primary_Contact__c from contacts where buildertek__Primary_Contact__c =true and Email != null) 
                                   FROM Account WHERE Id NOT IN:Ids AND BT_Account_Type__c = 'Vendor' AND buildertek__Pre_Qualified__c = true Order By buildertek__Trade_Type_Lookup__r.Name NULLS LAST]; // Order By Name,
                     }
                 }else{
-                   acclst = [Select Id,Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Insurance__c,buildertek__Pre_Qualified__c,
+                   acclst = [Select Id,Name,buildertek__Trade_Type_Lookup__c,buildertek__Trade_Type_Lookup__r.Name,buildertek__Insurance__c,buildertek__Pre_Qualified__c, buildertek__Primary_Contact__c,
                                   (select Id, Name, Email,buildertek__Primary_Contact__c from contacts where buildertek__Primary_Contact__c =true and Email != null) 
                                   FROM Account WHERE Id NOT IN:Ids AND BT_Account_Type__c = 'Vendor' Order By buildertek__Trade_Type_Lookup__r.Name NULLS LAST]; // Order By Name,
                 }

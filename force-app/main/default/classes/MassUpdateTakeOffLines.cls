@@ -196,7 +196,7 @@ public class MassUpdateTakeOffLines{
                     searchTradeType = '%' + searchTradeType + '%';
                     query += ' AND buildertek__Trade_Type__r.Name LIKE : searchTradeType';
                 }
-                query += ' ORDER BY Name DESC NULLS LAST';
+                query += ' ORDER BY buildertek__Cost_Code__r.Name ASC NULLS LAST';
                 query += ' LIMIT : pageSize OFFSET : offset';
 
                 for (sObject s : Database.query(query)){
@@ -309,7 +309,7 @@ public class MassUpdateTakeOffLines{
     }
 
     @AuraEnabled
-    public static Map<Id, Id> get_ProductPhase_BuildPhase(){
+    public static Map<Id, Id> get_ProductPhase_BuildPhase(String takeOffId){
         try {
             List<buildertek__Quote_Line_Group__c> ProductPhase = [SELECT Id, Name FROM buildertek__Quote_Line_Group__c];
             List<buildertek__Build_Phase__c> BuildPhases = [SELECT Id, Name FROM buildertek__Build_Phase__c];

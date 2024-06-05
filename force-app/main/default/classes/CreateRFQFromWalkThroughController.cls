@@ -6,7 +6,7 @@ public class CreateRFQFromWalkThroughController{
 
             List<buildertek__RFQ_Item__c> newRFQLines = new List<buildertek__RFQ_Item__c>();
 
-            List<buildertek__Walk_Through_List__c> walkthroughrec = [SELECT Id, buildertek__Description__c, buildertek__Project__c, (SELECT Id, Name,buildertek__Quantity__c, buildertek__Details__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__BT_Category__c, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
+            List<buildertek__Walk_Through_List__c> walkthroughrec = [SELECT Id, buildertek__Description__c, buildertek__Project__c, (SELECT Id, Name,buildertek__Quantity__c, buildertek__Details__c, buildertek__Price__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__BT_Category__c, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
                                                                                                                                      FROM buildertek__Walk_Through_Line_Items__r)
                                                                      FROM buildertek__Walk_Through_List__c
                                                                      WHERE Id = :walkThroughId];
@@ -39,6 +39,7 @@ public class CreateRFQFromWalkThroughController{
                         newRFQLine.buildertek__Cost_Code__c = walkthroughline.buildertek__BT_Cost_Code__c;
                         newRFQLine.buildertek__BT_Category__c = walkthroughline.buildertek__BT_Category__c;
                         newRFQLine.buildertek__Trade_Type__c = walkthroughline.buildertek__Trade_Type__c;
+                        newRFQLine.buildertek__Walk_Through_Unit_Cost__c = walkthroughline.buildertek__Price__c;
 
                         newRFQLines.add(newRFQLine);
                     }
@@ -54,11 +55,13 @@ public class CreateRFQFromWalkThroughController{
                         msg.Status = 'Success';
                         msg.Message = 'RFQ is Created Successfully';
                         msg.newRecordId = newRFQrecord.Id;
+                        msg.projectId = walkthroughrec[0].buildertek__Project__c;
                     }
                 } else{
                     msg.Status = 'Success';
                     msg.Message = 'RFQ is Created Successfully';
                     msg.newRecordId = newRFQrecord.Id;
+                    msg.projectId = walkthroughrec[0].buildertek__Project__c;
                 }
             } else{
                 msg.Status = 'Failed';
@@ -94,7 +97,7 @@ public class CreateRFQFromWalkThroughController{
                                                                      WHERE Id = :walkThroughId];
 
             if (grpType == 'tradeType'){
-                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c, buildertek__Description__c, buildertek__Quantity__c,buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
+                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c, buildertek__Price__c, buildertek__Description__c, buildertek__Quantity__c,buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
                                                                                         FROM buildertek__Walk_Through_Line_Items__c
                                                                                         WHERE buildertek__Walk_Through_List__c = :walkThroughId
                                                                                         ORDER BY buildertek__Trade_Type__r.Name];
@@ -134,6 +137,7 @@ public class CreateRFQFromWalkThroughController{
                         addFilesOnRfqLines(mapOfWalkThroughLineIdAndRfqLineId);
                         msg.Status = 'Success';
                         msg.Message = 'All of your RFQs have been created';
+                        msg.projectId = walkthroughrec[0].buildertek__Project__c;
                     }
 
                 } else{
@@ -142,7 +146,7 @@ public class CreateRFQFromWalkThroughController{
                 }
 
             } else if (grpType == 'costCode'){
-                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c,buildertek__Quantity__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
+                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c,buildertek__Price__c, buildertek__Quantity__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
                                                                                         FROM buildertek__Walk_Through_Line_Items__c
                                                                                         WHERE buildertek__Walk_Through_List__c = :walkThroughId
                                                                                         ORDER BY buildertek__BT_Cost_Code__r.Name];
@@ -181,6 +185,7 @@ public class CreateRFQFromWalkThroughController{
 
                         msg.Status = 'Success';
                         msg.Message = 'All of your RFQs have been created';
+                        msg.projectId = walkthroughrec[0].buildertek__Project__c;
                     }
 
                 } else{
@@ -189,7 +194,7 @@ public class CreateRFQFromWalkThroughController{
                 }
 
             } else if (grpType == 'section'){
-                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c,buildertek__Quantity__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
+                List<buildertek__Walk_Through_Line_Items__c> walkthroughLineItemList = [SELECT Id, Name, buildertek__Details__c,buildertek__Price__c,buildertek__Quantity__c, buildertek__Description__c, buildertek__Trade_Type__c, buildertek__Trade_Type__r.Name, buildertek__BT_Category__r.Name, buildertek__BT_Category__c, buildertek__BT_Cost_Code__r.Name, buildertek__BT_Cost_Code__c, buildertek__Anticipated_Finish_Date__c, buildertek__Anticipated_Start_Date__c
                                                                                         FROM buildertek__Walk_Through_Line_Items__c
                                                                                         WHERE buildertek__Walk_Through_List__c = :walkThroughId
                                                                                         ORDER BY buildertek__BT_Category__r.Name];
@@ -229,6 +234,7 @@ public class CreateRFQFromWalkThroughController{
 
                         msg.Status = 'Success';
                         msg.Message = 'All of your RFQs have been created';
+                        msg.projectId = walkthroughrec[0].buildertek__Project__c;
                     }
 
                 } else{
@@ -289,6 +295,7 @@ public class CreateRFQFromWalkThroughController{
                         newRFQLine.buildertek__Trade_Type__c = walkthroughline.buildertek__Trade_Type__c;
                         newRFQLine.buildertek__Cost_Code__c = walkthroughline.buildertek__BT_Cost_Code__c;
                         newRFQLine.buildertek__BT_Category__c = walkthroughline.buildertek__BT_Category__c;
+                        newRFQLine.buildertek__Walk_Through_Unit_Cost__c = walkthroughline.buildertek__Price__c;
 
                         newRFQLines.add(newRFQLine);
                     }
@@ -324,6 +331,7 @@ public class CreateRFQFromWalkThroughController{
                         newRFQLine.buildertek__Cost_Code__c = walkthroughline.buildertek__BT_Cost_Code__c;
                         newRFQLine.buildertek__BT_Category__c = walkthroughline.buildertek__BT_Category__c;
                         newRFQLine.buildertek__Trade_Type__c = walkthroughline.buildertek__Trade_Type__c;
+                        newRFQLine.buildertek__Walk_Through_Unit_Cost__c = walkthroughline.buildertek__Price__c;
 
                         newRFQLines.add(newRFQLine);
                     }
@@ -359,6 +367,7 @@ public class CreateRFQFromWalkThroughController{
                         newRFQLine.buildertek__BT_Category__c = walkthroughline.buildertek__BT_Category__c;
                         newRFQLine.buildertek__Cost_Code__c = walkthroughline.buildertek__BT_Cost_Code__c;
                         newRFQLine.buildertek__Trade_Type__c = walkthroughline.buildertek__Trade_Type__c;
+                        newRFQLine.buildertek__Walk_Through_Unit_Cost__c = walkthroughline.buildertek__Price__c;                        
 
                         newRFQLines.add(newRFQLine);
                     }
@@ -555,7 +564,7 @@ public class CreateRFQFromWalkThroughController{
         //Create a map of ContentDistribution Id and Public File Id
         Map<Id, Id> mapOfContentDistributionIdAndPublicFileId = new Map<Id, Id>();
         for (buildertek__Public_File__c publicFile : publicFileList){
-            mapOfContentDistributionIdAndPublicFileId.put(publicFile.buildertek__Content_Distrubution__c, publicFile.Id);`
+            mapOfContentDistributionIdAndPublicFileId.put(publicFile.buildertek__Content_Distrubution__c, publicFile.Id);
         }
 
         //Create a map of RelatedRecordId and List of Public File Id
@@ -629,6 +638,8 @@ public class CreateRFQFromWalkThroughController{
         @AuraEnabled
         public String newRecordId;
 
+        @AuraEnabled
+        public String projectId;
     }
 
 }

@@ -54,7 +54,7 @@
             width: 72% !important;
         }
         .scrollable {
-            height: 400px;
+            height: 400px !important;
             overflow-y: auto;
         }
     </aura:html>

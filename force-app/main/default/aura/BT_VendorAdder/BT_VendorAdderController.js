@@ -36,6 +36,7 @@
         actionRfqToVendorList.setCallback(this, function (response) {
             if (component.isValid() && response.getState() === "SUCCESS") {
                 var rfqToVendorList = response.getReturnValue();
+                console.log('rfqToVendorList'+JSON.stringify(rfqToVendorList));
                 /*component.set("v.vendorList",rfqToVendorList);
                 component.set("v.vendorOptionList",rfqToVendorList);*/
             	var rows = rfqToVendorList;

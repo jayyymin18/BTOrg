@@ -69,6 +69,7 @@ public with sharing class PurchaseOrderTriggerHandler{
     }
 
     public void OnBeforeUpdate(Purchase_Order__c[] oldPurchaseOrders, Purchase_Order__c[] updatedPurchaseOrders, Map<ID, Purchase_Order__c> oldPurchaseOrderMap, Map<ID, Purchase_Order__c> PurchaseOrderMap){
+        System.debug('OnBeforeUpdate PO Trigger');
         try {
             for (Purchase_Order__c PO : updatedPurchaseOrders){
                 if ((PO.buildertek__Completion__c == 100 && PO.buildertek__Completion__c != oldPurchaseOrderMap.get(PO.Id).buildertek__Completion__c)){
@@ -88,7 +89,8 @@ public with sharing class PurchaseOrderTriggerHandler{
                 }
                 else if(PO.buildertek__Paid__c == 0){
                     //BUIL - 3960 PO could be at Open, Approved, Ordered, Vendor Accepted, Vendor Rejected and Liend Release Accepted status when the paid amount is 0
-                    if (PO.buildertek__Status__c != 'Open' && PO.buildertek__Status__c != 'Approved' && PO.buildertek__Status__c != 'Ordered' && PO.buildertek__Status__c != 'Vendor Accepted' && PO.buildertek__Status__c != 'Vendor Rejected' && PO.buildertek__Status__c != 'Lien Release Accepted'){
+                    //add Canceled	in if condition for this ticket BUIL-4167 PO's - Void PO button needs some additional logic.
+                    if (PO.buildertek__Status__c != 'Open' && PO.buildertek__Status__c != 'Approved' && PO.buildertek__Status__c != 'Ordered' && PO.buildertek__Status__c != 'Vendor Accepted' && PO.buildertek__Status__c != 'Vendor Rejected' && PO.buildertek__Status__c != 'Lien Release Accepted'&& PO.buildertek__Status__c != 'Canceled'){
                         PO.buildertek__Status__c = 'Open';
                     }
                 }
@@ -102,7 +104,7 @@ public with sharing class PurchaseOrderTriggerHandler{
                     }
                 }
                 if(PO.buildertek__Budget_Line__c == null && PO.buildertek__Budget__c != null){
-                    PO.buildertek__Budget__c = null;
+                    // PO.buildertek__Budget__c = null;
                 }
                 //made process builder inactive and added
                  PO.buildertek__Date_Created__c = System.today();
@@ -291,7 +293,44 @@ public with sharing class PurchaseOrderTriggerHandler{
         }
         // remove PO from schedule item
         removePOFromScheduleItem(updatedPurchaseOrders, oldPurchaseOrdersMap);
+        deleteoldbudgetlineonupdate(oldPurchaseOrders, updatedPurchaseOrders, PurchaseOrderMap, oldPurchaseOrdersMap);
     }
+
+public void deleteoldbudgetlineonupdate(
+    Purchase_Order__c[] oldPurchaseOrders,
+    Purchase_Order__c[] updatedPurchaseOrders,
+    Map<ID, Purchase_Order__c> PurchaseOrderMap,
+    Map<Id, Purchase_Order__c> oldPurchaseOrdersMap
+) {
+    List<buildertek__Budget_Item__c> budgetLinesToDelete = new List<buildertek__Budget_Item__c>();
+
+    // Collect the IDs of the updated Purchase Orders' Budget Lines
+    Set<Id> oldBudgetLineIds = new Set<Id>();
+    for (Purchase_Order__c updatedPurchaseOrder : updatedPurchaseOrders) {
+        Purchase_Order__c oldPurchaseOrder = oldPurchaseOrdersMap.get(updatedPurchaseOrder.Id);
+
+        if (updatedPurchaseOrder.buildertek__Budget_Line__c != oldPurchaseOrder.buildertek__Budget_Line__c && oldPurchaseOrder.buildertek__Budget_Line__c != null) {
+            oldBudgetLineIds.add(oldPurchaseOrder.buildertek__Budget_Line__c);
+        }
+    }
+
+    if (!oldBudgetLineIds.isEmpty()) {
+        budgetLinesToDelete = [
+            SELECT Id
+            FROM buildertek__Budget_Item__c
+            WHERE Id IN :oldBudgetLineIds
+        ];
+    }
+
+    // Perform the deletion
+    if (!budgetLinesToDelete.isEmpty()) {
+        delete budgetLinesToDelete;
+        System.debug('Budget Lines deleted successfully.');
+    } else {
+        System.debug('No Budget Lines to delete.');
+    }
+
+}
 
     public void OnBeforeUpdate(Purchase_Order__c[] newPurchaseOrders, Map<ID, Purchase_Order__c> newPurchaseOrdersMap, Map<ID, Purchase_Order__c> oldPurchaseOrdersMap){
         //* added this lines by Nishit (MV Clouds)
@@ -366,7 +405,7 @@ public with sharing class PurchaseOrderTriggerHandler{
 
                 system.debug('BudgetItemList.size()----->'+BudgetItemList.size());
 
-                List<buildertek__PO_Item_To_Budget_Item_Link__c> poLink = [SELECT Id, Name, buildertek__Approved_PO__c FROM buildertek__PO_Item_To_Budget_Item_Link__c WHERE buildertek__PO_Item__c =: purchaseOrderItemID];
+                List<buildertek__PO_Item_To_Budget_Item_Link__c> poLink = [SELECT Id, Name, buildertek__Approved_PO__c, buildertek__Purchase_Order__c FROM buildertek__PO_Item_To_Budget_Item_Link__c WHERE buildertek__PO_Item__c =: purchaseOrderItemID];
 
                 for(buildertek__Purchase_Order__c purchaseRec : newPurchaseOrders){
 
@@ -392,7 +431,7 @@ public with sharing class PurchaseOrderTriggerHandler{
                                         buildertek__PO_Item_To_Budget_Item_Link__c potobudgetRec = new buildertek__PO_Item_To_Budget_Item_Link__c();
                                         potobudgetRec.buildertek__Budget_Item__c = budgetRec.Id;
                                         potobudgetRec.buildertek__PO_Item__c = poitemRec.Id;
-                                        potobudgetRec.buildertek__Approved_PO__c = purchaseRec.buildertek__PO_Total__c + poitemRec.buildertek__Total_Amount_Tax__c;
+                                        potobudgetRec.buildertek__Approved_PO__c = purchaseRec.buildertek__PO_Total__c;
                                         potobudgetRec.buildertek__Purchase_Order__c = purchaseRec.Id;
                                         budgetItemLinkRecs.add(potobudgetRec);
                                     }
@@ -409,13 +448,17 @@ public with sharing class PurchaseOrderTriggerHandler{
                     if (poLink.size()>0) {
                         if (purchaseRec.buildertek__Status__c == 'Pending') {
                             for (buildertek__PO_Item_To_Budget_Item_Link__c po : poLink) {
-                                po.buildertek__Pending_PO__c = purchaseRec.buildertek__PO_Total__c;
-                                po.buildertek__Approved_PO__c = 0;
+                                if(po.buildertek__Purchase_Order__c == purchaseRec.Id){
+                                    po.buildertek__Pending_PO__c = purchaseRec.buildertek__PO_Total__c;
+                                    po.buildertek__Approved_PO__c = 0;
+                                }
                             }
                         }else {
                             for (buildertek__PO_Item_To_Budget_Item_Link__c po : poLink) {
-                                po.buildertek__Pending_PO__c = 0;
-                                po.buildertek__Approved_PO__c = purchaseRec.buildertek__PO_Total__c;
+                                if(po.buildertek__Purchase_Order__c == purchaseRec.Id){
+                                    po.buildertek__Pending_PO__c = 0;
+                                    po.buildertek__Approved_PO__c = purchaseRec.buildertek__PO_Total__c;
+                                }
                             }
                         }
                     }
@@ -434,7 +477,7 @@ public with sharing class PurchaseOrderTriggerHandler{
                     }
                 }
             }
-            
+
             if (!deleteViaPOList.isEmpty()) {
                 List<buildertek__PO_Item_To_Budget_Item_Link__c> poBudgetItemLinkList = [SELECT Id, Name, buildertek__Purchase_Order__c FROM buildertek__PO_Item_To_Budget_Item_Link__c WHERE buildertek__Purchase_Order__c IN :deleteViaPOList];
 
@@ -577,22 +620,21 @@ public with sharing class PurchaseOrderTriggerHandler{
 
     public void removePOFromBudgetLine(Purchase_Order__c[] oldPO, Map<ID, Purchase_Order__c> oldPurchaseOrderMap) {
         try {
-            System.debug('HEYYYYYYYYYY CHECKKKKKKKK THISSSSSSSS OUTTTTTTTTT:'+oldPO);
-            System.debug('HEYYYYYYYYYY oldPurchaseOrderMap:'+oldPurchaseOrderMap);
             List<buildertek__Purchase_Order__c> deleteViaPOList = new List<buildertek__Purchase_Order__c>();
             if (oldPurchaseOrderMap != null) {
                 for (buildertek__Purchase_Order__c PO : oldPO) {
-                    if (oldPurchaseOrderMap.containsKey(PO.Id) && oldPurchaseOrderMap.get(PO.Id).buildertek__Budget_Line__c != null && PO.buildertek__Budget_Line__c == null) {
+                    if (oldPurchaseOrderMap.containsKey(PO.Id) && oldPurchaseOrderMap.get(PO.Id).buildertek__Budget_Line__c != null) {
                         System.debug('Check PO Name ======== ' + PO.Name);
                         deleteViaPOList.add(PO);
                     }
                 }
             }
-            
+
             if (!deleteViaPOList.isEmpty()) {
                 List<buildertek__PO_Item_To_Budget_Item_Link__c> poBudgetItemLinkList = [SELECT Id, Name, buildertek__Purchase_Order__c FROM buildertek__PO_Item_To_Budget_Item_Link__c WHERE buildertek__Purchase_Order__c IN :deleteViaPOList];
 
                 if (!poBudgetItemLinkList.isEmpty()) {
+                    System.debug('Deleting PO Item To Budget Item Links: ' + poBudgetItemLinkList);
                     delete poBudgetItemLinkList;
                 }
             }

@@ -1,6 +1,5 @@
 public with sharing class AccountPayableHelper {
-    
-    public static boolean bypassTrigger = false;        
+
     public static boolean skipInvoicePOUpdate = false;
 
 
@@ -297,7 +296,6 @@ public with sharing class AccountPayableHelper {
 
     //onbeforeInsert
     public static void onbeforeInsert(buildertek__Account_Payable__c[] invoiceList){
-        if (true) {
         String budgetLineGroupId ;
         list<buildertek__Budget_Line_Group__c> budgetLineGroups = [SELECT Id, Name FROM buildertek__Budget_Line_Group__c WHERE Name LIKE '%Invoice (PO)%'];
         if (budgetLineGroups.size() == 0){
@@ -345,8 +343,6 @@ public with sharing class AccountPayableHelper {
                 }
             }
         }
-
-    }
 }
 
 

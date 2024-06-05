@@ -64,6 +64,7 @@ public without sharing class PreviewQuoteController{
                            FROM EmailTemplate
                            WHERE Id = :templateId];
         }
+        System.debug('templateId: ' + templateId);
         email.setTemplateId(theTemplate.Id);
         email.setWhatId(recordId);
         email.setTargetObjectId(con.Id);
@@ -344,7 +345,7 @@ if(sum>3000000){
             if (results.size() > 0){
                 List<ContentDocument> contentDocumentsToDelete = [SELECT Id FROM ContentDocument WHERE Id IN :files];
                 if (!contentDocumentsToDelete.isEmpty()) {
-                    delete contentDocumentsToDelete;
+                    delete contentDocumentsToDelete; 
                 }
                 if (results[0].isSuccess()){
                      string Toaddresses = '';
@@ -895,6 +896,5 @@ if(sum>3000000){
 
         return relatedFiles;
     }
-
 
 }

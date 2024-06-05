@@ -256,6 +256,7 @@
         var newfromdate = new Date(today.getFullYear(), today.getMonth(),1);
         //newfromdate = new Date(newfromdate.getFullYear(), newfromdate.getMonth(),newfromdate.getDate()-newfromdate.getDay());
         var newtodate;
+        console.log('today.getMonth() ========> ',today.getMonth());
         if(today.getMonth() == 11){
             newtodate = new Date(today.getFullYear()+1, 0,0);
         }else{

@@ -70,10 +70,7 @@ public without sharing class OpportunityTriggerHandler{
         }
         System.debug('oppoids.size() ' + oppoids.size());
         if (oppoids.size() > 0){
-            list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id, buildertek__Quote_Configuration__c, buildertek__Create_Project_from_Opportunity__c
-                                                                                                        from buildertek__Admin_Interface_Node_Configuration__c
-                                                                                                        WHERE Name = :'Quote Configuration' and buildertek__Create_Project_from_Opportunity__c != false
-                                                                                                        limit 1];
+            list<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [Select Id, buildertek__Create_Project_from_Opportunity__c from buildertek__Admin_Interface_Node_Configuration__c WHERE Name = :'Opportunity Configuration' limit 1];
 
             if (adminInterfaceNodeConfigurations.size() > 0){
                 if (adminInterfaceNodeConfigurations[0].buildertek__Create_Project_from_Opportunity__c == true){
@@ -390,7 +387,7 @@ public without sharing class OpportunityTriggerHandler{
                             prj.buildertek__State__c = opp.Account.Billingstate;
                             prj.buildertek__Address__c = opp.Account.Billingstreet;
                             prj.buildertek__Zip__c = opp.Account.Billingpostalcode;
-                            prj.Name = opp.Account.Name;
+                            prj.Name = opp.Name;
                             prj.buildertek__Opportunity__c = opp.Id;
                             prj.OwnerId = opp.OwnerId;
                             if (opp.buildertek__Estimator__c != null) {

@@ -11,7 +11,8 @@ export default class NewWalkThroughLineCmp extends LightningElement {
 
     @api walkThroughId;
     @api categoryId;
-    
+
+    @track isSaveandNew = false;
     @track recordTypeName;
     @track selectedRecordType;
     @track step1 = false;
@@ -102,6 +103,10 @@ export default class NewWalkThroughLineCmp extends LightningElement {
         this.dispatchEvent(new CustomEvent("close"));
     }
 
+    handleSaveAndNew(event){
+        this.isSaveandNew = true;
+    }
+
     handleSave(event){
         try{
             event.preventDefault();
@@ -113,16 +118,22 @@ export default class NewWalkThroughLineCmp extends LightningElement {
             });
 
             if (this.recordTypeName === 'Product') {
-                if (this.selectedProductResult == undefined) {
+                if (fields['buildertek__Description__c'] == null || fields['buildertek__Description__c'] == '') {
                     this.spinner = false;
-                    this.showToast('Error', 'Please select a Product', 'error');
+                    this.showToast('Error', 'Please add description', 'error');
                     return;
                 } else {
-                    fields['RecordTypeId'] = this.selectedRecordType;
-                    fields['buildertek__Walk_Through_List__c'] = this.walkThroughId;
-                    fields['buildertek__BT_Category__c'] = this.categoryId;
-                    fields['buildertek__Product__c'] = this.selectedProductResult.value ;
-                    fields['buildertek__Price_Book__c'] = this.selectedPriceBook ;
+                    if (fields['buildertek__Description__c'].length > 255) {
+                        this.spinner = false;
+                        this.showToast('Error', 'String length must be less than 255 characters.', 'error');
+                        return;
+                    } else {
+                        fields['RecordTypeId'] = this.selectedRecordType;
+                        fields['buildertek__Walk_Through_List__c'] = this.walkThroughId;
+                        fields['buildertek__BT_Category__c'] = this.categoryId;
+                        fields['buildertek__Product__c'] = this.selectedProductResult ? this.selectedProductResult.value : '';
+                        fields['buildertek__Price_Book__c'] = this.selectedPriceBook ;
+                    }
                 }
             } else if (this.recordTypeName === 'No Product') {
                 if (fields['buildertek__Description__c'] == null || fields['buildertek__Description__c'] == '') {
@@ -142,7 +153,13 @@ export default class NewWalkThroughLineCmp extends LightningElement {
             .then(result =>{
                 this.spinner = false;
                 console.log('result', result);
-                this.dispatchEvent(new CustomEvent("close"));
+                if(this.isSaveandNew){
+                    console.log('Save and New');
+                    this.isSaveandNew = false;
+                    this.dispatchEvent(new CustomEvent("refresh"));
+                }else{
+                    this.dispatchEvent(new CustomEvent("closeandrefresh"));
+                }
                 this.showToast('Success', 'Record Created Successfully', 'success');
             }).catch(error => {
                 this.spinner = false;

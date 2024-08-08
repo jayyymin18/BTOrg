@@ -12,6 +12,7 @@ global  without sharing class QuotelineswithGroupingNameController {
     global string RollupAllGroupName {get;set;}
 
     global string queryfields ;
+    global string tableHeaderDynamicColor {get;set;}
     global list<buildertek__Quote_Item__c> dynamicQuoteItem {get;set;}
     global list<buildertek__Quote_Item__c> QuoteItem;
     global list<buildertek__Quote_Line_Group__c> Quotelinegroup ;
@@ -27,6 +28,12 @@ global  without sharing class QuotelineswithGroupingNameController {
         QuoteItem = new list<buildertek__Quote_Item__c>();
         dynamicQuoteItem = new list<buildertek__Quote_Item__c>();
         Quotelinegroup = new list<buildertek__Quote_Line_Group__c>();
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id, buildertek__Color_code__c from buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Quote Configuration'];
+        if(adminInterfaceNodeConfigurations != null && String.isNotBlank(adminInterfaceNodeConfigurations.buildertek__Color_code__c)){
+          tableHeaderDynamicColor = adminInterfaceNodeConfigurations.buildertek__Color_code__c;
+        } else {
+          tableHeaderDynamicColor = '#1B5397';
+        }
     }
     global void setquerystring(string querystring){
         this.queryfields = querystring;
@@ -161,6 +168,29 @@ global  without sharing class QuotelineswithGroupingNameController {
 
         Quotelinegroup = [Select Id, Name,buildertek__Sort_Id__c from buildertek__Quote_Line_Group__c where Id =: groupId order by buildertek__Sort_Id__c ASC NULLS LAST, Name ASC];
         system.debug('Quotelinegroupsize---->'+ Quotelinegroup.size());
+
+        buildertek__Quote_Line_Group__c noGroup; 
+ 
+        Integer index = -1;
+        Integer count = 0;
+
+        for(buildertek__Quote_Line_Group__c groupingRec : Quotelinegroup){
+          if(groupingRec.Name == 'No Grouping'){
+            noGroup = groupingRec;
+            index = count;
+          }
+          count++;
+        }
+
+        if(index != -1 && Quotelinegroup.size() > 1){
+          system.debug('in side if for index '+index);
+          Quotelinegroup.remove(index);
+        }
+
+        if(noGroup != null && Quotelinegroup.size() > 1){
+          system.debug('inside another if for noGroup '+noGroup);
+          Quotelinegroup.add(0, noGroup);
+        }
 
         for(buildertek__Quote_Line_Group__c quotelinegrouprec : Quotelinegroup){
 

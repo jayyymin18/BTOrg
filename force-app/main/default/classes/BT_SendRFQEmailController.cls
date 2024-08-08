@@ -24,6 +24,8 @@ public without sharing class BT_SendRFQEmailController {
         system.debug('recordId:::::'+recordId);
         list<Id> rfqvendorIds = new list<Id>();
         map<Id,buildertek__RFQ_To_Vendor__c> vendorUserMap2 = new map<Id,buildertek__RFQ_To_Vendor__c>();
+        map<Id,buildertek__RFQ_To_Vendor__c> vendorUserMap3 = new map<Id,buildertek__RFQ_To_Vendor__c>();
+
         List<String> LinkedConList = new List<String>();
         if (rfqToVendor.size() > 0){           
             for (RFQ_To_Vendor__c rfqVendor : rfqToVendor){
@@ -32,6 +34,7 @@ public without sharing class BT_SendRFQEmailController {
                     rfqvendorIds.add(rfqVendor.Id);
                     LinkedConList.add(rfqVendor.buildertek__Contact__c);
                     vendorUserMap2.put(rfqVendor.buildertek__Vendor__c,rfqVendor);
+                    vendorUserMap3.put(rfqVendor.buildertek__Contact__c,rfqVendor);
                 }
             }
         }
@@ -88,7 +91,7 @@ vendorUserMap.put(usr.AccountId,usr);
         //if (Schema.sObjectType.EmailTemplate.fields.id.isAccessible()){
         rfqRejectedTemplate = [SELECT Id,DeveloperName
                                FROM EmailTemplate
-                               WHERE DeveloperName = 'RFQ_Rejected_Email'].Id;
+                               WHERE DeveloperName = 'RFQ_Rejected_Email_New'].Id;
         // } 
         string rfqAwardTemplate;
         // if (Schema.sObjectType.EmailTemplate.fields.id.isAccessible()){
@@ -115,11 +118,12 @@ vendorUserMap.put(usr.AccountId,usr);
         for(buildertek__RFQ_To_Vendor__c rfq :rfqToVendor){
             for(Contact conRec : contactlist){
                 if(conRec.Email != null){
-                    if(rfq.buildertek__Status__c == 'Email Sent'){
+                    if(rfq.buildertek__Status__c == 'Email Sent' || rfq.buildertek__Status__c == 'Waiting for Answer') {
                         if(!duplicateid.contains(conRec.Id)){
                             contactMap.put(conRec.Id,conRec);
-                            buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.get(conRec.AccountId); 
+                            buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.containsKey(conRec.AccountId) ? vendorUserMap2.get(conRec.AccountId) : vendorUserMap3.get(conRec.Id);
                             if(vendorUserMap1.get(conRec.Id) == null){
+                                System.debug('1 setWhatId: ' + vendorRec.Id);
                                 string toemailadd = conRec.Email;
                                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                                 email.toAddresses = new String[] { toemailadd};
@@ -137,7 +141,7 @@ vendorUserMap.put(usr.AccountId,usr);
                         if(conRec.Email != null){
                             if(!duplicateid.contains(conRec.Id)){
                                 contactMap.put(conRec.Id,conRec);
-                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.get(conRec.AccountId); 
+                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.containsKey(conRec.AccountId) ? vendorUserMap2.get(conRec.AccountId) : vendorUserMap3.get(conRec.Id);
                                 string toemailadd = conRec.Email;
                                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                                 system.debug('vendorUserMap1.get(conRec.Id)'+vendorUserMap1.get(conRec.Id));
@@ -163,7 +167,7 @@ vendorUserMap.put(usr.AccountId,usr);
                         if(conRec.Email != null){
                             if(!duplicateid.contains(conRec.Id)){
                                 contactMap.put(conRec.Id,conRec);
-                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.get(conRec.AccountId);
+                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.containsKey(conRec.AccountId) ? vendorUserMap2.get(conRec.AccountId) : vendorUserMap3.get(conRec.Id);
                                 string toemailadd = conRec.Email;
                                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                                 email.toAddresses = new String[] { toemailadd};
@@ -185,7 +189,7 @@ vendorUserMap.put(usr.AccountId,usr);
                             if(!duplicateid.contains(conRec.Id)){
                                 system.debug('uiojk;');
                                 contactMap.put(conRec.Id,conRec);
-                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.get(conRec.AccountId);
+                                buildertek__RFQ_To_Vendor__c vendorRec = vendorUserMap2.containsKey(conRec.AccountId) ? vendorUserMap2.get(conRec.AccountId) : vendorUserMap3.get(conRec.Id);
                                 string toemailadd = conRec.Email;
                                 Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
                                 email.toAddresses = new String[] { toemailadd};
@@ -232,6 +236,7 @@ vendorUserMap.put(usr.AccountId,usr);
                              emailToSend.setOrgWideEmailAddressId(email.getOrgWideEmailAddressId());
                         }
                         emailToSend.setSaveAsActivity(true);
+                        emailToSend.setWhatId(email.getWhatId());
                         emailToSend.setReplyTo(fromAddress);   
                         system.debug('&&&&'+emailToSend);
                         actualMessageList.add(emailToSend);

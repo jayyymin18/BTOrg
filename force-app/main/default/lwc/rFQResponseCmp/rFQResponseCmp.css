@@ -1,0 +1,34 @@
+/* Add SLDS classes to your CSS */
+.builder {
+    color: #005fb2; /* SLDS Blue */
+}
+.tek {
+    color: #8c8c8c; /* SLDS Grey */
+}
+.slds-box {
+    background-color: #ffffff; /* White background for boxes */
+}
+.add-more{
+    padding-top: 1%;
+}
+.slds-text_body, .slds-text_heading_medium {
+    color: #333333; /* Darker text for readability */
+    font-weight: bold;
+}
+.slds-border_bottom {
+    border-bottom: 1px solid #d8dde6; /* SLDS border color */
+}
+.slds-drag-drop {
+    border: 2px dashed #d8dde6; /* SLDS border color */
+    padding: 10px;
+}
+.slds-table_bordered th, .slds-table_bordered td {
+    border: 1px solid #d8dde6; /* SLDS border color */
+}
+.slds-text-heading_small {
+    background-color: #005fb2;
+    color: white;
+}
+.border{
+    border: solid;
+}

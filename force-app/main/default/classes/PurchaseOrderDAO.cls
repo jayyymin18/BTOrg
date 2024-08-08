@@ -314,33 +314,19 @@ public without sharing class PurchaseOrderDAO{
         }*/
     }
 
-@AuraEnabled
-public static string createAPFromPO(string poid){
-    system.debug('poid---->' + poid);
-    List<buildertek__Purchase_Order__c> PO = [SELECT Id, Name,(SELECT Id, Name,buildertek__Status__c  FROM buildertek__Purchase_Order_Items__r)
-                                                FROM buildertek__Purchase_Order__c WHERE Id =: poid LIMIT 1];
-    boolean hasApprovedForPayment = false;
-    if(PO[0].buildertek__Purchase_Order_Items__r.size() > 0){
-        for(buildertek__Purchase_Order_Item__c line : PO[0].buildertek__Purchase_Order_Items__r){
-            if(line.buildertek__Status__c == 'Approved_For_Payment'){
-                hasApprovedForPayment = true;
-                break;
-            }
-        } 
-    }                   
-    if(hasApprovedForPayment){
+    @AuraEnabled
+    public static string createAPFromPO(string poid){
+        system.debug('poid---->' + poid);
         isInvoiceCreated = true;
         string accountPaybleId = createAP([Select Id, Name, Project__c, Vendor__c, Period__c, Tax__c, buildertek__Status__c, buildertek__Description__c,buildertek__Budget__c,buildertek__Budget_Line__c	
                                            from purchase_order__c
                                            where Id = :poid]);
-        createAPItems([Select Id, Name, Tax__c, purchase_order__c, Item_Name__c, Description__c, Cost_Code__c, Product__c, Quantity__c, Unit_Price__c, buildertek__Quantity_Remaining__c, buildertek__Quantity_Received__c,buildertek__Status__c
+        createAPItems([Select Id, Name, Tax__c, purchase_order__c, Item_Name__c, Description__c, Cost_Code__c, Product__c, Quantity__c, Unit_Price__c, buildertek__Quantity_Remaining__c, buildertek__Quantity_Received__c
                        from Purchase_Order_Item__c
                        where purchase_order__c = :poid]);
+
         return accountPaybleId;
-    } else {
-        return null;
     }
-}
 
     /**********************************************************************************************************************
      Purpose: This method is used to create a AP from PO
@@ -352,7 +338,13 @@ public static string createAPFromPO(string poid){
         system.debug('Inside createAP');
         Map<Id, Account_Payable__c> PoIdbyAp = new Map<Id, Account_Payable__c>();
         Id posRecId;
-        for (Purchase_Order__c po : pos){          
+        for (Purchase_Order__c po : pos){
+            /* if(Schema.sObjectType.buildertek__Account_Payable__c.isCreateable()&&
+             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Purchase_Order__c.isCreateable()&&
+             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Project__c.isCreateable()&&
+             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Vendor__c.isCreateable()&&
+             Schema.sObjectType.buildertek__Account_Payable__c.fields.buildertek__Tax__c.isCreateable()){*/
+
             Account_Payable__c ap = new Account_Payable__c();
             //ap.Name = po.Name;
             ap.Purchase_Order__c = po.id;
@@ -369,8 +361,10 @@ public static string createAPFromPO(string poid){
             PoIdbyAp.put(po.id, ap);
             posRecId = po.id;
         }
+        /* }*/
  
         insert PoIdbyAp.values();
+
         return PoIdbyAp.get(posRecId).Id;
     }
 
@@ -393,7 +387,6 @@ public static string createAPFromPO(string poid){
         List<buildertek__Account_Payable_Item__c> apItems = new List<buildertek__Account_Payable_Item__c>();
         for (Purchase_Order_Item__c poItem : poItems){        
             System.debug('poItem.purchaseorder--->' + PoIdbyAp.get(poItem.Purchase_Order__c));
-            if(poItem.buildertek__Status__c=='Approved_For_Payment'){
             Account_Payable_Item__c apItem = new Account_Payable_Item__c();
             apItem.Account_Payable__c = PoIdbyAp.get(poItem.Purchase_Order__c).Id;
             apItem.Name = poItem.Name;
@@ -402,7 +395,7 @@ public static string createAPFromPO(string poid){
             apItem.Cost_Code__c = poItem.Cost_Code__c;
             apItem.Product__c = poItem.Product__c;
             apItem.Purchase_Order_Item__c = poItem.Id;
-            apItem.Quantity__c = poItem.Quantity__c; //(this changes made by brian)
+            apItem.Quantity__c = poItem.Quantity_Remaining__c;
             
             if(poItem.Unit_Price__c != null){
                 apItem.Unit_Price__c = poItem.Unit_Price__c;
@@ -411,7 +404,6 @@ public static string createAPFromPO(string poid){
                 apItem.Tax__c = poItem.Tax__c;
             }
             apItems.add(apItem);
-          }
         }
         /* if(Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Id.isCreateable() &&
          Schema.sObjectType.buildertek__Account_Payable_Item__c.fields.Account_Payable__c.isCreateable() &&
@@ -428,21 +420,6 @@ public static string createAPFromPO(string poid){
         /*}*/
         //system.debug('apItems--->' + apItems);
         insert apItems;
-    
-    List<buildertek__Account_Payable_Item__c> insertedApItems = [SELECT Id, Purchase_Order_Item__c FROM buildertek__Account_Payable_Item__c WHERE Purchase_Order_Item__c IN :poItems];
-    
-    List<Purchase_Order_Item__c> poItemsToUpdate = new List<Purchase_Order_Item__c>();
-
-    for (buildertek__Account_Payable_Item__c apItem : insertedApItems) {
-        for (Purchase_Order_Item__c poItem : poItems) {
-            if (poItem.buildertek__Status__c == 'Approved_For_Payment' && poItem.Id == apItem.Purchase_Order_Item__c ) {
-                poItem.buildertek__Contractor_Invoice_Line__c = apItem.Id;
-                poItemsToUpdate.add(poItem);
-            }
-        }
-    }
-
-    update poItemsToUpdate;        
     }
 
     @AuraEnabled

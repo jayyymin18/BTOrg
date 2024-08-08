@@ -258,7 +258,9 @@ public with sharing class QuoteDAO{
             for (buildertek__RFQ__c rfq : rfqList){
                 rfq.buildertek__Added_to_Quote__c = QuoteId;
             }
+            RFQTriggerHandler.blnSkipRFQUpdateTrigger=true;
             update rfqList;
+            RFQTriggerHandler.blnSkipRFQUpdateTrigger=false;
 
 
             List<buildertek__Purchase_Order__c> purchaseOrderRecs;
@@ -342,9 +344,9 @@ public with sharing class QuoteDAO{
                     }
                 }
             }
+            System.debug(quoteItemsToInsert.size());
             System.debug('quoteItemsToInsert' + quoteItemsToInsert);
             insert quoteItemsToInsert;
-
             List<buildertek__RFQ_Item__c> rfqLinesList =[Select Id ,buildertek__RFQ_Package__c  , buildertek__Quote_Item__c ,Name From buildertek__RFQ_Item__c where buildertek__RFQ_Package__c=:rfqIds];
 
             for (buildertek__Quote_Item__c qItem : quoteItemsToInsert){
@@ -750,6 +752,9 @@ public with sharing class QuoteDAO{
             QuoteLineToInsert.Name = QuoteRec.Name;
         }
 
+        System.debug('QuoteRec.buildertek__Margin__c line 753 '+QuoteRec.buildertek__Margin__c);
+        System.debug('QuoteRec.buildertek__Markup__c '+QuoteRec.buildertek__Markup__c);
+
         QuoteLineToInsert.buildertek__Quote__c = QuoteRec.buildertek__Quote__c;
         QuoteLineToInsert.buildertek__Grouping__c = QuoteRec.buildertek__Grouping__c;
         QuoteLineToInsert.buildertek__UOM__c = QuoteRec.buildertek__UOM__c;
@@ -758,9 +763,7 @@ public with sharing class QuoteDAO{
         QuoteLineToInsert.buildertek__Quantity__c = QuoteRec.buildertek__Quantity__c;
         QuoteLineToInsert.buildertek__Notes__c = QuoteRec.buildertek__Notes__c;
         QuoteLineToInsert.buildertek__Cost_Code__c = QuoteRec.buildertek__Cost_Code__c;
-        if(adminInterfaceNodeConfigurations.buildertek__ShowMargin__c){
-            QuoteLineToInsert.buildertek__Margin__c = QuoteRec.buildertek__Margin__c;
-        }
+        QuoteLineToInsert.buildertek__Margin__c = QuoteRec.buildertek__Margin__c;
         QuoteLineToInsert.buildertek__Markup__c = QuoteRec.buildertek__Markup__c;
         QuoteLineToInsert.buildertek__Additional_Discount__c = QuoteRec.buildertek__Additional_Discount__c;
 
@@ -772,7 +775,7 @@ public with sharing class QuoteDAO{
 
         insert QuoteLineToInsert;
 
-        if(adminInterfaceNodeConfigurations.buildertek__ShowMargin__c && QuoteLineToInsert.buildertek__Markup__c !=0.0000){
+        if(QuoteLineToInsert.buildertek__Markup__c !=0.0000){
             QuoteLineToInsert.buildertek__Margin__c = QuoteRec.buildertek__Margin__c;
         }
         update QuoteLineToInsert;
@@ -2173,6 +2176,7 @@ public with sharing class QuoteDAO{
             newQline.buildertek__Markup__c = qql.buildertek__Markup__c;
             newQline.buildertek__Additional_Discount__c = qql.buildertek__Additional_Discount__c;
             newQline.buildertek__Grouping__c = qql.buildertek__Grouping__c;
+            newQline.buildertek__Description__c = qql.buildertek__Description__c;
             newQline.buildertek__Quantity__c = qql.buildertek__Quantity__c;
             newQline.buildertek__Notes__c = newQline.buildertek__Notes__c;
             newQline.buildertek__Status__c = 'Accept';
@@ -2454,7 +2458,7 @@ public with sharing class QuoteDAO{
         pricebookWrapper priceWrap = new pricebookWrapper();
         priceWrap.defaultValue= new pricebook2();
         priceWrap.priceWrapList = new List<pricebook2>();
-        List<pricebook2> PriceList = [SELECT Id, Name FROM pricebook2 ORDER BY Name ASC ];
+        List<pricebook2> PriceList = [SELECT Id, Name FROM pricebook2 WHERE buildertek__BT_Visible__c = true ORDER BY Name ASC ];
         priceWrap.priceWrapList=PriceList;
 
         buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = [Select Id,buildertek__ShowMargin__c from buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Quote Configuration'];
@@ -2494,6 +2498,7 @@ public with sharing class QuoteDAO{
         for (PriceBookEntry pEntry: pEntries) {
             productWrapper aProduct = new productWrapper();
             aProduct.Id = pEntry.Product2Id;
+            aProduct.rowId = pEntry.Id;
             aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
             aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.Name = pEntry.Product2.Name;
@@ -2577,7 +2582,7 @@ public with sharing class QuoteDAO{
         return products;
     }
 
-    @AuraEnabled
+    @AuraEnabled(cacheable=true)
     public static List<buildertek__Quote_Line_Group__c> getQuoteLineGroups(){
         List<buildertek__Quote_Line_Group__c> quoteLineGrouping = [SELECT Id, Name FROM buildertek__Quote_Line_Group__c ORDER BY Name ASC];
         return quoteLineGrouping;
@@ -2589,6 +2594,9 @@ public with sharing class QuoteDAO{
     public class productWrapper{
         @AuraEnabled
         public Id Id;
+
+        @AuraEnabled
+        public String rowId;
 
         @AuraEnabled
         public String Name;
@@ -2943,6 +2951,7 @@ public with sharing class QuoteDAO{
             productWrapper aProduct = new productWrapper();
             aProduct.PriceBookEntryId = pEntry.Id;
             aProduct.Id = pEntry.Product2Id;
+            aProduct.rowId= pEntry.Id;
             aProduct.Vendor = pEntry.Product2.buildertek__Vendor__r.Name;
             aProduct.CostCode = pEntry.Product2.buildertek__Cost_Code__r.Name;
             aProduct.Name = pEntry.Product2.Name;

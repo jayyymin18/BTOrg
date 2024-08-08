@@ -16,12 +16,14 @@ public with sharing class CreateInvoiceFromQuote {
                                         quoteRec= [select Id, 
                                                  Name, 
                                                  buildertek__Project__c, 
+                                                 buildertek__Customer_Account__c,
                                                  buildertek__Tax__c,
                                                  buildertek__Status__c 
                                                  from buildertek__Quote__c 
                                                  where Id =: QuoteId];
                // }
             buildertek__Billings__c AR = new buildertek__Billings__c();
+            AR.buildertek__Customer_Account__c = quoteRec.buildertek__Customer_Account__c;
             AR.buildertek__Project__c = quoteRec.buildertek__Project__c;
             AR.buildertek__Status__c = 'Open';
           //  AR.buildertek__Customer_Account__c = quoteRec.buildertek__Vendor__c;
@@ -70,7 +72,7 @@ public with sharing class CreateInvoiceFromQuote {
             for(buildertek__Quote_Item__c quoteItem : quoteItemList){
                 
                 Billable_Lines__c arItem = new Billable_Lines__c();
-                
+                arItem.buildertek__Item_Name__c = quoteItem.Name;
                 arItem.buildertek__Billings__c = AR.Id;
                 arItem.buildertek__Line_Title__c = quoteItem.buildertek__Item_Name__c;
                 arItem.buildertek__Cost_Code__c = quoteItem.buildertek__Cost_Code__c;

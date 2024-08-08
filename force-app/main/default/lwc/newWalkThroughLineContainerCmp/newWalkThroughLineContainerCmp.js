@@ -58,7 +58,7 @@ export default class NewWalkThroughLineContainerCmp extends NavigationMixin(Ligh
     @api errMsgs;
 
     connectedCallback() {
-        this.recordId = this.getParameterByName();
+        console.log('recordId-->', this.recordId);
         this.getCategoryData();
         this.getAdminSettingForSharinPix();
     }
@@ -294,8 +294,9 @@ export default class NewWalkThroughLineContainerCmp extends NavigationMixin(Ligh
 
             const style = document.createElement('style');
             style.innerText = `
-                .datatable_class .slds-cell-fixed{
-                    background: #0678FF1A !important;
+                .datatable_class .slds-cell-fixed {
+                    background: #e0ebfa !important;
+                    color:#0176d3;
                 }
 
                 .slds-dropdown_length-with-icon-10{
@@ -310,6 +311,7 @@ export default class NewWalkThroughLineContainerCmp extends NavigationMixin(Ligh
     }
 
     getRelatedRecords() {
+        this.data = undefined;
         this.isLoading = true;
         fetchDataAndFieldSetValues({
             wtRecordId: this.recordId,
@@ -463,6 +465,20 @@ export default class NewWalkThroughLineContainerCmp extends NavigationMixin(Ligh
 
     handleClose() {
         this.showNewModel = false;
+    }
+
+    handleCloseAndRefresh() {
+        this.showNewModel = false;
+        this.refreshTheDataTable();
+    }
+
+    handlerefresh(){
+        this.showNewModel = false;
+        this.refreshTheDataTable();
+        setTimeout(() => {
+            const plusIcon = this.template.querySelector('.plusIcon');
+            plusIcon.click();
+        }, 0);
     }
 
     refreshTheDataTable() {

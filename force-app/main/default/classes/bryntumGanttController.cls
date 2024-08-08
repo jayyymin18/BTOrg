@@ -383,18 +383,21 @@ public with sharing class bryntumGanttController {
         System.debug('type: ' + type);
         System.debug('user: ' + user);
         System.debug('masterId: ' + masterId);
+
         List<buildertek__Admin_Interface_Node_Configuration__c> adminInterfaceNodeConfigurations = [SELECT Id, buildertek__Include_Weekend__c FROM buildertek__Admin_Interface_Node_Configuration__c WHERE Name=:'Schedule Configuration'];
         Boolean checkIncludeWeekendSettings = false;
         if (adminInterfaceNodeConfigurations.size() > 0) {
             checkIncludeWeekendSettings = adminInterfaceNodeConfigurations[0].buildertek__Include_Weekend__c;
         }
 
+        initialStartDate = checkIncludeWeekendSettings ? initialStartDate : getInitialStartDate(initialStartDate);
+
         if(initialStartDate == null ){
             initialStartDate = Date.Today();
             System.debug('initialStartDate: ' + initialStartDate);
         }
 
-        initialStartDate = checkIncludeWeekendSettings ? initialStartDate : getInitialStartDate(initialStartDate);
+        initialStartDate = getInitialStartDate(initialStartDate);
 
         System.debug('initialStartDate: outif' + initialStartDate);
 

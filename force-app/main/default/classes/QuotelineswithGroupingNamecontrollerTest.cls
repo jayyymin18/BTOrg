@@ -56,6 +56,10 @@ public class QuotelineswithGroupingNamecontrollerTest {
         insert quoteItem;
         string fieldsnames = 'buildertek__Quote__c,buildertek__Net_Total_Price__c';
        
+        buildertek__Admin_Interface_Node_Configuration__c adminconfig = new buildertek__Admin_Interface_Node_Configuration__c();
+        adminconfig.Name = 'Quote Configuration';
+        adminconfig.buildertek__Color_code__c = '#1B5397';
+        insert adminconfig;
         
         QuotelineswithGroupingNameController quotelinewithgrouping = new QuotelineswithGroupingNameController();
         quotelinewithgrouping.queryfields = fieldsnames;

@@ -6,6 +6,9 @@
         //var Message=component.get("v.myMessage");   
         var action=component.get("c.sendEmail");
         //alert('action------'+action);
+        console.log('id: ', component.get("v.recordId"));
+        console.log('message: ',component.get("v.myMessage"));
+        console.log('subject: ',component.get("v.sub"));
         action.setParams({
             ids:component.get("v.recordId"),
             mailBody:component.get("v.myMessage"),

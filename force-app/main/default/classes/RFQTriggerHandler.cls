@@ -176,6 +176,8 @@ public with sharing class RFQTriggerHandler {
             }
         }
         if(quoteLineList.size() > 0){
+            System.debug(quoteLineList.size());
+            System.debug(quoteLineList);
             insert quoteLineList;
             List<buildertek__RFQ_Item__c> rfqItemList = [Select Id , Name , buildertek__Quote_Item__c , buildertek__RFQ_Package__c FROM buildertek__RFQ_Item__c where buildertek__RFQ_Package__c=:rfqIdSet];
 

@@ -241,7 +241,7 @@
 
 
 
-    <div style="background: white;border-radius: 5px;height: 100%;" class="slds" id="slds">
+    <div style="background: white;border-radius: 5px;height: 66vh;" class="slds" id="slds">
 
 
     <aura:if isTrue="{!v.isproject}">
@@ -847,7 +847,7 @@
                     </aura:if>
 
                     <aura:if isTrue="{!or(or(or(v.isDuplicate,v.isMassDuplicate),v.isOpen),v.isQuoteRecChange)}">
-                        <div class="slds-m-around_xx-large">
+                        <div>
                             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                                 <div class="slds-modal__container">
@@ -911,7 +911,7 @@
                     </aura:if>
 
                     <aura:if isTrue="{!v.isQuotelinedelete}">
-                        <div class="slds-m-around_xx-large">
+                        <div>
                             <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
                                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
                                 <aura:if isTrue="{!v.Spinner22}">
@@ -2571,7 +2571,7 @@
     </div>
 
 
-    <div class="slds-m-around_xx-large">
+    <div>
         <aura:if isTrue="{!v.isBOMmodalOpen}">
 
             <!-- Modal/Popup Box starts here-->

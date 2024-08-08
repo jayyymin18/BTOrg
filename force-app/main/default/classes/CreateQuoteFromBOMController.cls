@@ -42,7 +42,7 @@ public with sharing class CreateQuoteFromBOMController {
                     buildertek__Quote_Item__c quoteLine = new buildertek__Quote_Item__c();
                     quoteLine.buildertek__Quote__c = quote.Id;
                     quoteLine.buildertek__Product__c = BOMLine.buildertek__Product__c;
-                    quoteLine.Name = BOMLine.buildertek__Product__r.Name;
+                    quoteLine.Name = BOMLine.Name;
                     quoteLine.buildertek__Item_Name__c = BOMLine.buildertek__Product__r.Name;
                     quoteLine.buildertek__Quantity__c = BOMLine.buildertek__Quantity__c;
                     quoteLine.buildertek__Markup__c = BOMLine.buildertek__BL_MARKUP__c;

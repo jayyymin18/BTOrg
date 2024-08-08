@@ -40,7 +40,7 @@ public class QuoteDAOTest {
         insert quoteItem1;
 
   
-
+      
         product2 product1= new product2();
         product1.name='test ';
         product1.family ='Framing';
@@ -64,7 +64,12 @@ public class QuoteDAOTest {
          Account accRec = new Account();
         accRec.Name = 'Test 2';
         insert accRec;
-
+        
+        buildertek__Admin_Interface_Node_Configuration__c adminInterfaceNodeConfigurations = new buildertek__Admin_Interface_Node_Configuration__c();
+        adminInterfaceNodeConfigurations.Name='Quote Configuration';
+        adminInterfaceNodeConfigurations.buildertek__ShowMargin__c=true;
+        insert adminInterfaceNodeConfigurations;
+        
         buildertek__Purchase_Order__c poTest1 = new buildertek__Purchase_Order__c();
         poTest1.buildertek__RFQ__c=rfqTest1.id;
         poTest1.buildertek__Project__c=proj.id;

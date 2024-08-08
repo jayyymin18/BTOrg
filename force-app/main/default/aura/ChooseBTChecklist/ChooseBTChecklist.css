@@ -106,7 +106,7 @@
 
 }
 .THIS .slds-theme--info {
-    background-color: #d4d4d4;
+    background-color: white;
     color: black;
 }
 
@@ -138,4 +138,8 @@
 }
 .THIS .slds-icon_xx-small {
     fill: white;
+}
+
+.THIS .closeIcon svg {
+    fill: #fff;
 }

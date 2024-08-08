@@ -48,19 +48,31 @@
         var recordType = component.get("v.selectedRecordTypeName");
 
         if(recordType === 'Product'){
-            if(productId === undefined || productId === '' || productId === null){
+            if(description === undefined || description === '' || description === null){
                 component.set("v.Spinner", false);
                 var toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams({
                     title: "Error",
-                    message: "Please select a Product",
+                    message: "Please add Description",
                     type: "error"
                 });
                 toastEvent.fire();
                 return;
             } else {
-                fields["buildertek__Product__c"] = productId;
-                fields["buildertek__Price_Book__c"] = priceookId;
+                if (description.length > 255) {
+                    component.set("v.Spinner", false);
+                    var toastEvent = $A.get("e.force:showToast");
+                    toastEvent.setParams({
+                        title: "Error",
+                        message: "String length must be less than 255 characters.",
+                        type: "error"
+                    });
+                    toastEvent.fire();
+                    return;
+                } else {
+                    fields["buildertek__Product__c"] = productId;
+                    fields["buildertek__Price_Book__c"] = priceookId;
+                }
             }
         } else if(recordType === 'No Product'){
             if(description === undefined || description === '' || description === null){

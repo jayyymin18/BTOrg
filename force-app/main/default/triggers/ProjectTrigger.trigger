@@ -1,6 +1,5 @@
 trigger ProjectTrigger on buildertek__Project__c (after insert,after update , before delete, after delete) {
-    System.debug('bye');
-    return;
+
     System.debug('*** ** ProjectTrigger ** ***');
     System.debug('1st Condition ==> ' + BT_Utils.isTriggerDeactivate('Project__c'));
     System.debug('2nd Condition ==> ' + ProjectTriggerHandler.blnSkipProjectTrigger);

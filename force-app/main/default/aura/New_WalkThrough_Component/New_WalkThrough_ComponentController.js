@@ -16,7 +16,7 @@
                 var listOfFields0 = JSON.parse(response.getReturnValue());
                 console.log({listOfFields0});
                 component.set("v.listOfFields0", listOfFields0);
-                // component.set("v.isLoading", false);
+                component.set("v.isLoading", false);
             }
         });
         $A.enqueueAction(getFields);

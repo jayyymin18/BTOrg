@@ -1,6 +1,10 @@
 ({
 
     initialize : function(component, event, helper){
+
+        var tradeType = component.get("v.tradeType");
+        console.log('tradeType '+tradeType);
+
         $A.get('e.force:refreshView').fire();
 
         $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "SHOW" }).fire(); 
@@ -25,6 +29,16 @@
         var vendorValue = component.get("v.searchVendorNameFilter");
         var ratingValue = component.get("v.searchRatingFilter");
         var tradeTypeValue = component.get("v.searchTradeTypeFilter");
+
+        //BUIL: 4188 - it should have by default filter of Rfq.TradeType 
+        if((tradeTypeValue == null || tradeTypeValue == '') && tradeType != null && tradeType != ''){
+            tradeTypeValue = tradeType;
+            console.log('tradeTypeValue' + tradeTypeValue);
+            component.set("v.searchTradeTypeFilter",tradeType);
+        }
+
+        console.log("Final TradeType: ", tradeTypeValue );
+        debugger;
         
         actionRfqToVendorList = component.get("c.getAllVendors");
         actionRfqToVendorList.setParams({
@@ -42,7 +56,9 @@
             	var rows = rfqToVendorList;
                  var filteredRows = []
                 for (var i = 0; i < rows.length; i++) {
-                    if(rows[i].Contacts){
+                    var contacts = rows[i].Contacts;
+                    var primaryContact = rows[i].buildertek__Primary_Contact__c;
+                    if(contacts != null || primaryContact != null){
                         var row = rows[i];
                         if (row.buildertek__Trade_Type_Lookup__c){
                             row.Tradetype = row.buildertek__Trade_Type_Lookup__r.Name; 
@@ -53,7 +69,7 @@
                    
                 }
                
-                
+                console.log('filteredRows'+JSON.stringify(filteredRows));
                 component.set("v.vendorList",filteredRows);
                 component.set("v.vendorOptionList",filteredRows);
                 $A.get("e.c:BT_SpinnerEvent").setParams({"action" : "HIDE" }).fire();  

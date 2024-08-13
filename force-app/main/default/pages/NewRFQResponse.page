@@ -1,17 +1,21 @@
-<apex:page controller="RFQResponseClass" >
+<apex:page controller="RFQResponseClass">
     <apex:includeLightning />    
-    <div id="LightningComponentid" />    
+    <div id="LightningComponentid"></div>    
+
     <script>
-    $Lightning.use("c:NewRFQResponseApp", function() {
-        $Lightning.createComponent("c:rFQResponseCmp",
-          {
-          },
-          "LightningComponentid",
-          function(cmp) {
-             console.log('LWC Componenet added in VF page');
-          });
-    });
+
+        var rfqVendorID = "{!RFQVendorID}";  x
+        console.log('rfqVendorID: ' + rfqVendorID);
+        
+        $Lightning.use("c:NewRFQResponseApp", function() {
+            $Lightning.createComponent("c:rFQResponseCmp",
+              {
+                  "rfqVendorID": rfqVendorID  // Pass the rfqVendorID to the Aura component
+              },
+              "LightningComponentid",
+              function(cmp) {
+                    console.log('Component created');
+              });
+        });
     </script>
-    
-  
 </apex:page>

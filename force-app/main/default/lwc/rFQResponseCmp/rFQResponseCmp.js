@@ -1,23 +1,22 @@
 import { LightningElement, track, api } from 'lwc';
-import getallData from '@salesforce/apex/RFQResponseClass.getallData';
+import getallData from '@salesforce/apex/RFQResponseClass.getallData'; 
 
 
 export default class RFQResponseCmp extends LightningElement {
     @track data ;
     @track columns = [];
-    @api rfqVendorId='';
+    @api rfqVendorId = 'test'
 
     connectedCallback() {
-        console.log('RFQ Vendor Id:', this.rfqVendorId);
+        const url = new URL(window.location.href);
+        this.rfqVendorId = url.searchParams.get('Id');
+        console.log('jaimin==>',this.rfqVendorId);
         this.getData();
     }
 
     getData(){
-        console.log('This is just a log');
         getallData(
-            {
-                rfqVendorId : this.rfqVendorId
-            }
+            {rfqVen: this.rfqVendorId}
         )
         .then(result => {
             console.log('result==>',result);
